@@ -1,0 +1,123 @@
+/* EduVerse Design System - CSS Variables */
+
+/* Light theme (default) - black & white grid design */
+:root {
+  /* Colors */
+  --color-background: #ffffff;
+  --color-surface: #f5f5f7;
+  --color-card: #ffffff;
+  --color-border: #000000;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-accent: #000000;
+  --color-accent-hover: #333333;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+
+  /* Typography */
+  --font-primary: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 22px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.08);
+  --shadow-hover: 0 20px 60px rgba(15, 23, 42, 0.12);
+
+  /* Layout */
+  --layout-max-width: 1280px;
+  --layout-side-padding: 24px;
+  --layout-section-spacing: 64px;
+  --layout-grid-gap: 24px;
+
+  /* Spacing scale (8px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+}
+
+/* Dark mode - inverse of light (white becomes black, black becomes white) */
+:root[data-theme="dark"] {
+  --color-background: #000000;
+  --color-surface: #1a1a1a;
+  --color-card: #000000;
+  --color-border: #ffffff;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-accent: #ffffff;
+  --color-accent-hover: #e0e0e0;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+}
+
+/* Global utility classes that can be used without Tailwind */
+.ev-container {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding-inline: var(--layout-side-padding);
+}
+
+.ev-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.ev-card--hover:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-accent);
+}
+
+.ev-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.ev-button--primary {
+  background-color: var(--color-accent);
+  color: var(--color-background);
+}
+
+.ev-button--primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.ev-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  color: var(--color-text-primary);
+}
+
+.ev-input::placeholder {
+  color: var(--color-text-secondary);
+}

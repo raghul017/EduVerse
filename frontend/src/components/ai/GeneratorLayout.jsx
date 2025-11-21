@@ -1,0 +1,109 @@
+import Button from "../common/Button.jsx";
+
+function GeneratorLayout({
+  title,
+  subtitle,
+  topic,
+  setTopic,
+  placeholder,
+  formats,
+  activeFormat,
+  setActiveFormat,
+  answerQuestions,
+  setAnswerQuestions,
+  loading,
+  error,
+  onSubmit,
+  children,
+}) {
+  return (
+    <div className="min-h-[calc(100vh-80px)] bg-background flex">
+      <main className="flex-1 p-12">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-semibold text-textPrimary mb-2">
+            {title}
+          </h1>
+          <p className="text-textSecondary mb-8">{subtitle}</p>
+
+          <form
+            onSubmit={onSubmit}
+            className="space-y-6"
+          >
+            <div>
+              <input
+                type="text"
+                value={topic}
+                onChange={(event) => setTopic(event.target.value)}
+                placeholder={placeholder}
+                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-textPrimary placeholder-textSecondary focus:outline-none focus:border-accent transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-textSecondary mb-3">
+                Choose the format
+              </label>
+              <div className="grid grid-cols-3 gap-4">
+                {formats.map((fmt) => (
+                  <button
+                    key={fmt.id}
+                    type="button"
+                    onClick={() => setActiveFormat(fmt.id)}
+                    className={`p-4 border rounded-lg transition text-left ${
+                      activeFormat === fmt.id
+                        ? "border-accent bg-accent/10"
+                        : "border-border bg-card hover:border-accent/50"
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{fmt.icon}</div>
+                    <div className="text-sm font-medium text-textPrimary">
+                      {fmt.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="answerQuestions"
+                checked={answerQuestions}
+                onChange={(e) => setAnswerQuestions(e.target.checked)}
+                className="w-4 h-4 rounded border-border bg-card text-accent focus:ring-accent"
+              />
+              <label
+                htmlFor="answerQuestions"
+                className="text-sm text-textSecondary"
+              >
+                Answer the following questions for a better outline
+              </label>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              disabled={loading || !topic.trim()}
+              className="w-full flex items-center justify-center gap-2"
+            >
+              {loading ? "Generating..." : "✨ Generate"}
+            </Button>
+          </form>
+
+          {error && (
+            <div className="mt-4 p-4 bg-danger/10 border border-danger/20 rounded-lg text-sm text-danger">
+              {error}
+            </div>
+          )}
+
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default GeneratorLayout;
+
+
