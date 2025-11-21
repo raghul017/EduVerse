@@ -334,6 +334,43 @@ class AIService {
     throw new Error(errorMsg);
   }
 
+  async callAIWithRetry(prompt, priority = "fast", retries = 2) {
+    let currentPriority = priority;
+    
+    for (let i = 0; i <= retries; i++) {
+      try {
+        return await this.callAI(prompt, currentPriority);
+      } catch (error) {
+        if (i === retries) throw error;
+        
+        // Downgrade priority on retry to increase success chance
+        if (currentPriority === "smart") currentPriority = "balanced";
+        else if (currentPriority === "balanced") currentPriority = "fast";
+        
+        console.warn(
+          `[AI Service] Attempt ${i + 1} failed. Retrying with ${currentPriority} model... (${error.message})`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+  }
+
+  validateAndFixUrl(url, topic) {
+    // If no URL or it's a placeholder/example, fallback to search
+    if (!url || url === "#" || url.includes("example.com") || url.includes("placeholder")) {
+      const searchQuery = encodeURIComponent(topic);
+      return `https://www.google.com/search?q=${searchQuery}`;
+    }
+    
+    // If it looks like a valid URL, trust it!
+    // The user prefers a potentially broken direct link over a search link.
+    if (!url.startsWith("http")) {
+      return `https://${url}`;
+    }
+    
+    return url;
+  }
+
   async summarize(postId, transcript) {
     const cacheKey = `summary_${postId}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
@@ -456,17 +493,17 @@ Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
 }
 
 Requirements:
-- Create AT LEAST 6-8 stages covering: Fundamentals, Core Skills, Tools & Environment, Frameworks/Libraries, Testing, Deployment, Best Practices, Advanced Topics
-- Each stage should have 5-8 VERY SPECIFIC nodes
-- Mention exact technologies, tools, frameworks, courses
-- Include time estimates (e.g., "2-3 weeks", "1 month")
-- Add logical dependencies between nodes
-- Make it as detailed as roadmap.sh - cover EVERYTHING needed
+- Create 8-10 stages covering ALL key areas (Fundamentals, Core Skills, Tools, Frameworks, Advanced, Soft Skills)
+- Each stage MUST have 4-6 nodes
+- Keep descriptions SHORT (1 sentence max) to save tokens for more nodes
+- Mention exact technologies and tools
+- Add logical dependencies
+- Focus on BREADTH and DEPTH of topics, but brevity of text
 
 Be very specific and comprehensive!`;
 
     try {
-      const aiResponse = await this.callAI(prompt, "smart");
+      const aiResponse = await this.callAIWithRetry(prompt, "balanced");
       const actualTokens = aiResponse.tokensUsed || 0;
       const responseText = aiResponse.content;
 
@@ -553,7 +590,7 @@ Return ONLY valid JSON (no markdown) with this structure:
 Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
 
     try {
-      const aiResponse = await this.callAI(prompt, "smart");
+      const aiResponse = await this.callAIWithRetry(prompt, "balanced");
       const actualTokens = aiResponse.tokensUsed || 0;
       const responseText = aiResponse.content;
 
@@ -631,7 +668,7 @@ Requirements:
 Be specific and provide REAL, CLICKABLE URLs!`;
 
     try {
-      const aiResponse = await this.callAI(prompt, "fast");
+      const aiResponse = await this.callAIWithRetry(prompt, "fast");
       const actualTokens = aiResponse.tokensUsed || 0;
       const responseText = aiResponse.content;
 
@@ -651,10 +688,23 @@ Be specific and provide REAL, CLICKABLE URLs!`;
       if (!parsed?.description) {
         parsed.description = `Learn ${topic} to enhance your development skills.`;
       }
-      if (!parsed?.freeResources) {
+      
+      // Validate and fix URLs
+      if (parsed?.freeResources) {
+        parsed.freeResources = parsed.freeResources.map(r => ({
+          ...r,
+          url: this.validateAndFixUrl(r.url, `${topic} ${r.title}`)
+        }));
+      } else {
         parsed.freeResources = [];
       }
-      if (!parsed?.premiumResources) {
+
+      if (parsed?.premiumResources) {
+        parsed.premiumResources = parsed.premiumResources.map(r => ({
+          ...r,
+          url: this.validateAndFixUrl(r.url, `${topic} ${r.title}`)
+        }));
+      } else {
         parsed.premiumResources = [];
       }
 

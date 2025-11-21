@@ -43,66 +43,13 @@ export const aiRoadmap = async (req, res, next) => {
 
     if (!roadmap || roadmap.error) {
       const errorMsg = roadmap?.error || "Unknown error";
-      console.log(
-        `[Path Controller] Returning fallback roadmap for: ${role}. Reason: ${errorMsg}`
+      console.error(
+        `[Path Controller] AI Roadmap generation failed: ${errorMsg}`
       );
-      const trimmed = role.trim();
-
-      // Check if it's a rate limit error
-      let userMessage = "AI provider is temporarily unavailable.";
-      if (errorMsg.includes("rate limit") || errorMsg.includes("Rate limit")) {
-        userMessage =
-          "AI rate limit reached. Using cached roadmap. Please try again in a few minutes for AI-generated content.";
-      } else if (
-        errorMsg.includes("API key") ||
-        errorMsg.includes("not configured")
-      ) {
-        userMessage =
-          "AI service is not properly configured. Using basic roadmap template.";
-      }
-
-      const fallback = {
-        title: `${trimmed} Roadmap`,
-        description: userMessage,
-        stages: [
-          {
-            id: "basics",
-            label: "Foundations",
-            summary: "Core fundamentals for this role.",
-            nodes: [
-              {
-                id: "overview",
-                label: `${trimmed} Overview`,
-                details:
-                  "Understand what this role does day to day. Read 1–2 high-level guides.",
-                dependsOn: [],
-              },
-              {
-                id: "core-concepts",
-                label: "Core Concepts",
-                details:
-                  "List the main technologies and concepts required. Prioritize 3–5 that you want to learn first.",
-                dependsOn: ["overview"],
-              },
-            ],
-          },
-          {
-            id: "projects",
-            label: "Projects",
-            summary: "Build small projects to apply the basics.",
-            nodes: [
-              {
-                id: "mini-project",
-                label: "Mini Project",
-                details:
-                  "Pick a simple project idea related to this role. Break it into 3–5 tasks and complete them.",
-                dependsOn: ["core-concepts"],
-              },
-            ],
-          },
-        ],
-      };
-      return res.json({ data: fallback });
+      return res.status(503).json({ 
+        message: "AI service is currently unavailable. Please try again.",
+        error: errorMsg 
+      });
     }
 
     res.json({ data: roadmap });

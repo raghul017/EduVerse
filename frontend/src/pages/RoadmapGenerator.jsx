@@ -13,9 +13,12 @@ import {
   Code,
   Sparkles,
   Loader2,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
+import { motion, AnimatePresence } from "framer-motion";
 
 function RoadmapGenerator() {
   const [searchParams] = useSearchParams();
@@ -67,8 +70,10 @@ function RoadmapGenerator() {
       console.log("Generated roadmap:", data);
       setRoadmap(data);
     } catch (err) {
+      console.error("Roadmap generation error:", err);
       setError(
-        err.response?.data?.message || "AI roadmap generator is unavailable."
+        err.response?.data?.message ||
+          "AI service is currently unavailable. Please try again."
       );
     } finally {
       setLoading(false);
@@ -104,16 +109,13 @@ function RoadmapGenerator() {
         description: response.data.description || node.details,
       };
 
-      console.log("Parsed resources:", resources);
-
       setNodeResources((prev) => ({
         ...prev,
         [node.id]: resources,
       }));
     } catch (err) {
       console.error("Failed to generate resources:", err);
-      console.error("Error details:", err.response?.data || err.message);
-
+      
       // Fallback resources with working search URLs
       const searchQuery = encodeURIComponent(node.label);
       setNodeResources((prev) => ({
@@ -134,21 +136,8 @@ function RoadmapGenerator() {
               platform: "YouTube",
               url: `https://www.youtube.com/results?search_query=${searchQuery}+tutorial`,
             },
-            {
-              type: "course",
-              title: `Learn ${node.label}`,
-              platform: "freeCodeCamp",
-              url: `https://www.freecodecamp.org/news/search?query=${searchQuery}`,
-            },
           ],
-          premiumResources: [
-            {
-              type: "course",
-              title: `${node.label} Courses`,
-              platform: "Udemy",
-              url: `https://www.udemy.com/courses/search/?q=${searchQuery}`,
-            },
-          ],
+          premiumResources: [],
         },
       }));
     } finally {
@@ -157,20 +146,13 @@ function RoadmapGenerator() {
   };
 
   const handleNodeClick = async (node) => {
-    console.log("Node clicked:", node.label, "ID:", node.id);
-    console.log("Existing resources:", nodeResources[node.id]);
-
-    // Set selected node first to open the panel
     setSelectedNode(node);
-
-    // Generate resources if they don't exist
     if (!nodeResources[node.id]) {
       await generateNodeResources(node);
     }
   };
 
   const handleDownload = () => {
-    // Convert roadmap to downloadable format
     const roadmapText = JSON.stringify(roadmap, null, 2);
     const blob = new Blob([roadmapText], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -194,43 +176,52 @@ function RoadmapGenerator() {
     const isSelected = selectedNode?.id === node.id;
 
     return (
-      <button
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={() => onNodeClick(node)}
-        className={`relative px-6 py-4 rounded-xl border-2 transition-all text-center min-w-[200px] max-w-[280px] shadow-md hover:shadow-xl ${
+        className={`relative group flex items-center justify-between w-64 p-4 rounded-lg border-2 text-left transition-all 
+        ${
           isCompleted
-            ? "bg-green-50 border-green-500"
+            ? "bg-green-100 border-green-600 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]"
             : isSelected
-            ? "bg-yellow-300 border-yellow-500"
-            : "bg-yellow-100 border-yellow-400 hover:border-yellow-500"
+            ? "bg-yellow-300 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ring-2 ring-black"
+            : "bg-[#fffae5] border-gray-400 hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
         }`}
       >
-        {/* Progress Indicator */}
-        <div className="absolute -top-2 -right-2">
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleProgress(node.id);
-            }}
-            className={`w-6 h-6 rounded-full flex items-center justify-center ${
-              isCompleted ? "bg-green-600" : "bg-white border-2 border-gray-300"
-            }`}
-          >
-            {isCompleted && <CheckCircle size={16} className="text-white" />}
-          </div>
+        <span className={`font-bold text-sm ${isCompleted ? "text-green-900" : "text-gray-900"}`}>
+          {node.label}
+        </span>
+        
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleProgress(node.id);
+          }}
+          className={`ml-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-colors border ${
+            isCompleted 
+              ? "bg-green-500 border-green-600 text-white" 
+              : "bg-white border-gray-400 text-gray-300 group-hover:border-gray-600"
+          }`}
+        >
+          {isCompleted ? <CheckCircle size={14} /> : <Circle size={14} />}
         </div>
-
-        <h3 className="font-bold text-gray-900 text-sm">{node.label}</h3>
-      </button>
+      </motion.button>
     );
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-void mx-auto mb-4"></div>
-          <p className="text-textSecondary text-lg">
-            Generating your personalized roadmap...
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-void border-t-transparent rounded-full animate-spin"></div>
+            <Sparkles className="absolute inset-0 m-auto text-void animate-pulse" size={24} />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Generating Roadmap</h2>
+          <p className="text-gray-600">
+            AI is crafting a personalized learning path for <span className="font-semibold text-void">{topic}</span>...
           </p>
         </div>
       </div>
@@ -239,38 +230,41 @@ function RoadmapGenerator() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-textPrimary mb-2">
-            Oops! Something went wrong
-          </h2>
-          <p className="text-textSecondary mb-6">{error}</p>
-          <button
-            onClick={() => navigate("/ai-roadmap")}
-            className="px-6 py-3 bg-void text-white rounded-lg hover:bg-opacity-90 transition-all"
-          >
-            Go Back
-          </button>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full border-l-4 border-red-500">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="text-red-500" size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Generation Failed</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => navigate("/ai-roadmap")}
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={() => generateRoadmap(topic)}
+              className="px-4 py-2 bg-void text-white rounded-lg hover:bg-opacity-90 transition-colors flex items-center gap-2"
+            >
+              <RefreshCw size={16} />
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   if (!roadmap) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-textSecondary text-lg">No roadmap generated yet</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="bg-white border-b border-gray-200 z-20 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -281,372 +275,277 @@ function RoadmapGenerator() {
                 <ArrowLeft size={20} className="text-gray-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   {roadmap.title || `${topic} Developer`}
+                  <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">AI Generated</span>
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  {roadmap.description ||
-                    "Step-by-step guide to becoming a professional"}
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {roadmap.description || "Step-by-step guide to becoming a professional"}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleDownload}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
               >
-                <Download size={18} />
-                <span className="text-sm font-medium">Download</span>
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 size={18} />
-                <span className="text-sm font-medium">Share</span>
+                <Download size={16} />
+                Download
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Roadmap Content */}
-      <div className="flex gap-0">
-        {/* Main Roadmap Canvas */}
-        <div
-          className={`flex-1 overflow-x-auto overflow-y-auto transition-all duration-300 ${
-            selectedNode ? "mr-0" : ""
-          }`}
-        >
-          <div className="min-w-[1000px] bg-gray-50 p-8" ref={roadmapRef}>
-            {/* Flowchart Style Roadmap */}
-            <div className="relative flex flex-col items-center space-y-12">
-              {stages.map((stage, stageIndex) => (
-                <div key={stage.id} className="w-full max-w-6xl">
-                  {/* Stage Header Card */}
-                  <div className="flex justify-center mb-8">
-                    <div className="bg-gradient-to-r from-void to-purple-600 text-white px-8 py-4 rounded-xl shadow-lg">
-                      <h2 className="text-2xl font-bold text-center">
-                        {stage.label}
-                      </h2>
-                      {stage.summary && (
-                        <p className="text-sm text-white/90 text-center mt-1">
-                          {stage.summary}
-                        </p>
-                      )}
-                    </div>
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Roadmap Canvas */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[#f8f9fa] relative custom-scrollbar">
+          <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 min-h-full">
+            {/* Central Spine Line - Moved inside to grow with content */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-blue-300 transform -translate-x-1/2 z-0"></div>
+
+            {stages.map((stage, stageIndex) => (
+              <div key={stage.id} className="mb-16 relative">
+                {/* Stage Marker on Spine */}
+                <div className="absolute left-1/2 top-6 w-4 h-4 bg-yellow-400 rounded-full border-4 border-white shadow-sm transform -translate-x-1/2 z-20"></div>
+
+                {/* Stage Title */}
+                <div className="flex justify-center mb-10 relative z-20">
+                  <div className="bg-white border-2 border-gray-800 px-8 py-3 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <h2 className="text-xl font-bold text-gray-900 text-center uppercase tracking-wide">
+                      {stage.label}
+                    </h2>
                   </div>
-
-                  {/* Nodes in Flowchart Layout */}
-                  <div className="relative">
-                    {/* Draw connecting lines */}
-                    <svg
-                      className="absolute inset-0 pointer-events-none"
-                      style={{ width: "100%", height: "100%", zIndex: 0 }}
-                    >
-                      {stage.nodes?.map((node, idx) => {
-                        if (idx < stage.nodes.length - 1) {
-                          return (
-                            <line
-                              key={`line-${node.id}`}
-                              x1="50%"
-                              y1={`${idx * 100 + 50}px`}
-                              x2="50%"
-                              y2={`${(idx + 1) * 100 + 50}px`}
-                              stroke="#e5e7eb"
-                              strokeWidth="2"
-                              strokeDasharray="5,5"
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-                    </svg>
-
-                    {/* Nodes */}
-                    <div className="space-y-8 relative z-10">
-                      {stage.nodes?.map((node, nodeIndex) => {
-                        const isEven = nodeIndex % 2 === 0;
-                        const hasMultipleInRow =
-                          stage.nodes.length > 3 &&
-                          nodeIndex < stage.nodes.length - 1;
-
-                        return (
-                          <div
-                            key={node.id}
-                            className="flex justify-center items-center gap-4"
-                          >
-                            {/* Show multiple nodes in a row occasionally */}
-                            {hasMultipleInRow &&
-                            isEven &&
-                            stage.nodes[nodeIndex + 1] ? (
-                              <>
-                                <NodeCard
-                                  node={node}
-                                  progress={progress}
-                                  selectedNode={selectedNode}
-                                  onNodeClick={handleNodeClick}
-                                  onToggleProgress={toggleNodeProgress}
-                                />
-                                <NodeCard
-                                  node={stage.nodes[nodeIndex + 1]}
-                                  progress={progress}
-                                  selectedNode={selectedNode}
-                                  onNodeClick={handleNodeClick}
-                                  onToggleProgress={toggleNodeProgress}
-                                />
-                              </>
-                            ) : !hasMultipleInRow || !isEven ? (
-                              <NodeCard
-                                node={node}
-                                progress={progress}
-                                selectedNode={selectedNode}
-                                onNodeClick={handleNodeClick}
-                                onToggleProgress={toggleNodeProgress}
-                              />
-                            ) : null}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Connection Arrow to Next Stage */}
-                  {stageIndex < stages.length - 1 && (
-                    <div className="flex justify-center my-12">
-                      <div className="flex flex-col items-center">
-                        <div className="w-0.5 h-12 bg-gradient-to-b from-purple-400 to-void"></div>
-                        <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-void"></div>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              ))}
+
+                {/* Nodes Grid */}
+                <div className="grid grid-cols-2 gap-x-24 gap-y-8 relative">
+                  {stage.nodes?.map((node, nodeIndex) => {
+                    const isLeft = nodeIndex % 2 === 0;
+                    return (
+                      <div
+                        key={node.id}
+                        className={`flex ${isLeft ? "justify-end" : "justify-start"} relative items-center`}
+                      >
+                        {/* Curved SVG Connector */}
+                        <svg
+                          className={`absolute top-1/2 w-24 h-12 pointer-events-none
+                            ${isLeft ? "-right-24 -translate-y-1/2" : "-left-24 -translate-y-1/2"}
+                          `}
+                          style={{ overflow: 'visible' }}
+                        >
+                          <path
+                            d={isLeft 
+                              ? "M 96,24 C 48,24 48,24 0,24" // Right to Left curve
+                              : "M 0,24 C 48,24 48,24 96,24"  // Left to Right curve
+                            }
+                            fill="none"
+                            stroke="#93c5fd" // blue-300
+                            strokeWidth="2"
+                            strokeDasharray="6 4"
+                          />
+                          {/* Dot at spine connection */}
+                          <circle cx={isLeft ? 96 : 0} cy="24" r="3" fill="#3b82f6" />
+                        </svg>
+                        
+                        {/* Node */}
+                        <NodeCard
+                          node={node}
+                          progress={progress}
+                          selectedNode={selectedNode}
+                          onNodeClick={handleNodeClick}
+                          onToggleProgress={toggleNodeProgress}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* End Marker */}
+            <div className="flex justify-center pt-8 pb-16 relative z-20">
+              <div className="bg-green-100 text-green-800 px-6 py-2 rounded-full font-bold text-sm border border-green-200 shadow-sm">
+                Goal Reached! 🚀
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Side Panel for Resources */}
-        {selectedNode && (
-          <div className="w-[480px] h-screen sticky top-0 bg-white border-l border-gray-200 shadow-2xl overflow-y-auto flex-shrink-0">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    {selectedNode.label}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Learn everything you need to know
-                  </p>
+        {/* Resources Sidebar */}
+        <AnimatePresence>
+          {selectedNode && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="w-[450px] bg-white border-l border-gray-200 shadow-2xl flex flex-col z-30 h-full flex-shrink-0"
+            >
+              {/* Sidebar Header */}
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                <div className="flex gap-2">
+                  <button className="flex items-center gap-2 px-4 py-1.5 bg-black text-white rounded-md text-sm font-medium">
+                    <BookOpen size={16} />
+                    Resources
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-md text-sm font-medium hover:bg-gray-50">
+                    <Sparkles size={16} />
+                    AI Tutor
+                    <span className="bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded font-bold">New</span>
+                  </button>
                 </div>
                 <button
                   onClick={() => setSelectedNode(null)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl leading-none p-2 hover:bg-gray-100 rounded-lg transition-colors ml-2"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                 >
-                  ×
+                  <ArrowLeft size={20} className="rotate-180" />
                 </button>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="px-6 py-6 space-y-6">
-              {/* Description */}
-              {(nodeResources[selectedNode.id]?.description ||
-                selectedNode.details) && (
-                <div className="space-y-2">
-                  <h4 className="text-base font-semibold text-gray-900">
-                    How does {selectedNode.label} work?
-                  </h4>
-                  <p className="text-gray-700 text-sm leading-relaxed">
+              {/* Sidebar Content */}
+              <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+                {/* Title & Description */}
+                <div>
+                  <h2 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
+                    {selectedNode.label}
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed text-base">
                     {nodeResources[selectedNode.id]?.description ||
-                      selectedNode.details}
+                      selectedNode.details ||
+                      "Loading details..."}
                   </p>
                 </div>
-              )}
 
-              {/* Prerequisites */}
-              {selectedNode.dependsOn?.length > 0 && (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                    <Code size={16} />
-                    Prerequisites
-                  </p>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    {selectedNode.dependsOn.map((dep, idx) => (
-                      <li key={idx}>• {dep}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Resources Section */}
-              {loadingResources ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-center">
-                    <Loader2
-                      size={32}
-                      className="animate-spin text-void mx-auto mb-3"
-                    />
-                    <p className="text-gray-600 text-sm flex items-center gap-2 justify-center">
-                      <Sparkles size={16} className="text-void" />
-                      AI is curating resources...
-                    </p>
+                {/* Loading State */}
+                {loadingResources && (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Loader2 size={32} className="animate-spin text-gray-900 mb-3" />
+                    <p className="text-sm text-gray-500">Curating best resources...</p>
                   </div>
-                </div>
-              ) : nodeResources[selectedNode.id] ? (
-                <div className="space-y-6">
-                  {/* Free Resources */}
-                  {nodeResources[selectedNode.id].freeResources?.length > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Sparkles size={18} className="text-green-600" />
-                        <h4 className="text-base font-semibold text-gray-900">
-                          Free Resources
-                        </h4>
-                      </div>
-                      <div className="space-y-2">
-                        {nodeResources[selectedNode.id].freeResources.map(
-                          (resource, idx) => (
-                            <a
-                              key={idx}
-                              href={resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-start gap-3 p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors group"
-                            >
-                              <div className="p-2 bg-green-50 rounded-lg flex-shrink-0">
-                                {resource.type === "video" ? (
-                                  <Video size={16} className="text-green-600" />
-                                ) : resource.type === "course" ? (
-                                  <BookOpen
-                                    size={16}
-                                    className="text-green-600"
-                                  />
-                                ) : (
-                                  <FileText
-                                    size={16}
-                                    className="text-green-600"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-900 text-sm group-hover:text-void transition-colors">
-                                  {resource.title}
-                                </p>
-                                {resource.platform && (
-                                  <p className="text-xs text-gray-600 mt-1">
-                                    {resource.platform}
-                                  </p>
-                                )}
-                              </div>
-                              <ExternalLink
-                                size={14}
-                                className="text-gray-400 group-hover:text-void transition-colors flex-shrink-0 mt-1"
-                              />
-                            </a>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
+                )}
 
-                  {/* Premium Resources */}
-                  {nodeResources[selectedNode.id].premiumResources?.length >
-                    0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles size={18} className="text-yellow-600" />
-                          <h4 className="text-base font-semibold text-gray-900">
-                            Premium Resources
-                          </h4>
+                {/* Resources List */}
+                {!loadingResources && nodeResources[selectedNode.id] && (
+                  <div className="space-y-8">
+                    {/* Free Resources */}
+                    {nodeResources[selectedNode.id].freeResources?.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-6">
+                          <span className="px-3 py-1 rounded-full border border-green-500 text-green-700 text-xs font-bold bg-green-50 flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span> // Heart icon replacement
+                            Free Resources
+                          </span>
+                          <div className="h-px bg-green-500 flex-1"></div>
                         </div>
-                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">
-                          PAID
-                        </span>
+                        
+                        <div className="space-y-3">
+                          {nodeResources[selectedNode.id].freeResources.map((resource, idx) => (
+                            <div key={idx} className="flex items-start gap-3 group">
+                              <span className={`flex-shrink-0 px-2 py-0.5 rounded text-xs font-bold mt-0.5 ${
+                                resource.type === 'video' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-400 text-black'
+                              }`}>
+                                {resource.type === 'video' ? 'Video' : 'Article'}
+                              </span>
+                              <a
+                                href={resource.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-900 font-medium hover:text-blue-600 hover:underline leading-snug"
+                              >
+                                {resource.title}
+                              </a>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-600">
-                        Optional premium resources for in-depth learning
-                      </p>
-                      <div className="space-y-2">
-                        {nodeResources[selectedNode.id].premiumResources.map(
-                          (resource, idx) => (
-                            <a
-                              key={idx}
-                              href={resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-start gap-3 p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors group"
-                            >
-                              <div className="p-2 bg-white rounded-lg flex-shrink-0">
-                                {resource.type === "video" ? (
-                                  <Video
-                                    size={16}
-                                    className="text-yellow-600"
-                                  />
-                                ) : resource.type === "course" ? (
-                                  <BookOpen
-                                    size={16}
-                                    className="text-yellow-600"
-                                  />
-                                ) : (
-                                  <FileText
-                                    size={16}
-                                    className="text-yellow-600"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-900 text-sm group-hover:text-void transition-colors">
-                                  {resource.title}
-                                </p>
-                                {resource.platform && (
-                                  <p className="text-xs text-gray-600 mt-1">
-                                    {resource.platform}
-                                  </p>
-                                )}
-                                {resource.discount && (
-                                  <p className="text-xs text-green-600 mt-1 font-medium">
-                                    {resource.discount}
-                                  </p>
-                                )}
-                              </div>
-                              <ExternalLink
-                                size={14}
-                                className="text-gray-400 group-hover:text-void transition-colors flex-shrink-0 mt-1"
-                              />
-                            </a>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : null}
+                    )}
 
-              {/* Mark Complete Button */}
-              <div className="pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => toggleNodeProgress(selectedNode.id)}
-                  className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                    progress[selectedNode.id]
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-void text-white hover:bg-opacity-90"
-                  }`}
-                >
-                  {progress[selectedNode.id] ? (
-                    <>
-                      <CheckCircle size={18} />
-                      Mark as Incomplete
-                    </>
-                  ) : (
-                    <>
-                      <Circle size={18} />
-                      Mark as Complete
-                    </>
-                  )}
-                </button>
+                    {/* Premium Resources */}
+                    {nodeResources[selectedNode.id].premiumResources?.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-6">
+                          <span className="px-3 py-1 rounded-full border border-purple-500 text-purple-700 text-xs font-bold bg-purple-50 flex items-center gap-1">
+                            <Sparkles size={12} />
+                            Premium Resources
+                          </span>
+                          <div className="h-px bg-purple-500 flex-1"></div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {nodeResources[selectedNode.id].premiumResources.map((resource, idx) => (
+                            <div key={idx} className="flex items-start gap-3 group">
+                              <span className="flex-shrink-0 px-2 py-0.5 bg-yellow-400 text-black rounded text-xs font-bold mt-0.5">
+                                Course
+                              </span>
+                              {resource.discount && (
+                                <span className="flex-shrink-0 px-2 py-0.5 bg-green-200 text-green-800 rounded text-xs font-bold mt-0.5">
+                                  {resource.discount}
+                                </span>
+                              )}
+                              <a
+                                href={resource.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-900 font-medium hover:text-blue-600 hover:underline leading-snug"
+                              >
+                                {resource.title}
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Disclaimer Box */}
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 relative">
+                      <button 
+                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                        onClick={(e) => e.target.closest('div').style.display = 'none'}
+                      >
+                        <span className="sr-only">Close</span>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <h4 className="text-sm font-bold text-gray-900 mb-1">Note on Premium Resources</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        These are optional paid resources vetted by the roadmap team. 
+                        If you purchase a resource, we may receive a small commission at no extra cost to you. 
+                        This helps us offset the costs of running this site and keep it free for everyone.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Action Button */}
+                <div className="pt-4">
+                  <button
+                    onClick={() => toggleNodeProgress(selectedNode.id)}
+                    className={`w-full py-3 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border-2 ${
+                      progress[selectedNode.id]
+                        ? "bg-green-100 border-green-500 text-green-700"
+                        : "bg-white border-gray-200 text-gray-900 hover:border-gray-900"
+                    }`}
+                  >
+                    {progress[selectedNode.id] ? (
+                      <>
+                        <CheckCircle size={18} />
+                        Completed
+                      </>
+                    ) : (
+                      <>
+                        <Circle size={18} />
+                        Mark as Complete
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
