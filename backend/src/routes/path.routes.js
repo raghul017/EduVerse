@@ -9,6 +9,7 @@ import {
   aiRoadmap,
   aiCourse,
   aiResources,
+  getAiUsage,
 } from "../controllers/path.controller.js";
 
 const router = Router();
@@ -21,5 +22,6 @@ router.post("/:id/progress", authenticate, updatePathProgress);
 router.post("/ai-roadmap", optionalAuth, aiRoadmap);
 router.post("/ai-course", optionalAuth, aiCourse);
 router.post("/ai-resources", optionalAuth, aiResources);
+router.get("/ai-usage/stats", getAiUsage);
 
 export default router;

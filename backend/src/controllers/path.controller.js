@@ -30,23 +30,40 @@ export const aiRoadmap = async (req, res, next) => {
     const { role } = req.body;
     console.log(`[Path Controller] AI Roadmap request for role: ${role}`);
     console.log(`[Path Controller] Request body:`, JSON.stringify(req.body));
-    console.log(`[Path Controller] User:`, req.user?.id || 'anonymous');
-    
+    console.log(`[Path Controller] User:`, req.user?.id || "anonymous");
+
     if (!role || !role.trim()) {
       return res.status(400).json({ message: "Role is required." });
     }
 
     const roadmap = await aiService.generateRoadmap(role.trim());
-    console.log(`[Path Controller] AI Roadmap result: ${roadmap ? 'success' : 'failed'}`);
-    
+    console.log(
+      `[Path Controller] AI Roadmap result: ${roadmap ? "success" : "failed"}`
+    );
+
     if (!roadmap || roadmap.error) {
       const errorMsg = roadmap?.error || "Unknown error";
-      console.log(`[Path Controller] Returning fallback roadmap for: ${role}. Reason: ${errorMsg}`);
+      console.log(
+        `[Path Controller] Returning fallback roadmap for: ${role}. Reason: ${errorMsg}`
+      );
       const trimmed = role.trim();
+
+      // Check if it's a rate limit error
+      let userMessage = "AI provider is temporarily unavailable.";
+      if (errorMsg.includes("rate limit") || errorMsg.includes("Rate limit")) {
+        userMessage =
+          "AI rate limit reached. Using cached roadmap. Please try again in a few minutes for AI-generated content.";
+      } else if (
+        errorMsg.includes("API key") ||
+        errorMsg.includes("not configured")
+      ) {
+        userMessage =
+          "AI service is not properly configured. Using basic roadmap template.";
+      }
+
       const fallback = {
         title: `${trimmed} Roadmap`,
-        description:
-          `AI provider is currently unavailable. Reason: ${errorMsg}. Please check your GROQ_API_KEY or GEMINI_API_KEY environment variables.`,
+        description: userMessage,
         stages: [
           {
             id: "basics",
@@ -113,26 +130,33 @@ export const aiCourse = async (req, res, next) => {
           {
             id: "m1",
             title: "Fundamentals & Core Concepts",
-            summary: "Build a solid foundation by understanding the key principles.",
+            summary:
+              "Build a solid foundation by understanding the key principles.",
             lessons: [
               {
                 id: "l1",
                 title: `Introduction to ${trimmed}`,
-                objective: "Understand the history, importance, and basic terminology.",
-                suggestedResources: [{ type: "video", title: `${trimmed} Crash Course`, url: "" }]
+                objective:
+                  "Understand the history, importance, and basic terminology.",
+                suggestedResources: [
+                  { type: "video", title: `${trimmed} Crash Course`, url: "" },
+                ],
               },
               {
                 id: "l2",
                 title: "Environment Setup",
                 objective: "Configure your development environment and tools.",
-                suggestedResources: [{ type: "docs", title: "Official Documentation", url: "" }]
+                suggestedResources: [
+                  { type: "docs", title: "Official Documentation", url: "" },
+                ],
               },
               {
                 id: "l3",
                 title: "Key Syntax & Structure",
-                objective: "Learn the essential syntax and structural patterns.",
-                suggestedResources: []
-              }
+                objective:
+                  "Learn the essential syntax and structural patterns.",
+                suggestedResources: [],
+              },
             ],
           },
           {
@@ -144,14 +168,15 @@ export const aiCourse = async (req, res, next) => {
                 id: "l4",
                 title: "State Management & Data Flow",
                 objective: "Master how data moves through your application.",
-                suggestedResources: []
+                suggestedResources: [],
               },
               {
                 id: "l5",
                 title: "Performance Optimization",
-                objective: "Techniques to make your solution faster and more efficient.",
-                suggestedResources: []
-              }
+                objective:
+                  "Techniques to make your solution faster and more efficient.",
+                suggestedResources: [],
+              },
             ],
           },
           {
@@ -163,16 +188,16 @@ export const aiCourse = async (req, res, next) => {
                 id: "l6",
                 title: "Project Planning",
                 objective: "Scope out a realistic project MVP.",
-                suggestedResources: []
+                suggestedResources: [],
               },
               {
                 id: "l7",
                 title: "Implementation & Deployment",
                 objective: "Build, test, and deploy your final project.",
-                suggestedResources: []
-              }
+                suggestedResources: [],
+              },
             ],
-          }
+          },
         ],
       };
       return res.json({ data: fallback });
@@ -186,14 +211,24 @@ export const aiCourse = async (req, res, next) => {
 
 export const aiResources = async (req, res, next) => {
   try {
-    const { topic, role } = req.body;
+    const { topic, context } = req.body;
+    console.log(`[Path Controller] AI Resources request for topic: ${topic}`);
+
     if (!topic) {
       return res.status(400).json({ message: "Topic is required." });
     }
 
-    const resources = await aiService.generateResources(topic, role || "General");
-    res.json({ data: resources });
+    const resources = await aiService.generateResources(topic, context || "");
+    console.log(`[Path Controller] Resources generated successfully`);
+
+    res.json({
+      resources: resources.freeResources || [],
+      premiumResources: resources.premiumResources || [],
+      description:
+        resources.description || `Learn ${topic} to enhance your skills.`,
+    });
   } catch (error) {
+    console.error("[Path Controller] AI Resources error:", error);
     next(error);
   }
 };
@@ -328,6 +363,15 @@ export const updatePathProgress = async (req, res, next) => {
     ).then((result) => result.rows[0]);
 
     res.json({ data: updated });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAiUsage = async (req, res, next) => {
+  try {
+    const stats = aiService.getUsageStats();
+    res.json({ data: stats });
   } catch (error) {
     next(error);
   }

@@ -4,6 +4,7 @@ import { useAuthStore } from "../state/store.js";
 import StatsCard from "../components/dashboard/StatsCard.jsx";
 import StreakDisplay from "../components/dashboard/StreakDisplay.jsx";
 import ProgressChart from "../components/dashboard/ProgressChart.jsx";
+import AIUsageStats from "../components/ai/AIUsageStats.jsx";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -27,7 +28,9 @@ function Dashboard() {
   }, []);
 
   if (loading)
-    return <p className="text-center text-textSecondary">Loading dashboard...</p>;
+    return (
+      <p className="text-center text-textSecondary">Loading dashboard...</p>
+    );
   if (error) return <p className="text-center text-danger">{error}</p>;
 
   return (
@@ -70,6 +73,9 @@ function Dashboard() {
             <ProgressChart subjects={stats.subjects_progress} />
           </div>
 
+          {/* AI Usage Stats */}
+          <AIUsageStats />
+
           <section className="bg-card border border-border rounded-3xl p-6 shadow-card space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-textPrimary">
@@ -90,9 +96,7 @@ function Dashboard() {
                 <p className="text-xs uppercase text-textSecondary">
                   Community subjects
                 </p>
-                <p className="text-2xl font-semibold">
-                  {stats.subjects_count}
-                </p>
+                <p className="text-2xl font-semibold">{stats.subjects_count}</p>
               </div>
               <div className="p-4 rounded-2xl bg-success/10 border border-border">
                 <p className="text-xs uppercase text-textSecondary">

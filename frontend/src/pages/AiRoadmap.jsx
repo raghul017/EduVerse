@@ -2,33 +2,98 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Map, ArrowLeft, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import AIUsageStats from "../components/ai/AIUsageStats.jsx";
 
 function AiRoadmap() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const roleBasedRoadmaps = [
-    { id: "frontend", title: "Frontend Developer", description: "Master HTML, CSS, JavaScript, and modern frameworks" },
-    { id: "backend", title: "Backend Developer", description: "Build scalable server-side applications" },
-    { id: "fullstack", title: "Full Stack Developer", description: "Complete web development mastery" },
-    { id: "devops", title: "DevOps Engineer", description: "Automation, CI/CD, and cloud infrastructure" },
-    { id: "mobile", title: "Mobile Developer", description: "iOS and Android app development" },
-    { id: "data-scientist", title: "Data Scientist", description: "Machine learning and data analysis" },
-    { id: "ml-engineer", title: "ML Engineer", description: "Build and deploy ML models at scale" },
-    { id: "cybersecurity", title: "Cybersecurity Specialist", description: "Protect systems and networks" },
-    { id: "cloud-architect", title: "Cloud Architect", description: "Design scalable cloud solutions" },
-    { id: "qa-engineer", title: "QA Engineer", description: "Testing and quality assurance" },
+    {
+      id: "frontend",
+      title: "Frontend Developer",
+      description: "Master HTML, CSS, JavaScript, and modern frameworks",
+    },
+    {
+      id: "backend",
+      title: "Backend Developer",
+      description: "Build scalable server-side applications",
+    },
+    {
+      id: "fullstack",
+      title: "Full Stack Developer",
+      description: "Complete web development mastery",
+    },
+    {
+      id: "devops",
+      title: "DevOps Engineer",
+      description: "Automation, CI/CD, and cloud infrastructure",
+    },
+    {
+      id: "mobile",
+      title: "Mobile Developer",
+      description: "iOS and Android app development",
+    },
+    {
+      id: "data-scientist",
+      title: "Data Scientist",
+      description: "Machine learning and data analysis",
+    },
+    {
+      id: "ml-engineer",
+      title: "ML Engineer",
+      description: "Build and deploy ML models at scale",
+    },
+    {
+      id: "cybersecurity",
+      title: "Cybersecurity Specialist",
+      description: "Protect systems and networks",
+    },
+    {
+      id: "cloud-architect",
+      title: "Cloud Architect",
+      description: "Design scalable cloud solutions",
+    },
+    {
+      id: "qa-engineer",
+      title: "QA Engineer",
+      description: "Testing and quality assurance",
+    },
   ];
 
   const skillBasedRoadmaps = [
-    { id: "react", title: "React", description: "Modern UI library for web apps" },
-    { id: "nodejs", title: "Node.js", description: "JavaScript runtime for backend" },
-    { id: "python", title: "Python", description: "Versatile programming language" },
-    { id: "typescript", title: "TypeScript", description: "Typed JavaScript at scale" },
+    {
+      id: "react",
+      title: "React",
+      description: "Modern UI library for web apps",
+    },
+    {
+      id: "nodejs",
+      title: "Node.js",
+      description: "JavaScript runtime for backend",
+    },
+    {
+      id: "python",
+      title: "Python",
+      description: "Versatile programming language",
+    },
+    {
+      id: "typescript",
+      title: "TypeScript",
+      description: "Typed JavaScript at scale",
+    },
     { id: "aws", title: "AWS", description: "Amazon cloud services" },
     { id: "docker", title: "Docker", description: "Containerization platform" },
-    { id: "kubernetes", title: "Kubernetes", description: "Container orchestration" },
-    { id: "postgresql", title: "PostgreSQL", description: "Relational database" },
+    {
+      id: "kubernetes",
+      title: "Kubernetes",
+      description: "Container orchestration",
+    },
+    {
+      id: "postgresql",
+      title: "PostgreSQL",
+      description: "Relational database",
+    },
     { id: "mongodb", title: "MongoDB", description: "NoSQL document database" },
     { id: "graphql", title: "GraphQL", description: "API query language" },
   ];
@@ -62,14 +127,18 @@ function AiRoadmap() {
               AI Roadmap Generator
             </h1>
             <p className="text-textSecondary text-lg mt-2">
-              Choose a role or skill to generate your personalized learning roadmap
+              Choose a role or skill to generate your personalized learning
+              roadmap
             </p>
           </div>
         </div>
 
         {/* Search Bar */}
         <div className="relative max-w-2xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={20} />
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted"
+            size={20}
+          />
           <input
             type="text"
             placeholder="Search roadmaps..."
@@ -77,6 +146,11 @@ function AiRoadmap() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border-2 border-border focus:border-void rounded-xl px-12 py-3 text-textPrimary placeholder-textMuted focus:outline-none transition-all"
           />
+        </div>
+
+        {/* AI Usage Stats */}
+        <div className="max-w-2xl">
+          <AIUsageStats />
         </div>
 
         {/* Role-Based Roadmaps */}
@@ -140,7 +214,9 @@ function AiRoadmap() {
         {/* No Results */}
         {filteredRoadmaps.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-textMuted text-lg">No roadmaps found matching your search.</p>
+            <p className="text-textMuted text-lg">
+              No roadmaps found matching your search.
+            </p>
           </div>
         )}
       </div>

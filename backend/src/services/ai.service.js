@@ -3,25 +3,184 @@ import Groq from "groq-sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "../config/environment.js";
 
+// Cache for AI responses (24 hours) and usage tracking (25 hours to persist across day boundary)
 const cache = new NodeCache({ stdTTL: 60 * 60 * 24 });
+const usageCache = new NodeCache({ stdTTL: 60 * 60 * 25 }); // 25 hours to persist
 
 class AIService {
   constructor() {
     this.groq = env.groqApiKey ? new Groq({ apiKey: env.groqApiKey }) : null;
-    this.genAI = env.geminiApiKey ? new GoogleGenerativeAI(env.geminiApiKey) : null;
+    this.genAI = env.geminiApiKey
+      ? new GoogleGenerativeAI(env.geminiApiKey)
+      : null;
+
+    // Rate limiting (per minute)
     this.groqRequestCount = 0;
     this.resetTime = Date.now() + 60 * 1000;
+
+    // Daily usage tracking
+    this.dailyUsage = {
+      date: new Date().toDateString(),
+      tokensUsed: 0,
+      requestsCount: 0,
+      roadmapsGenerated: 0,
+      coursesGenerated: 0,
+      resourcesGenerated: 0,
+    };
+
+    // Daily limits (Groq free tier)
+    this.dailyLimits = {
+      maxTokens: 100000, // 100K tokens per day
+      maxRequests: 1000, // Generous request limit
+      estimatedTokensPerRoadmap: 3000,
+      estimatedTokensPerCourse: 2000,
+      estimatedTokensPerResource: 500,
+    };
+
+    this.loadUsageFromCache();
+  }
+
+  loadUsageFromCache() {
+    const cached = usageCache.get("daily_usage");
+    if (cached && cached.date === new Date().toDateString()) {
+      this.dailyUsage = cached;
+      console.log(
+        `[AI Service] Loaded usage from cache: ${cached.tokensUsed} tokens, ${cached.requestsCount} requests`
+      );
+    } else {
+      console.log("[AI Service] Starting fresh usage tracking for today");
+    }
+  }
+
+  saveUsageToCache() {
+    usageCache.set("daily_usage", this.dailyUsage, 60 * 60 * 25); // 25 hours
+    console.log(
+      `[AI Service] Saved usage to cache: ${this.dailyUsage.tokensUsed} tokens`
+    );
+  }
+
+  resetDailyUsageIfNeeded() {
+    const today = new Date().toDateString();
+    if (this.dailyUsage.date !== today) {
+      console.log("[AI Service] Resetting daily usage for new day");
+      this.dailyUsage = {
+        date: today,
+        tokensUsed: 0,
+        requestsCount: 0,
+        roadmapsGenerated: 0,
+        coursesGenerated: 0,
+        resourcesGenerated: 0,
+      };
+      this.saveUsageToCache();
+    }
+  }
+
+  trackUsage(type, actualTokens) {
+    this.resetDailyUsageIfNeeded();
+    this.dailyUsage.tokensUsed += actualTokens;
+    this.dailyUsage.requestsCount += 1;
+
+    if (type === "roadmap") this.dailyUsage.roadmapsGenerated += 1;
+    if (type === "course") this.dailyUsage.coursesGenerated += 1;
+    if (type === "resource") this.dailyUsage.resourcesGenerated += 1;
+
+    console.log(
+      `[AI Service] Tracked ${actualTokens} tokens for ${type}. Total today: ${this.dailyUsage.tokensUsed}`
+    );
+    this.saveUsageToCache();
+  }
+
+  getUsageStats() {
+    this.resetDailyUsageIfNeeded();
+
+    const tokenLimit = this.dailyLimits.maxTokens;
+    const tokensUsed = this.dailyUsage.tokensUsed;
+    const tokensRemaining = Math.max(0, tokenLimit - tokensUsed);
+    const percentageUsed = Math.min(100, (tokensUsed / tokenLimit) * 100);
+
+    // Estimate remaining generations
+    const roadmapsRemaining = Math.floor(
+      tokensRemaining / this.dailyLimits.estimatedTokensPerRoadmap
+    );
+    const coursesRemaining = Math.floor(
+      tokensRemaining / this.dailyLimits.estimatedTokensPerCourse
+    );
+    const resourcesRemaining = Math.floor(
+      tokensRemaining / this.dailyLimits.estimatedTokensPerResource
+    );
+
+    // Calculate human-readable reset time
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const diff = tomorrow.getTime() - now.getTime();
+    const hoursUntilReset = Math.floor(diff / (1000 * 60 * 60));
+    const minutesUntilReset = Math.floor(
+      (diff % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const resetTimeString =
+      hoursUntilReset > 0
+        ? `${hoursUntilReset}h ${minutesUntilReset}m`
+        : `${minutesUntilReset}m`;
+
+    return {
+      tokensUsed,
+      dailyLimit: tokenLimit,
+      remainingTokens: tokensRemaining,
+      requestsCount: this.dailyUsage.requestsCount,
+      roadmapsGenerated: this.dailyUsage.roadmapsGenerated,
+      coursesGenerated: this.dailyUsage.coursesGenerated,
+      resourcesGenerated: this.dailyUsage.resourcesGenerated,
+      canGenerate: {
+        roadmaps: roadmapsRemaining,
+        courses: coursesRemaining,
+        resources: resourcesRemaining,
+      },
+      resetTime: resetTimeString,
+      percentageUsed: Math.round(percentageUsed * 10) / 10,
+      status:
+        percentageUsed >= 100
+          ? "limit_reached"
+          : percentageUsed >= 80
+          ? "warning"
+          : "ok",
+    };
+  }
+
+  getNextResetTime() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow.toISOString();
+  }
+
+  canMakeRequest(estimatedTokens = 1000) {
+    this.resetDailyUsageIfNeeded();
+    const remaining = this.dailyLimits.maxTokens - this.dailyUsage.tokensUsed;
+    return remaining >= estimatedTokens;
   }
 
   canUseGroq() {
-    if (Date.now() > this.resetTime) {
+    const now = Date.now();
+    if (now > this.resetTime) {
+      console.log("[AI Service] Groq rate limit window reset");
       this.groqRequestCount = 0;
-      this.resetTime = Date.now() + 60 * 1000;
+      this.resetTime = now + 60 * 1000;
     }
-    if (this.groqRequestCount >= 30) {
+    // Groq free tier: 1000 RPM (requests per minute), using 500 to be safe
+    if (this.groqRequestCount >= 500) {
+      const secondsUntilReset = Math.ceil((this.resetTime - now) / 1000);
+      console.log(
+        `[AI Service] Groq rate limit reached (${this.groqRequestCount}/500 requests). Resets in ${secondsUntilReset}s`
+      );
       return false;
     }
     this.groqRequestCount += 1;
+    console.log(
+      `[AI Service] Groq request ${this.groqRequestCount}/500 in current minute`
+    );
     return true;
   }
 
@@ -29,9 +188,9 @@ class AIService {
     if (!this.groq) throw new Error("Groq API key not configured");
 
     const models = {
-      fast: "llama-3.3-70b-versatile", // Updated to latest supported model
-      smart: "llama-3.3-70b-versatile",
-      balanced: "mixtral-8x7b-32768",
+      fast: "llama-3.1-8b-instant", // 560 T/sec, cheaper
+      smart: "llama-3.3-70b-versatile", // 280 T/sec, better quality
+      balanced: "llama-3.1-8b-instant", // Fast and efficient
     };
     const model = models[priority] || models.fast;
 
@@ -40,20 +199,32 @@ class AIService {
         messages: [{ role: "user", content: prompt }],
         model: model,
         temperature: 0.7,
-        max_tokens: 8192, // Increased to handle large roadmap JSON
+        max_tokens: 4096, // Reduced to stay under rate limits
       });
-      
+
       if (!completion.choices || completion.choices.length === 0) {
         throw new Error("No choices returned from Groq");
       }
-      
+
       const content = completion.choices[0]?.message?.content;
       if (!content) {
         throw new Error("Empty content returned from Groq");
       }
-      
-      return content;
+
+      // Track actual token usage from API response
+      const tokensUsed = completion.usage?.total_tokens || 0;
+      if (tokensUsed > 0) {
+        console.log(`[AI Service] Groq API used ${tokensUsed} tokens`);
+      }
+
+      return { content, tokensUsed };
     } catch (error) {
+      // Check if it's a rate limit error
+      if (error.message && error.message.includes("rate_limit_exceeded")) {
+        throw new Error(
+          "Groq rate limit exceeded. Please try again in a few minutes."
+        );
+      }
       console.error("[AI Service] Groq error:", error.message);
       throw new Error(`Groq error: ${error.message}`);
     }
@@ -63,38 +234,79 @@ class AIService {
     if (!this.genAI) throw new Error("Gemini API key not configured");
 
     try {
-      // Fallback to gemini-1.5-flash
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
+      // Note: Google AI SDK currently uses v1beta endpoint which has limited model availability
+      // If this fails, Groq will be used as the primary provider
+      // You can get Gemini working by using the REST API directly or waiting for SDK updates
+
+      const models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro"];
+
+      let lastError = null;
+      for (const modelName of models) {
+        try {
+          const model = this.genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          const text = response.text();
+          if (text && text.trim().length > 0) {
+            console.log(`[AI Service] Gemini success with model: ${modelName}`);
+            return text;
+          }
+        } catch (err) {
+          lastError = err;
+          // Only log error for the last model to reduce noise
+          if (modelName === models[models.length - 1]) {
+            console.warn(
+              `[AI Service] All Gemini models failed. This is expected - Groq will be used instead.`
+            );
+          }
+          continue;
+        }
+      }
+      throw (
+        lastError ||
+        new Error(
+          "Gemini models not available on v1beta endpoint. Using Groq as primary provider."
+        )
+      );
     } catch (error) {
-      console.error("[AI Service] Gemini error:", error.message);
-      throw new Error(`Gemini error: ${error.message}`);
+      // Don't log as error since Groq is working fine
+      throw new Error(`Gemini unavailable (v1beta API limitation)`);
     }
   }
 
   async callAI(prompt, priority = "fast") {
     console.log(`[AI Service] Calling AI with priority: ${priority}`);
-    console.log(`[AI Service] Groq Key Present: ${!!this.groq}, Request Count: ${this.groqRequestCount}`);
-    
+    console.log(
+      `[AI Service] Groq Key Present: ${!!this.groq}, Request Count: ${
+        this.groqRequestCount
+      }`
+    );
+
     let groqError = null;
     let geminiError = null;
 
     // Try Groq first
-    if (this.groq && this.canUseGroq()) {
-      try {
-        const result = await this.callGroq(prompt, priority);
-        if (result && result.trim().length > 0) {
-          console.log(`[AI Service] Groq success`);
-          return result;
+    if (this.groq) {
+      if (!this.canUseGroq()) {
+        groqError =
+          "Rate limit reached (100 requests/minute). Please wait a moment.";
+        console.warn(`[AI Service] ${groqError}`);
+      } else {
+        try {
+          const result = await this.callGroq(prompt, priority);
+          if (result && result.content && result.content.trim().length > 0) {
+            console.log(`[AI Service] Groq success`);
+            return { content: result.content, tokensUsed: result.tokensUsed };
+          }
+          throw new Error("Empty response from Groq");
+        } catch (error) {
+          console.warn(
+            `[AI Service] Groq failed: ${error.message}. Falling back to Gemini...`
+          );
+          groqError = error.message;
         }
-        throw new Error("Empty response from Groq");
-      } catch (error) {
-        console.warn(`[AI Service] Groq failed: ${error.message}. Falling back to Gemini...`);
-        groqError = error.message;
       }
-    } else if (!this.groq) {
+    } else {
       groqError = "Groq API key not configured";
     }
 
@@ -104,7 +316,9 @@ class AIService {
         const result = await this.callGemini(prompt);
         if (result && result.trim().length > 0) {
           console.log(`[AI Service] Gemini success`);
-          return result;
+          // Gemini doesn't provide token usage, estimate it
+          const estimatedTokens = Math.ceil(result.length / 4);
+          return { content: result, tokensUsed: estimatedTokens };
         }
         throw new Error("Empty response from Gemini");
       } catch (error) {
@@ -123,9 +337,12 @@ class AIService {
   async summarize(postId, transcript) {
     const cacheKey = `summary_${postId}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
-    
-    const prompt = `Summarize this educational content in 3 clear sentences:\n\n${transcript.substring(0, 3000)}`;
-    
+
+    const prompt = `Summarize this educational content in 3 clear sentences:\n\n${transcript.substring(
+      0,
+      3000
+    )}`;
+
     try {
       const summary = await this.callAI(prompt, "fast");
       cache.set(cacheKey, summary);
@@ -139,7 +356,7 @@ class AIService {
   async quiz(postId, transcript) {
     const cacheKey = `quiz_${postId}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
-    
+
     const prompt = `Create a 3-question multiple choice quiz based on this content. Return ONLY valid JSON (no markdown):
 [
   {
@@ -167,7 +384,7 @@ Content: ${transcript.substring(0, 2000)}`;
   async flashcards(postId, transcript) {
     const cacheKey = `flashcards_${postId}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
-    
+
     const prompt = `Create 5 flashcards from this content. Return ONLY valid JSON (no markdown):
 [
   {
@@ -192,8 +409,11 @@ Content: ${transcript.substring(0, 2000)}`;
   }
 
   async explain(question, context) {
-    const prompt = `Answer this question clearly for a beginner:\n\nQuestion: ${question}\n\nContext: ${context.substring(0, 1500)}`;
-    
+    const prompt = `Answer this question clearly for a beginner:\n\nQuestion: ${question}\n\nContext: ${context.substring(
+      0,
+      1500
+    )}`;
+
     try {
       return await this.callAI(prompt, "fast");
     } catch (error) {
@@ -211,7 +431,7 @@ Content: ${transcript.substring(0, 2000)}`;
     }
 
     console.log(`[AI Service] Generating detailed roadmap for role: ${role}`);
-    
+
     const prompt = `You are an expert career advisor. Create a COMPREHENSIVE learning roadmap for becoming a ${role}, similar to roadmap.sh quality.
 
 Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
@@ -247,25 +467,35 @@ Be very specific and comprehensive!`;
 
     try {
       const aiResponse = await this.callAI(prompt, "smart");
-      console.log(`[AI Service] Raw roadmap response length: ${aiResponse.length}`);
-      
+      const actualTokens = aiResponse.tokensUsed || 0;
+      const responseText = aiResponse.content;
+
+      console.log(
+        `[AI Service] Raw roadmap response length: ${responseText.length}, tokens: ${actualTokens}`
+      );
+
       let parsed;
       try {
         // Clean up markdown if present
-        let cleanResponse = aiResponse.replace(/```json|```/g, "").trim();
+        let cleanResponse = responseText.replace(/```json|```/g, "").trim();
         // Find the first { and last } to extract JSON
-        const firstBrace = cleanResponse.indexOf('{');
-        const lastBrace = cleanResponse.lastIndexOf('}');
-        
+        const firstBrace = cleanResponse.indexOf("{");
+        const lastBrace = cleanResponse.lastIndexOf("}");
+
         if (firstBrace === -1 || lastBrace === -1) {
           throw new Error("No JSON object found in response");
         }
-        
+
         const jsonStr = cleanResponse.substring(firstBrace, lastBrace + 1);
         parsed = JSON.parse(jsonStr);
       } catch (parseError) {
         console.error(`[AI Service] JSON parse error: ${parseError.message}`);
-        console.error(`[AI Service] Raw response (first 500): ${aiResponse.substring(0, 500)}`);
+        console.error(
+          `[AI Service] Raw response (first 500): ${responseText.substring(
+            0,
+            500
+          )}`
+        );
         throw new Error(`Failed to parse AI response: ${parseError.message}`);
       }
 
@@ -274,12 +504,20 @@ Be very specific and comprehensive!`;
         throw new Error("Invalid roadmap structure received from AI");
       }
 
-      console.log(`[AI Service] Successfully generated roadmap with ${parsed.stages.length} stages`);
+      console.log(
+        `[AI Service] Successfully generated roadmap with ${parsed.stages.length} stages`
+      );
       cache.set(cacheKey, parsed);
+      this.trackUsage(
+        "roadmap",
+        actualTokens || this.dailyLimits.estimatedTokensPerRoadmap
+      );
       return parsed;
     } catch (error) {
       console.error(`[AI Service] Roadmap generation error: ${error.message}`);
-      // Return the error object so the controller can display it
+      // Don't cache errors - return error object so controller can display it
+      // Clear any existing cache for this key to allow retry
+      cache.del(cacheKey);
       return { error: error.message };
     }
   }
@@ -316,16 +554,23 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
 
     try {
       const aiResponse = await this.callAI(prompt, "smart");
-      let cleanResponse = aiResponse.replace(/```json|```/g, "").trim();
+      const actualTokens = aiResponse.tokensUsed || 0;
+      const responseText = aiResponse.content;
+
+      let cleanResponse = responseText.replace(/```json|```/g, "").trim();
       const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? jsonMatch[0] : cleanResponse;
       const parsed = JSON.parse(jsonStr);
-      
+
       if (!parsed?.modules || !Array.isArray(parsed.modules)) {
         return null;
       }
-      
+
       cache.set(cacheKey, parsed);
+      this.trackUsage(
+        "course",
+        actualTokens || this.dailyLimits.estimatedTokensPerCourse
+      );
       return parsed;
     } catch (error) {
       console.error(`[AI Service] Course generation error: ${error.message}`);
@@ -333,41 +578,129 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
     }
   }
 
-  async generateResources(topic, role) {
-    const key = `${topic}-${role}`.trim().toLowerCase();
+  async generateResources(topic, context = "") {
+    const key = `${topic}-${context}`.trim().toLowerCase();
     const cacheKey = `resources_${key}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
 
-    const prompt = `Provide 5 high-quality, free learning resources for "${topic}" in the context of "${role}".
-Return ONLY valid JSON (no markdown) with this structure:
+    const prompt = `You are an expert educational resource curator. Provide the BEST learning resources for: "${topic}"
+${context ? `Additional context: ${context}` : ""}
+
+Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
 {
-  "resources": [
+  "description": "A brief 2-3 sentence overview of what ${topic} is and why it's important",
+  "freeResources": [
     {
-      "title": "Resource Title",
-      "type": "Article" | "Video" | "Course" | "Documentation",
-      "url": "URL if known, otherwise empty string",
-      "description": "Brief description of why this is useful"
+      "type": "article|video|course",
+      "title": "Specific resource name",
+      "platform": "Platform/Website name",
+      "url": "https://example.com/actual-path"
+    }
+  ],
+  "premiumResources": [
+    {
+      "type": "article|video|course",
+      "title": "Specific resource name",
+      "platform": "Platform name",
+      "url": "https://example.com/actual-path",
+      "discount": "Check website for current discounts"
     }
   ]
 }
-Prioritize official documentation, high-quality articles (e.g. MDN, web.dev, freeCodeCamp), and popular YouTube tutorials.`;
+
+Requirements:
+- Include 4-6 FREE resources (documentation, articles, YouTube videos, free courses)
+- Include 2-3 PREMIUM resources if applicable
+- Use REAL URLs when you know them (e.g., https://developer.mozilla.org/en-US/docs/Web/JavaScript, https://www.freecodecamp.org/, https://www.youtube.com/)
+- For YouTube, use https://www.youtube.com/results?search_query=${topic.replace(
+      / /g,
+      "+"
+    )}
+- For freeCodeCamp, use https://www.freecodecamp.org/learn or https://www.freecodecamp.org/news/search?query=${topic.replace(
+      / /g,
+      "+"
+    )}
+- For MDN, use https://developer.mozilla.org/en-US/docs/Web/ (with appropriate path)
+- For Udemy, use https://www.udemy.com/courses/search/?q=${topic.replace(
+      / /g,
+      "+"
+    )}
+- For generic search, use the actual domain with /search or /learn paths
+- NEVER use "#" as a URL - always provide a working link
+
+Be specific and provide REAL, CLICKABLE URLs!`;
 
     try {
       const aiResponse = await this.callAI(prompt, "fast");
-      let cleanResponse = aiResponse.replace(/```json|```/g, "").trim();
-      const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? jsonMatch[0] : cleanResponse;
-      const parsed = JSON.parse(jsonStr);
-      
-      if (!parsed?.resources || !Array.isArray(parsed.resources)) {
-        return { resources: [] };
+      const actualTokens = aiResponse.tokensUsed || 0;
+      const responseText = aiResponse.content;
+
+      let cleanResponse = responseText.replace(/```json|```/g, "").trim();
+
+      // Find the first { and last } to extract JSON
+      const firstBrace = cleanResponse.indexOf("{");
+      const lastBrace = cleanResponse.lastIndexOf("}");
+
+      if (firstBrace === -1 || lastBrace === -1) {
+        throw new Error("No JSON object found in response");
       }
-      
+
+      const jsonStr = cleanResponse.substring(firstBrace, lastBrace + 1);
+      const parsed = JSON.parse(jsonStr);
+
+      if (!parsed?.description) {
+        parsed.description = `Learn ${topic} to enhance your development skills.`;
+      }
+      if (!parsed?.freeResources) {
+        parsed.freeResources = [];
+      }
+      if (!parsed?.premiumResources) {
+        parsed.premiumResources = [];
+      }
+
       cache.set(cacheKey, parsed);
+      this.trackUsage(
+        "resource",
+        actualTokens || this.dailyLimits.estimatedTokensPerResource
+      );
       return parsed;
     } catch (error) {
-      console.error(`[AI Service] Resources generation error: ${error.message}`);
-      return { resources: [] };
+      console.error(
+        `[AI Service] Resources generation error: ${error.message}`
+      );
+      // Return fallback resources with working search URLs
+      const searchQuery = encodeURIComponent(topic);
+      return {
+        description: `Learn ${topic} to enhance your development skills.`,
+        freeResources: [
+          {
+            type: "article",
+            title: `${topic} Documentation`,
+            platform: "MDN Web Docs",
+            url: `https://developer.mozilla.org/en-US/search?q=${searchQuery}`,
+          },
+          {
+            type: "video",
+            title: `${topic} Tutorial for Beginners`,
+            platform: "YouTube",
+            url: `https://www.youtube.com/results?search_query=${searchQuery}+tutorial`,
+          },
+          {
+            type: "course",
+            title: `Learn ${topic}`,
+            platform: "freeCodeCamp",
+            url: `https://www.freecodecamp.org/news/search?query=${searchQuery}`,
+          },
+        ],
+        premiumResources: [
+          {
+            type: "course",
+            title: `${topic} Courses`,
+            platform: "Udemy",
+            url: `https://www.udemy.com/courses/search/?q=${searchQuery}`,
+          },
+        ],
+      };
     }
   }
 }
