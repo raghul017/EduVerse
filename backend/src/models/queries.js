@@ -37,15 +37,36 @@ export const PostModel = {
        RETURNING *`,
       [creatorId, title, description, videoUrl, thumbnailUrl, subject, tags, duration, transcript]
     ).then((res) => res.rows[0]),
-  list: ({ limit = 10, offset = 0 }) =>
-    query(
-      `SELECT posts.*, users.name as creator_name
+  list: ({ limit = 10, offset = 0, userId = null }) => {
+    if (userId) {
+      return query(
+        `SELECT posts.*, 
+         users.name as creator_name,
+         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id AND user_id = $3) > 0 as liked,
+         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id AND user_id = $3) > 0 as bookmarked
+         FROM posts
+         JOIN users ON users.id = posts.creator_id
+         ORDER BY posts.created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset, userId]
+      ).then((res) => res.rows);
+    }
+    return query(
+      `SELECT posts.*, 
+       users.name as creator_name,
+       (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
+       (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+       false as liked,
+       false as bookmarked
        FROM posts
        JOIN users ON users.id = posts.creator_id
        ORDER BY posts.created_at DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset]
-    ).then((res) => res.rows)
+    ).then((res) => res.rows);
+  }
 };
 
 export const FollowModel = {

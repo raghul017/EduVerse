@@ -1,22 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import GeneratorLayout from "../components/ai/GeneratorLayout.jsx";
 import { aiGenerate } from "../utils/api.js";
 
 function RoadmapGenerator() {
+  const [searchParams] = useSearchParams();
   const [topic, setTopic] = useState("");
   const [answerQuestions, setAnswerQuestions] = useState(false);
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!topic.trim()) return;
+  // Auto-generate roadmap when role query parameter is present
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam) {
+      setTopic(roleParam);
+      generateRoadmap(roleParam);
+    }
+  }, [searchParams]);
+
+  const generateRoadmap = async (topicToGenerate) => {
+    if (!topicToGenerate?.trim()) return;
     setLoading(true);
     setError(null);
     setRoadmap(null);
     try {
-      const data = await aiGenerate("roadmap", { topic, answerQuestions });
+      const data = await aiGenerate("roadmap", { topic: topicToGenerate, answerQuestions });
       setRoadmap(data);
     } catch (err) {
       setError(
@@ -25,6 +35,11 @@ function RoadmapGenerator() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    generateRoadmap(topic);
   };
 
   const stages = roadmap?.stages || [];
@@ -109,5 +124,3 @@ function RoadmapGenerator() {
 }
 
 export default RoadmapGenerator;
-
-

@@ -25,7 +25,7 @@ function FeedContainer({ searchQuery = "" }) {
     : posts;
 
   return (
-    <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <section className="grid gap-x-4 gap-y-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {visiblePosts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}

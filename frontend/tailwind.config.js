@@ -1,45 +1,47 @@
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,jsx}'
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Use CSS variables so light/dark themes share the same Tailwind tokens
-        background: 'var(--color-background)',
-        surface: 'var(--color-surface)',
-        card: 'var(--color-card)',
-        border: 'var(--color-border)',
-        textPrimary: 'var(--color-text-primary)',
-        textSecondary: 'var(--color-text-secondary)',
-        accent: 'var(--color-accent)',
-        accentHover: 'var(--color-accent-hover)',
-        danger: 'var(--color-danger)',
-        success: 'var(--color-success)',
-        warning: 'var(--color-warning)',
-        // Legacy aliases for compatibility
-        primary: 'var(--color-accent)',
-        bg: 'var(--color-background)',
-        text: 'var(--color-text-primary)',
-        muted: 'var(--color-text-secondary)',
-        error: 'var(--color-danger)'
+        background: "var(--background)",
+        surface: "var(--surface)",
+        muted: "var(--muted)",
+        border: "var(--border)",
+        divider: "var(--divider)",
+        
+        textPrimary: "var(--text-primary)",
+        textSecondary: "var(--text-secondary)",
+        textMuted: "var(--text-muted)",
+        textDisabled: "var(--text-disabled)",
+        
+        void: "var(--void)",
+        accent: "var(--accent)",
+        
+        success: "var(--success)",
+        warning: "var(--warning)",
+        error: "var(--error)",
+        info: "var(--info)",
+        ring: 'var(--color-ring)'
       },
       fontFamily: {
-        primary: ['Inter', 'system-ui', 'sans-serif']
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        heading: ['Lato', 'system-ui', 'sans-serif']
       },
       borderRadius: {
-        sm: '4px',
-        md: '8px',
-        lg: '12px',
-        xl: '16px'
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)',
+        full: 'var(--radius-full)'
       },
       boxShadow: {
-        card: '0 4px 12px rgba(0, 0, 0, 0.3)',
-        hover: '0 6px 20px rgba(0,0,0,0.4)'
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        glow: 'var(--shadow-glow)'
       },
       maxWidth: {
-        layout: '1280px'
+        layout: 'var(--layout-max-width)'
       }
     }
   },

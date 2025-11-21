@@ -54,7 +54,7 @@ function Feed() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative z-10">
       <div className="max-w-layout mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Filters */}

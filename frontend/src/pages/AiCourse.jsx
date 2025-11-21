@@ -43,7 +43,7 @@ function AiCourse() {
   const stages = course?.stages || [];
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen flex relative z-10">
       {/* Left Sidebar */}
       <aside className="w-64 border-r border-border bg-surface flex flex-col">
         <div className="p-6 border-b border-border">

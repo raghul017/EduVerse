@@ -1,100 +1,80 @@
 import { Link } from 'react-router-dom';
-import Button from '../common/Button.jsx';
-import VideoPlayer from './VideoPlayer.jsx';
-import { usePostStore } from '../../store/postStore.js';
-import { useAuthStore } from '../../store/authStore.js';
+import { motion } from 'framer-motion';
+import { Play, MoreVertical, CheckCircle2, Eye, Clock } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
-const Pill = ({ children, variant = 'default' }) => {
-  const variants = {
-    default: 'bg-surface border border-border text-textSecondary',
-    success: 'bg-success/20 text-success border border-success/30',
-    warning: 'bg-warning/20 text-warning border border-warning/30'
-  };
+function PostCard({ post, index = 0 }) {
   return (
-    <span className={`px-3 py-1 rounded-full text-[11px] font-medium ${variants[variant]}`}>{children}</span>
-  );
-};
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="group flex flex-col gap-3 cursor-pointer"
+    >
+      {/* Thumbnail Container */}
+      <Link to={`/posts/${post.id}`} className="relative aspect-video rounded-xl overflow-hidden bg-surface border border-border group-hover:border-accent/50 transition-all duration-300 shadow-sm group-hover:shadow-glow">
+        <img
+          src={post.thumbnail || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop"}
+          alt={post.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        
+        {/* Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Duration Pill */}
+        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 backdrop-blur-sm rounded text-[10px] font-bold text-white">
+          {post.duration || "10:00"}
+        </div>
 
-function PostCard ({ post }) {
-  const { toggleLike, toggleBookmark, deletePost } = usePostStore();
-  const { user } = useAuthStore();
-  const isOwner = user?.id === post.creator_id;
-
-  const handleDelete = async () => {
-    if (!window.confirm('Delete this video?')) return;
-    try {
-      await deletePost(post.id);
-    } catch (error) {
-      alert(error.response?.data?.message || 'Unable to delete right now.');
-    }
-  };
-
-  return (
-    <article className="rounded-lg border border-border bg-card shadow-card hover:shadow-hover transition overflow-hidden">
-      <VideoPlayer source={post.video_url} thumbnail={post.thumbnail_url} title={post.title} />
-      <div className="p-6 space-y-4">
-        <div className="flex flex-wrap items-center gap-3 justify-between text-xs">
-          <Pill>{post.subject}</Pill>
-          <div className="flex items-center gap-2 text-textSecondary">
-            <span>{post.duration ? `${Math.round(post.duration / 60)} min` : 'Short lesson'}</span>
-            <Pill variant={post.transcript_ready ? 'success' : 'warning'}>
-              {post.transcript_ready ? 'Transcript ready' : 'Analyzing audio'}
-            </Pill>
-            {isOwner && (
-              <button
-                onClick={handleDelete}
-                className="text-danger text-[11px] uppercase tracking-wide hover:text-danger/80 transition"
-              >
-                Delete
-              </button>
-            )}
+        {/* Play Button Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
+            <Play size={20} fill="currentColor" />
           </div>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold text-textPrimary">{post.title}</h3>
-          <p className="text-textSecondary text-sm mt-2 max-h-16 overflow-hidden text-ellipsis">
-            {post.description}
-          </p>
+      </Link>
+
+      {/* Meta Data */}
+      <div className="flex gap-3 items-start px-1">
+        {/* Avatar */}
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-secondary flex-shrink-0 p-0.5">
+          <img 
+            src={post.creator?.avatar || `https://ui-avatars.com/api/?name=${post.creator?.name || 'User'}`}
+            alt=""
+            className="w-full h-full rounded-[6px] object-cover bg-background"
+          />
         </div>
-        <div className="flex flex-wrap gap-2">
-          {post.tags?.map((tag) => (
-            <span key={tag} className="text-xs px-3 py-1 rounded-full bg-accent/20 text-accent border border-accent/30">
-              #{tag}
-            </span>
-          ))}
-        </div>
-        <div className="flex items-center justify-between text-sm text-textSecondary">
-          <Link to={`/profile/${post.creator_id}`} className="text-textPrimary font-semibold hover:text-accent transition">
-            {post.creator_name || 'Creator'}
+
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <Link to={`/posts/${post.id}`}>
+            <h3 className="text-base font-bold text-white leading-tight line-clamp-2 group-hover:text-accent transition-colors">
+              {post.title}
+            </h3>
           </Link>
-          <div className="flex gap-4 text-xs">
-            <span>{post.views_count} views</span>
-            <span>{post.likes_count} likes</span>
+
+          {/* Creator & Stats */}
+          <div className="mt-1 flex flex-col gap-0.5">
+            <div className="flex items-center gap-1 text-xs text-textSecondary hover:text-textPrimary transition-colors">
+              <span className="font-medium">{post.creator?.name || "EduVerse Creator"}</span>
+              <CheckCircle2 size={10} className="text-accent" fill="currentColor" />
+            </div>
+            
+            <div className="flex items-center gap-1 text-[11px] text-textMuted">
+              <span>{post.views || 0} views</span>
+              <span className="w-0.5 h-0.5 bg-textMuted rounded-full" />
+              <span>{post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : "Just now"}</span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button
-            variant={post.liked ? 'secondary' : 'primary'}
-            size="sm"
-            onClick={() => toggleLike(post.id)}
-          >
-            {post.liked ? 'Liked' : 'Like'}
-          </Button>
-          <Button
-            variant={post.bookmarked ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => toggleBookmark(post.id)}
-          >
-            {post.bookmarked ? 'Bookmarked' : 'Bookmark'}
-          </Button>
-          <Link to={`/posts/${post.id}`} className="ml-auto text-accent text-sm font-semibold flex items-center gap-2 hover:text-accentHover transition">
-            AI Tutor
-            {!post.transcript_ready && <span className="text-[10px] uppercase">beta</span>}
-            →
-          </Link>
-        </div>
+
+        {/* Options */}
+        <button className="text-textSecondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-surface rounded">
+          <MoreVertical size={16} />
+        </button>
       </div>
-    </article>
+    </motion.div>
   );
 }
 

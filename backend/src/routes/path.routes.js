@@ -8,6 +8,7 @@ import {
   updatePathProgress,
   aiRoadmap,
   aiCourse,
+  aiResources,
 } from "../controllers/path.controller.js";
 
 const router = Router();
@@ -19,5 +20,6 @@ router.get("/:id/progress", authenticate, getPathProgress);
 router.post("/:id/progress", authenticate, updatePathProgress);
 router.post("/ai-roadmap", optionalAuth, aiRoadmap);
 router.post("/ai-course", optionalAuth, aiCourse);
+router.post("/ai-resources", optionalAuth, aiResources);
 
 export default router;

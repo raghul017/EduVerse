@@ -1,3 +1,5 @@
+import 'dotenv/config'; // Load .env before anything else
+
 import app from './src/app.js';
 import { env } from './src/config/environment.js';
 

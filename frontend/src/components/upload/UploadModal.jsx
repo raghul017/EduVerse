@@ -17,6 +17,7 @@ function UploadModal () {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -28,29 +29,55 @@ function UploadModal () {
       setMessage('Upload a video first.');
       return;
     }
+    if (!form.title.trim()) {
+      setMessage('Title is required.');
+      return;
+    }
+    
     const payload = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (key !== 'tags') {
+      if (key !== 'tags' && value) {
         payload.append(key, value);
       }
     });
-    payload.append(
-      'tags',
-      JSON.stringify(form.tags.split(',').map((tag) => tag.trim()).filter(Boolean))
-    );
+    if (form.tags) {
+      payload.append(
+        'tags',
+        JSON.stringify(form.tags.split(',').map((tag) => tag.trim()).filter(Boolean))
+      );
+    }
     payload.append('video', file);
 
     setLoading(true);
     setMessage(null);
+    setUploadProgress(0);
     try {
-      await api.post('/posts', payload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      console.log('[Upload] Starting upload:', { title: form.title, fileSize: file.size, fileName: file.name });
+      const response = await api.post('/posts', payload, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 300000, // 5 minutes timeout for large video uploads
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+            console.log('[Upload] Progress:', percentCompleted + '%');
+          }
+        }
       });
-      setMessage('Upload successful! Pending review.');
+      console.log('[Upload] Success:', response.data);
+      setMessage('Upload successful! Redirecting...');
       setForm(defaultForm);
       setFile(null);
+      // Redirect to videos page after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/videos';
+      }, 2000);
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Upload failed.');
+      console.error('[Upload] Error:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Upload failed. Please check your connection and try again.';
+      setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -99,13 +126,27 @@ function UploadModal () {
           onChange={handleChange}
         />
       </div>
+      {loading && uploadProgress > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs text-textSecondary">
+            <span>Uploading...</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="h-2 bg-surface rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-accent transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
       {message && (
         <p className={`text-sm ${message.includes('successful') ? 'text-success' : 'text-danger'}`}>
           {message}
         </p>
       )}
       <Button type="submit" disabled={loading}>
-        {loading ? 'Uploading...' : 'Publish lesson'}
+        {loading ? (uploadProgress > 0 ? `Uploading... ${uploadProgress}%` : 'Uploading...') : 'Publish lesson'}
       </Button>
     </form>
   );

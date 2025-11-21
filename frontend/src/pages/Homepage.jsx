@@ -1,94 +1,24 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles, Users, BookOpen, TrendingUp } from 'lucide-react';
 import { usePathStore } from "../store/pathStore.js";
 import { useCommunityStore } from "../store/communityStore.js";
+import { ROLE_BASED_ROADMAPS, SKILL_BASED_ROADMAPS } from "../utils/constants.js";
 import Footer from "../components/common/Footer.jsx";
+import Button from "../components/ui/Button.jsx";
 
-// Role-based roadmaps (using your existing paths data)
-const roleBasedRoadmaps = [
-  "Frontend Developer",
-  "Backend Developer",
-  "Full Stack Developer",
-  "DevOps Engineer",
-  "Data Analyst",
-  "AI Engineer",
-  "Data Scientist",
-  "Data Engineer",
-  "Android Developer",
-  "Machine Learning Engineer",
-  "iOS Developer",
-  "Blockchain Developer",
-  "QA Engineer",
-  "Software Architect",
-  "Cyber Security",
-  "UX Designer",
-  "Technical Writer",
-  "Game Developer",
-  "Product Manager",
-  "Engineering Manager",
-];
-
-// Skill-based roadmaps
-const skillBasedRoadmaps = [
-  "SQL",
-  "Computer Science",
-  "React",
-  "Vue",
-  "Angular",
-  "JavaScript",
-  "TypeScript",
-  "Node.js",
-  "Python",
-  "System Design",
-  "Java",
-  "ASP.NET Core",
-  "API Design",
-  "Spring Boot",
-  "Flutter",
-  "C++",
-  "Rust",
-  "Go",
-  "Design and Architecture",
-  "GraphQL",
-  "React Native",
-  "Design System",
-  "Prompt Engineering",
-  "MongoDB",
-  "Linux",
-  "Kubernetes",
-  "Docker",
-  "AWS",
-  "Terraform",
-  "Data Structures & Algorithms",
-  "Redis",
-  "Git and GitHub",
-  "PHP",
-  "Next.js",
-  "Kotlin",
-  "HTML",
-  "CSS",
-  "Swift & Swift UI",
-];
-
-// Guides (placeholder - you can fetch from your API)
 const guides = [
   { title: "10 DevOps Deployment Tools for 2025", type: "Textual" },
-  { title: "30 C++ Interview Questions and Answers (+ Quiz)", type: "Question" },
-  { title: "Top 14 DevOps Testing Tools: My Best Recommendations", type: "Textual" },
-  { title: "Top 30 System Design Interview Questions (+ Quiz)", type: "Question" },
-  { title: "Top 37 REST API Interview Questions (and Answers)", type: "Question" },
-  { title: "Top 20 Python Interview Questions and Answers", type: "Question" },
-  { title: "Is Python Hard to Learn? Our Experts Say...", type: "Textual" },
-  { title: "What Does a Data Analyst Do?", type: "Textual" },
-  { title: "Go vs. Rust Compared: Which is right for you?", type: "Textual" },
-  { title: "Python vs JavaScript: The Ultimate Guide for 2025", type: "Textual" },
+  { title: "30 C++ Interview Questions and Answers", type: "Question" },
+  { title: "Top 14 DevOps Testing Tools", type: "Textual" },
+  { title: "Top 30 System Design Interview Questions", type: "Question" },
+  { title: "Python vs JavaScript: The Ultimate Guide", type: "Textual" },
 ];
 
 function Homepage() {
   const { paths, fetchPaths } = usePathStore();
   const { communities, fetchCommunities } = useCommunityStore();
-  
-  // Add fade-in animation to homepage
 
   useEffect(() => {
     fetchPaths();
@@ -96,282 +26,284 @@ function Homepage() {
   }, []);
 
   const RoadmapCard = ({ title, isNew = false, index = 0 }) => (
-    <Link
-      to={`/ai-roadmap?role=${encodeURIComponent(title)}`}
-      className="group relative flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:border-accent hover:shadow-hover transition-smooth hover-lift animate-slide-up cursor-pointer"
-      style={{ animationDelay: `${index * 0.05}s` }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.03 }}
     >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-textPrimary font-medium text-sm group-hover:text-accent transition">
-            {title}
-          </span>
-          {isNew && (
-            <span className="px-1.5 py-0.5 bg-accent/20 text-accent text-[10px] font-semibold rounded uppercase">
-              New
+      <Link
+        to={`/ai-roadmap?role=${encodeURIComponent(title)}`}
+        className="group relative flex items-center gap-3 p-5 bg-card border border-border rounded-xl hover:border-accent/50 hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1"
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-textPrimary font-semibold text-sm group-hover:text-accent transition-colors">
+              {title}
             </span>
-          )}
+            {isNew && (
+              <span className="px-2 py-0.5 bg-accent/10 text-accent text-[10px] font-bold rounded-full uppercase border border-accent/20">
+                New
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="w-5 h-5 border border-border rounded flex items-center justify-center group-hover:border-accent transition">
-        <svg
-          className="w-3 h-3 text-textSecondary group-hover:text-accent transition"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </div>
-    </Link>
+        <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+      </Link>
+    </motion.div>
+  );
+
+  const GuideCard = ({ title, type, index = 0 }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.03 }}
+    >
+      <Link
+        to={`/guide-generator?topic=${encodeURIComponent(title)}`}
+        className="group flex items-center gap-3 p-5 bg-card border border-border rounded-xl hover:border-accent/50 hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1"
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-textPrimary font-semibold text-sm group-hover:text-accent transition-colors">
+            {title}
+          </p>
+          <p className="text-textSecondary text-xs mt-1 font-medium">{type}</p>
+        </div>
+        <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+      </Link>
+    </motion.div>
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="max-w-layout mx-auto px-6 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-textPrimary mb-4">
-            EduVerse Roadmaps
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="py-20 md:py-28 text-center relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent border border-accent/20 text-sm font-semibold mb-6"
+          >
+            <Sparkles className="w-4 h-4" />
+            AI-Powered Learning Platform
+          </motion.div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-textPrimary mb-6 text-balance leading-tight">
+            Learn, Grow, and Build Your
+            <span className="block bg-gradient-to-r from-accent to-accentHover bg-clip-text text-transparent">
+              Future with AI
+            </span>
           </h1>
-          <p className="text-xl text-textSecondary max-w-2xl mx-auto">
-            A community-driven platform to learn, grow, and build your future using AI-powered learning.
+          <p className="text-xl text-textSecondary max-w-2xl mx-auto mb-10 text-balance leading-relaxed">
+            A community-driven platform to learn, grow, and build your future
+            using AI-powered learning roadmaps, courses, and guides.
           </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/ai-tutor">
+              <Button size="lg" className="text-base px-8 py-3">
+                Start Learning
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/videos">
+              <Button variant="outline" size="lg" className="text-base px-8 py-3">
+                Explore Videos
+              </Button>
+            </Link>
+          </div>
         </div>
+      </motion.section>
 
-        {/* Role-Based Learning Roadmaps */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-textPrimary">
+      {/* Role-Based Roadmaps */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="py-16 border-t border-border"
+      >
+        <div className="max-w-layout mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-textPrimary mb-3">
               Role-Based Learning Roadmaps
             </h2>
-            <Link
-              to="/paths"
-              className="text-sm text-textSecondary hover:text-accent transition"
-            >
-              View All →
-            </Link>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto">
+              Structured learning paths tailored to your career goals
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {roleBasedRoadmaps.map((role, index) => (
+            {ROLE_BASED_ROADMAPS.slice(0, 12).map((role, index) => (
               <RoadmapCard key={role} title={role} index={index} />
             ))}
-            <Link
-              to="/paths"
-              className="group flex items-center justify-center gap-2 p-4 bg-card border-2 border-dashed border-border rounded-lg hover:border-accent hover:bg-surface transition cursor-pointer"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
             >
-              <svg
-                className="w-5 h-5 text-textSecondary group-hover:text-accent transition"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <Link
+                to="/paths"
+                className="group flex items-center justify-center gap-2 p-5 bg-card border-2 border-dashed border-border rounded-xl hover:border-accent hover:bg-surface/50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              <span className="text-sm font-medium text-textSecondary group-hover:text-accent transition">
-                Create your own roadmap
-              </span>
-            </Link>
+                <span className="text-textSecondary group-hover:text-accent font-semibold text-sm">
+                  View All Roadmaps
+                </span>
+                <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+              </Link>
+            </motion.div>
           </div>
-        </section>
+        </div>
+      </motion.section>
 
-        {/* Skill-Based Learning Roadmaps */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-textPrimary">
+      {/* Skill-Based Roadmaps */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="py-16 border-t border-border bg-surface/30"
+      >
+        <div className="max-w-layout mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-textPrimary mb-3">
               Skill-Based Learning Roadmaps
             </h2>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto">
+              Master specific technologies and skills with focused learning paths
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {skillBasedRoadmaps.map((skill, index) => (
+            {SKILL_BASED_ROADMAPS.slice(0, 12).map((skill, index) => (
               <RoadmapCard
                 key={skill}
                 title={skill}
-                index={index}
                 isNew={skill === "Shell / Bash" || skill === "Laravel"}
+                index={index}
               />
             ))}
-            <Link
-              to="/paths"
-              className="group flex items-center justify-center gap-2 p-4 bg-card border-2 border-dashed border-border rounded-lg hover:border-accent hover:bg-surface transition cursor-pointer"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
             >
-              <svg
-                className="w-5 h-5 text-textSecondary group-hover:text-accent transition"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              <span className="text-sm font-medium text-textSecondary group-hover:text-accent transition">
-                Create your own roadmap
-              </span>
-            </Link>
-          </div>
-        </section>
-
-        {/* Project Ideas */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-semibold text-textPrimary mb-6">
-            Project Ideas
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {["Frontend", "Backend", "DevOps"].map((project) => (
               <Link
-                key={project}
-                to={`/feed?subject=${project}`}
-                className="group p-6 bg-card border border-border rounded-lg hover:border-accent hover:shadow-hover transition"
+                to="/paths"
+                className="group flex items-center justify-center gap-2 p-5 bg-card border-2 border-dashed border-border rounded-xl hover:border-accent hover:bg-surface/50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
               >
-                <h3 className="text-lg font-semibold text-textPrimary mb-2 group-hover:text-accent transition">
-                  {project}
-                </h3>
-                <p className="text-sm text-textSecondary">
-                  Explore {project.toLowerCase()} project ideas and tutorials
-                </p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Best Practices */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-semibold text-textPrimary mb-6">
-            Best Practices
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {["AWS", "API Security", "Backend Performance", "Frontend Performance", "Code Review"].map(
-              (practice) => (
-                <Link
-                  key={practice}
-                  to={`/feed?tag=${practice}`}
-                  className="group p-4 bg-card border border-border rounded-lg hover:border-accent hover:shadow-hover transition text-center"
-                >
-                  <span className="text-sm font-medium text-textPrimary group-hover:text-accent transition">
-                    {practice}
-                  </span>
-                </Link>
-              )
-            )}
-          </div>
-        </section>
-
-        {/* Guides */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-textPrimary">Guides</h2>
-            <Link
-              to="/feed"
-              className="text-sm text-textSecondary hover:text-accent transition"
-            >
-              View All Guides →
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {guides.map((guide, idx) => (
-              <Link
-                key={idx}
-                to="/feed"
-                className="group flex items-center justify-between p-4 bg-card border border-border rounded-lg hover:border-accent hover:shadow-hover transition"
-              >
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-textPrimary group-hover:text-accent transition">
-                    {guide.title}
-                  </span>
-                </div>
-                <span className="ml-4 px-2 py-1 text-xs font-medium text-textSecondary bg-surface rounded">
-                  {guide.type}
+                <span className="text-textSecondary group-hover:text-accent font-semibold text-sm">
+                  View All Skills
                 </span>
+                <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
               </Link>
-            ))}
+            </motion.div>
           </div>
-        </section>
+        </div>
+      </motion.section>
 
-        {/* Actively Maintained */}
-        <section className="mb-16">
-          <div className="bg-card border border-border rounded-lg p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🚀</span>
-              <h2 className="text-2xl font-semibold text-textPrimary">
-                Actively Maintained
-              </h2>
-            </div>
-            <p className="text-textSecondary mb-6">
-              We continuously improve our content based on community feedback and industry trends.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button className="px-4 py-2 text-sm font-medium text-textSecondary hover:text-textPrimary bg-surface border border-border rounded-md hover:border-accent transition">
-                View Full Changelog
-              </button>
-              <button className="px-4 py-2 text-sm font-medium text-textSecondary hover:text-textPrimary bg-surface border border-border rounded-md hover:border-accent transition">
-                🔔 Subscribe for Notifications
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Join the Community */}
-        <section className="mb-16">
-          <div className="bg-card border border-border rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-semibold text-textPrimary mb-4">
-              Join the Community
+      {/* Guides */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="py-16 border-t border-border"
+      >
+        <div className="max-w-layout mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-textPrimary mb-3 flex items-center justify-center gap-3">
+              <BookOpen className="w-8 h-8 text-accent" />
+              Guides
             </h2>
-            <p className="text-textSecondary mb-8 max-w-2xl mx-auto">
-              EduVerse is visited by thousands of learners every month. Join our growing community of students, creators, and educators.
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto">
+              Comprehensive guides to help you master new skills
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <div className="text-3xl font-bold text-textPrimary mb-2">
-                  {communities.reduce((sum, c) => sum + (c.member_count || 0), 0).toLocaleString()}
-                </div>
-                <p className="text-sm text-textSecondary mb-3">Community Members</p>
-                <Link
-                  to="/communities"
-                  className="inline-block px-4 py-2 text-sm font-medium bg-accent text-background rounded-md hover:bg-accentHover transition"
-                >
-                  🤝 Join Communities
-                </Link>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-textPrimary mb-2">
-                  {paths.length}+
-                </div>
-                <p className="text-sm text-textSecondary mb-3">Learning Paths</p>
-                <Link
-                  to="/paths"
-                  className="inline-block px-4 py-2 text-sm font-medium bg-accent text-background rounded-md hover:bg-accentHover transition"
-                >
-                  📚 Explore Paths
-                </Link>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-textPrimary mb-2">AI</div>
-                <p className="text-sm text-textSecondary mb-3">Powered Learning</p>
-                <Link
-                  to="/ai-course"
-                  className="inline-block px-4 py-2 text-sm font-medium bg-accent text-background rounded-md hover:bg-accentHover transition"
-                >
-                  ✨ Try AI Tutor
-                </Link>
-              </div>
-            </div>
           </div>
-        </section>
-      </section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {guides.map((guide, index) => (
+              <GuideCard key={guide.title} title={guide.title} type={guide.type} index={index} />
+            ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.6 }}
+            >
+              <Link
+                to="/guide-generator"
+                className="group flex items-center justify-center gap-2 p-5 bg-card border-2 border-dashed border-border rounded-xl hover:border-accent hover:bg-surface/50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+              >
+                <span className="text-textSecondary group-hover:text-accent font-semibold text-sm">
+                  View All Guides
+                </span>
+                <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Communities */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="py-16 border-y border-border bg-surface/30"
+      >
+        <div className="max-w-layout mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-textPrimary mb-3 flex items-center justify-center gap-3">
+              <Users className="w-8 h-8 text-accent" />
+              Actively Maintained Communities
+            </h2>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto">
+              Join vibrant communities of learners and experts
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {communities.slice(0, 3).map((community, index) => (
+              <motion.div
+                key={community.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.7 + index * 0.1 }}
+              >
+                <Link
+                  to={`/communities?id=${community.id}`}
+                  className="group flex items-center gap-3 p-5 bg-card border border-border rounded-xl hover:border-accent/50 hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-accentHover flex items-center justify-center text-white text-sm font-bold shadow-md">
+                    {community.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-textPrimary font-semibold text-sm group-hover:text-accent transition-colors">
+                      {community.name}
+                    </p>
+                    <p className="text-textSecondary text-xs mt-1">
+                      {community.subject} · {community.member_count || 0} members
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                </Link>
+              </motion.div>
+            ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 1 }}
+            >
+              <Link
+                to="/communities"
+                className="group flex items-center justify-center gap-2 p-5 bg-card border-2 border-dashed border-border rounded-xl hover:border-accent hover:bg-surface/50 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+              >
+                <span className="text-textSecondary group-hover:text-accent font-semibold text-sm">
+                  View All Communities
+                </span>
+                <ArrowRight className="w-5 h-5 text-textSecondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
 
       <Footer />
     </div>
@@ -379,4 +311,3 @@ function Homepage() {
 }
 
 export default Homepage;
-

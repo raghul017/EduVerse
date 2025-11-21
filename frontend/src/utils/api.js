@@ -6,7 +6,7 @@ const baseURL = `${root || ""}/api`;
 
 const api = axios.create({
   baseURL,
-  timeout: 60000,
+  timeout: 300000, // 5 minutes for video uploads
   maxContentLength: Infinity,
   maxBodyLength: Infinity,
 });

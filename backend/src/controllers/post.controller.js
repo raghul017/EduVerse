@@ -13,7 +13,8 @@ export const listPosts = async (req, res, next) => {
     const page = Number(req.query.page || 1);
     const limit = 10;
     const offset = (page - 1) * limit;
-    const posts = await PostModel.list({ limit, offset });
+    const userId = req.user?.id || null;
+    const posts = await PostModel.list({ limit, offset, userId });
     res.json({ data: posts });
   } catch (error) {
     next(error);
@@ -22,9 +23,37 @@ export const listPosts = async (req, res, next) => {
 
 export const getPost = async (req, res, next) => {
   try {
-    const post = await query("SELECT * FROM posts WHERE id = $1", [
-      req.params.id,
-    ]).then((result) => result.rows[0]);
+    const userId = req.user?.id || null;
+    let post;
+    
+    if (userId) {
+      post = await query(
+        `SELECT posts.*,
+         users.name as creator_name,
+         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id AND user_id = $2) > 0 as liked,
+         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id AND user_id = $2) > 0 as bookmarked
+         FROM posts
+         LEFT JOIN users ON users.id = posts.creator_id
+         WHERE posts.id = $1`,
+        [req.params.id, userId]
+      ).then((result) => result.rows[0]);
+    } else {
+      post = await query(
+        `SELECT posts.*,
+         users.name as creator_name,
+         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         false as liked,
+         false as bookmarked
+         FROM posts
+         LEFT JOIN users ON users.id = posts.creator_id
+         WHERE posts.id = $1`,
+        [req.params.id]
+      ).then((result) => result.rows[0]);
+    }
+    
     if (!post) return res.status(404).json({ message: "Post not found" });
     res.json({ data: post });
   } catch (error) {
@@ -92,24 +121,44 @@ export const createPost = async (req, res, next) => {
   if (!req.file) {
     return res.status(400).json({ message: "Video file required" });
   }
+  
+  console.log('[Post Controller] Starting video upload:', {
+    fileName: req.file.originalname,
+    fileSize: req.file.size,
+    mimetype: req.file.mimetype,
+    title: req.body.title
+  });
+  
   try {
     const manualThumbnail =
       typeof req.body.thumbnail_url === "string" &&
       req.body.thumbnail_url.trim().length
         ? req.body.thumbnail_url.trim()
         : null;
-    const [upload, transcript] = await Promise.all([
-      uploadVideoBuffer(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype
-      ),
-      transcribeVideoBuffer(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype
-      ),
-    ]);
+    
+    console.log('[Post Controller] Uploading to Cloudinary...');
+    const upload = await uploadVideoBuffer(
+      req.file.buffer,
+      req.file.originalname,
+      req.file.mimetype
+    );
+    console.log('[Post Controller] Cloudinary upload successful:', upload.url);
+    
+    // Try to get transcript, but don't block on it
+    let transcript = null;
+    try {
+      transcript = await Promise.race([
+        transcribeVideoBuffer(req.file.buffer, req.file.originalname, req.file.mimetype),
+        new Promise((resolve) => setTimeout(() => resolve(null), 10000)) // 10s timeout
+      ]);
+      if (transcript) {
+        console.log('[Post Controller] Transcript generated during upload');
+      }
+    } catch (err) {
+      console.warn('[Post Controller] Transcript generation failed:', err.message);
+    }
+    
+    console.log('[Post Controller] Creating post in database...');
     const post = await PostModel.create({
       creatorId: req.user.id,
       title: req.body.title,
@@ -121,8 +170,36 @@ export const createPost = async (req, res, next) => {
       duration: upload.duration,
       transcript,
     });
+    console.log('[Post Controller] Post created successfully:', post.id);
+    
+    // Update transcript in background after post is created if we didn't get it
+    if (!transcript && post?.id) {
+      transcribeVideoBuffer(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype
+      ).then(t => {
+        if (t && post.id) {
+          console.log('[Post Controller] Transcript generated, updating post');
+          query("UPDATE posts SET transcript=$1 WHERE id=$2", [t, post.id]).catch(err => 
+            console.warn('[Post Controller] Failed to update transcript:', err.message)
+          );
+        }
+      }).catch(err => 
+        console.warn('[Post Controller] Transcript generation failed:', err.message)
+      );
+    }
+    
     res.status(201).json({ data: post });
   } catch (error) {
+    console.error('[Post Controller] Upload error:', error.message, error.stack);
+    // Provide more specific error messages
+    if (error.message.includes('Cloudinary')) {
+      return res.status(500).json({ message: 'Video upload service is unavailable. Please check server configuration.' });
+    }
+    if (error.message.includes('timeout')) {
+      return res.status(408).json({ message: 'Upload timed out. Please try a smaller video or check your connection.' });
+    }
     next(error);
   }
 };

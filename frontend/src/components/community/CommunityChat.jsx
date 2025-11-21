@@ -84,7 +84,6 @@ function CommunityChat({ communityId }) {
             <div
               key={msg.id}
               className={`flex ${isOwn ? "justify-end" : "justify-start"} animate-slide-up`}
-              style={{ animationDelay: `${index * 0.03}s` }}
             >
               <div
                 className={`relative max-w-[80%] rounded-2xl px-3 py-2 transition-smooth ${
