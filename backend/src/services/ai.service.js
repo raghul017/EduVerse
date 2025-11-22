@@ -469,23 +469,22 @@ Content: ${transcript.substring(0, 2000)}`;
 
     console.log(`[AI Service] Generating detailed roadmap for role: ${role}`);
 
-    const prompt = `You are an expert career advisor. Create a COMPREHENSIVE learning roadmap for becoming a ${role}, similar to roadmap.sh quality.
+    const prompt = `Generate a detailed learning roadmap for becoming a "${role}".
 
-Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
+Return ONLY valid JSON with this structure:
 {
   "title": "${role} Learning Roadmap",
-  "description": "A comprehensive path to master ${role}",
+  "description": "Brief overview of the roadmap.",
   "stages": [
     {
-      "id": "unique-id",
+      "id": "stage-1",
       "label": "Stage Name",
-      "summary": "What you'll learn in this stage",
+      "summary": "Short, concise summary of this stage.",
       "nodes": [
         {
-          "id": "node-id",
+          "id": "node-1-1",
           "label": "Specific Topic/Skill",
-          "details": "What to learn, recommended resources, estimated time",
-          "dependsOn": []
+          "details": "Concise explanation (max 1 sentence)."
         }
       ]
     }
@@ -493,14 +492,12 @@ Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
 }
 
 Requirements:
-- Create 8-10 stages covering ALL key areas (Fundamentals, Core Skills, Tools, Frameworks, Advanced, Soft Skills)
-- Each stage MUST have 4-6 nodes
-- Keep descriptions SHORT (1 sentence max) to save tokens for more nodes
-- Mention exact technologies and tools
-- Add logical dependencies
-- Focus on BREADTH and DEPTH of topics, but brevity of text
-
-Be very specific and comprehensive!`;
+1. Create 6-8 stages covering key areas.
+2. Each stage MUST have 3-5 nodes.
+3. Keep all descriptions and summaries VERY concise to save tokens.
+4. No markdown formatting or code blocks in the JSON output.
+5. Mention exact technologies and tools where relevant.
+6. Add logical dependencies between nodes if applicable.`;
 
     try {
       const aiResponse = await this.callAIWithRetry(prompt, "balanced");
@@ -612,6 +609,39 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
     } catch (error) {
       console.error(`[AI Service] Course generation error: ${error.message}`);
       return null;
+    }
+  }
+
+  async chatWithTutor(message, context) {
+    try {
+      if (!this.groq) {
+        throw new Error("Groq API key not configured");
+      }
+
+      const prompt = `
+        You are an expert AI Tutor. The user is asking a question about: "${context}".
+        
+        User Question: "${message}"
+        
+        Provide a helpful, concise, and encouraging answer. 
+        Keep it under 150 words. 
+        Use markdown for formatting.
+      `;
+
+      const completion = await this.groq.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: "llama-3.1-8b-instant",
+        temperature: 0.7,
+        max_tokens: 300,
+      });
+
+      const response = completion.choices[0]?.message?.content || "I couldn't generate a response.";
+      this.trackUsage("chat", completion.usage?.total_tokens || 0);
+      
+      return { response };
+    } catch (error) {
+      console.error("[AI Service] Chat failed:", error);
+      return { error: "Failed to get response from AI Tutor." };
     }
   }
 

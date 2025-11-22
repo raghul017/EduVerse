@@ -59,6 +59,26 @@ function AiRoadmap() {
       title: "QA Engineer",
       description: "Testing and quality assurance",
     },
+    {
+      id: "game-dev",
+      title: "Game Developer",
+      description: "Create immersive gaming experiences",
+    },
+    {
+      id: "blockchain",
+      title: "Blockchain Developer",
+      description: "Decentralized apps and smart contracts",
+    },
+    {
+      id: "ar-vr",
+      title: "AR/VR Developer",
+      description: "Augmented and Virtual Reality",
+    },
+    {
+      id: "embedded",
+      title: "Embedded Systems",
+      description: "Hardware-software integration",
+    },
   ];
 
   const skillBasedRoadmaps = [
@@ -112,9 +132,31 @@ function AiRoadmap() {
 
   return (
     <div className="min-h-screen bg-background px-6 py-8">
+      {/* Minimal AI Usage Display */}
+      <div className="max-w-7xl mx-auto px-6 pt-8">
+        <div className="flex items-center justify-between bg-white border border-stone-200 rounded-lg px-6 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-stone-100 rounded-md">
+              <Sparkles size={18} className="text-stone-700" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-stone-900">AI Usage Limit</p>
+              <p className="text-xs text-stone-500">100,000 tokens / day</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-32 h-2 bg-stone-100 rounded-full overflow-hidden">
+              <div className="h-full bg-stone-800 w-[16%]"></div>
+            </div>
+            <span className="text-sm font-medium text-stone-600">16.6% Used</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Wrapper */}
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="max-w-3xl mx-auto pt-12 pb-8 text-center px-6">
           <button
             onClick={() => navigate("/")}
             className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -148,10 +190,7 @@ function AiRoadmap() {
           />
         </div>
 
-        {/* AI Usage Stats */}
-        <div className="max-w-2xl">
-          <AIUsageStats />
-        </div>
+
 
         {/* Role-Based Roadmaps */}
         <div className="space-y-4">

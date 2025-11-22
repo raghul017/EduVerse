@@ -15,6 +15,7 @@ import {
   Loader2,
   RefreshCw,
   AlertTriangle,
+  Send,
 } from "lucide-react";
 import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
@@ -31,7 +32,49 @@ function RoadmapGenerator() {
   const [progress, setProgress] = useState({});
   const [nodeResources, setNodeResources] = useState({});
   const [loadingResources, setLoadingResources] = useState(false);
+  const [activeTab, setActiveTab] = useState("resources"); // 'resources' | 'chat'
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const roadmapRef = useRef(null);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    if (activeTab === "chat" && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, activeTab]);
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isChatLoading) return;
+
+    const userMessage = { role: "user", content: chatInput };
+    setChatMessages((prev) => [...prev, userMessage]);
+    setChatInput("");
+    setIsChatLoading(true);
+
+    try {
+      const response = await api.post("/paths/ai-chat", {
+        message: userMessage.content,
+        context: `Topic: ${selectedNode.label}. Details: ${selectedNode.details || ""}`,
+      });
+
+      if (response.data.response) {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: response.data.response },
+        ]);
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I couldn't generate a response. Please try again." },
+      ]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
 
   // Auto-generate roadmap when role query parameter is present
   useEffect(() => {
@@ -183,10 +226,10 @@ function RoadmapGenerator() {
         className={`relative group flex items-center justify-between w-64 p-4 rounded-lg border-2 text-left transition-all 
         ${
           isCompleted
-            ? "bg-green-100 border-green-600 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]"
+            ? "bg-[#e6f4ea] border-green-700 shadow-[4px_4px_0px_0px_rgba(21,128,61,1)]"
             : isSelected
-            ? "bg-yellow-300 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ring-2 ring-black"
-            : "bg-[#fffae5] border-gray-400 hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            ? "bg-[#fde047] border-stone-900 shadow-[4px_4px_0px_0px_rgba(28,25,23,1)] ring-1 ring-stone-900"
+            : "bg-[#fffbeb] border-stone-400 hover:border-stone-900 hover:shadow-[4px_4px_0px_0px_rgba(28,25,23,1)]"
         }`}
       >
         <span className={`font-bold text-sm ${isCompleted ? "text-green-900" : "text-gray-900"}`}>
@@ -262,48 +305,20 @@ function RoadmapGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 z-20 flex-shrink-0">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate("/ai-roadmap")}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft size={20} className="text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  {roadmap.title || `${topic} Developer`}
-                  <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">AI Generated</span>
-                </h1>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {roadmap.description || "Step-by-step guide to becoming a professional"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleDownload}
-                className="flex items-center gap-2 px-3 py-1.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
-              >
-                <Download size={16} />
-                Download
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden relative">
+      /* Main Content Area */
+      <div className="h-[calc(100vh-140px)] w-full flex overflow-hidden relative rounded-2xl border border-stone-200 shadow-sm bg-[#fbf7f1]">
         {/* Roadmap Canvas */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[#f8f9fa] relative custom-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[#fbf7f1] relative custom-scrollbar">
           <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 min-h-full">
+            {/* Back Button (Floating since header is removed) */}
+            <button
+                onClick={() => navigate("/ai-roadmap")}
+                className="absolute top-6 left-6 p-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm hover:bg-white transition-all z-50 group"
+            >
+                <ArrowLeft size={20} className="text-gray-600 group-hover:text-gray-900" />
+            </button>
             {/* Central Spine Line - Moved inside to grow with content */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-blue-300 transform -translate-x-1/2 z-0"></div>
+            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-stone-400 transform -translate-x-1/2 z-0"></div>
 
             {stages.map((stage, stageIndex) => (
               <div key={stage.id} className="mb-16 relative">
@@ -341,12 +356,12 @@ function RoadmapGenerator() {
                               : "M 0,24 C 48,24 48,24 96,24"  // Left to Right curve
                             }
                             fill="none"
-                            stroke="#93c5fd" // blue-300
+                            stroke="#a8a29e" // stone-400
                             strokeWidth="2"
                             strokeDasharray="6 4"
                           />
                           {/* Dot at spine connection */}
-                          <circle cx={isLeft ? 96 : 0} cy="24" r="3" fill="#3b82f6" />
+                          <circle cx={isLeft ? 96 : 0} cy="24" r="3" fill="#78716c" />
                         </svg>
                         
                         {/* Node */}
@@ -381,19 +396,33 @@ function RoadmapGenerator() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="w-[450px] bg-white border-l border-gray-200 shadow-2xl flex flex-col z-30 h-full flex-shrink-0"
+              className="w-[40%] max-w-[450px] min-w-[320px] bg-[#fbf7f1] border-l-2 border-stone-200 shadow-xl flex flex-col z-30 h-full flex-shrink-0"
             >
               {/* Sidebar Header */}
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+              <div className="p-6 border-b-2 border-stone-200 flex items-center justify-between bg-[#fbf7f1]">
                 <div className="flex gap-2">
-                  <button className="flex items-center gap-2 px-4 py-1.5 bg-black text-white rounded-md text-sm font-medium">
+                  <button 
+                    onClick={() => setActiveTab("resources")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === "resources" 
+                        ? "bg-stone-900 text-white" 
+                        : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+                    }`}
+                  >
                     <BookOpen size={16} />
                     Resources
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-md text-sm font-medium hover:bg-gray-50">
+                  <button 
+                    onClick={() => setActiveTab("chat")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === "chat" 
+                        ? "bg-stone-900 text-white" 
+                        : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+                    }`}
+                  >
                     <Sparkles size={16} />
                     AI Tutor
-                    <span className="bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded font-bold">New</span>
+                    {activeTab !== "chat" && <span className="bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded font-bold">New</span>}
                   </button>
                 </div>
                 <button
@@ -405,8 +434,10 @@ function RoadmapGenerator() {
               </div>
 
               {/* Sidebar Content */}
-              <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
-                {/* Title & Description */}
+              <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar relative">
+                {activeTab === "resources" ? (
+                  <>
+                    {/* Title & Description */}
                 <div>
                   <h2 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
                     {selectedNode.label}
@@ -542,13 +573,68 @@ function RoadmapGenerator() {
                     )}
                   </button>
                 </div>
+                  </>
+                ) : (
+                  /* Chat Interface */
+                  <div className="flex flex-col h-full">
+                    <div className="flex-1 space-y-4 pb-4">
+                      {chatMessages.length === 0 ? (
+                        <div className="text-center py-12 text-stone-500">
+                          <Sparkles size={48} className="mx-auto mb-4 text-stone-300" />
+                          <p className="text-lg font-medium text-stone-700">Ask AI Tutor</p>
+                          <p className="text-sm">Ask questions about {selectedNode.label}!</p>
+                        </div>
+                      ) : (
+                        chatMessages.map((msg, idx) => (
+                          <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                            <div className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed ${
+                              msg.role === "user" 
+                                ? "bg-stone-900 text-white rounded-br-none" 
+                                : "bg-white border border-stone-200 text-stone-800 rounded-bl-none shadow-sm"
+                            }`}>
+                              {msg.content}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                      {isChatLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-stone-100 p-3 rounded-lg rounded-bl-none">
+                            <Loader2 size={16} className="animate-spin text-stone-500" />
+                          </div>
+                        </div>
+                      )}
+                      <div ref={chatEndRef} />
+                    </div>
+
+                    {/* Chat Input */}
+                    <div className="sticky bottom-0 bg-[#fbf7f1] pt-4 border-t border-stone-200">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={chatInput}
+                          onChange={(e) => setChatInput(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                          placeholder="Ask a question..."
+                          className="w-full bg-white border border-stone-300 rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 shadow-sm"
+                        />
+                        <button
+                          onClick={handleSendMessage}
+                          disabled={!chatInput.trim() || isChatLoading}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-stone-900 text-white rounded-full disabled:opacity-50 hover:bg-stone-800 transition-colors"
+                        >
+                          <Send size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </div>
-  );
+    );
 }
 
 export default RoadmapGenerator;

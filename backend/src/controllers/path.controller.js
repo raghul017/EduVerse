@@ -323,3 +323,23 @@ export const getAiUsage = async (req, res, next) => {
     next(error);
   }
 };
+
+export const aiChat = async (req, res, next) => {
+  try {
+    const { message, context } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ message: "Message is required." });
+    }
+
+    const result = await aiService.chatWithTutor(message, context);
+    
+    if (result.error) {
+      return res.status(503).json({ message: result.error });
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};

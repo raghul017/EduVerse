@@ -1,170 +1,133 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Map, Play, Users, Brain, Flame, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, BookOpen, Video, Users, Brain } from "lucide-react";
 
 function Home() {
-  const features = [
-    {
-      icon: Map,
-      title: "AI Roadmaps",
-      description: "Get personalized learning paths powered by AI for any tech role or skill",
-      link: "/ai-roadmap",
-      color: "from-yellow-400 to-orange-500"
-    },
-    {
-      icon: Play,
-      title: "Learning Videos",
-      description: "Explore educational content from our community of creators",
-      link: "/videos",
-      color: "from-blue-400 to-indigo-500"
-    },
-    {
-      icon: Users,
-      title: "Communities",
-      description: "Join communities and connect with learners sharing your interests",
-      link: "/communities",
-      color: "from-green-400 to-teal-500"
-    },
-    {
-      icon: Brain,
-      title: "AI Tutor",
-      description: "Get instant answers and explanations for any learning topic",
-      link: "/ai-tutor",
-      color: "from-purple-400 to-pink-500"
-    },
-  ];
-
-  const steps = [
-    "Choose a learning roadmap or browse videos",
-    "Follow the structured path or explore freely",
-    "Join communities to connect with peers",
-    "Track your progress and stay motivated"
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#fbf7f1] text-stone-900 font-sans selection:bg-stone-200">
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+      <section className="max-w-7xl mx-auto px-6 py-24 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="max-w-4xl"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-void text-white text-xs font-bold uppercase tracking-wider mb-6">
-            <Sparkles size={14} /> AI-Powered Learning Platform
-          </div>
-          
-          <h1 className="text-6xl md:text-7xl font-heading font-bold text-textPrimary mb-6 leading-tight">
-            Master Any Skill with
-            <br />
-            <span className="bg-gradient-to-r from-void to-accent bg-clip-text text-transparent">
-              EduVerse
-            </span>
+          <h1 className="text-6xl md:text-8xl font-serif font-medium leading-[0.95] tracking-tight mb-12">
+            AI <span className="italic">research</span> and <br />
+            <span className="underline decoration-2 decoration-stone-300 underline-offset-8">products</span> that put <br />
+            safety at the frontier
           </h1>
           
-          <p className="text-xl text-textSecondary max-w-3xl mx-auto mb-10 leading-relaxed">
-            Your AI-powered learning companion. Get personalized roadmaps, explore quality content, and connect with a community of learners.
+          <p className="text-xl md:text-2xl text-stone-600 max-w-2xl leading-relaxed mb-12">
+            EduVerse is a public benefit corporation dedicated to securing the benefits of AI for everyone through personalized learning paths.
           </p>
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link
               to="/ai-roadmap"
-              className="px-8 py-4 bg-void hover:bg-black text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
+              className="px-8 py-4 bg-stone-900 text-[#fbf7f1] rounded-lg font-medium text-lg hover:bg-stone-800 transition-colors flex items-center gap-2"
             >
-              Start Learning <ArrowRight size={20} />
+              <Sparkles size={20} />
+              Generate Roadmap
             </Link>
             <Link
               to="/videos"
-              className="px-8 py-4 bg-white hover:bg-gray-50 text-textPrimary rounded-xl font-bold border-2 border-border transition-all"
+              className="px-8 py-4 bg-white border border-stone-200 text-stone-900 rounded-lg font-medium text-lg hover:bg-stone-50 transition-colors flex items-center gap-2"
             >
-              Browse Videos
+              <Video size={20} />
+              Browse Content
             </Link>
           </div>
         </motion.div>
-      </div>
+      </section>
 
-      {/* Features Grid */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-heading font-bold text-textPrimary mb-12 text-center">
-          Everything You Need to Learn
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                to={feature.link}
-                className="group block p-8 bg-white border-2 border-border rounded-xl hover:border-void hover:shadow-xl transition-all"
-              >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <feature.icon size={28} className="text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-textPrimary mb-2 group-hover:text-void transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-textSecondary leading-relaxed">
-                  {feature.description}
-                </p>
-                <div className="mt-4 flex items-center text-void font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                  Explore <ArrowRight size={18} className="ml-1" />
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+      {/* Feature Grid (Anthropic Style) */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <div className="bg-[#e6e4dd] rounded-3xl p-8 md:p-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link to="/ai-roadmap" className="group block space-y-4">
+              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
+                <MapIcon className="w-16 h-16 text-stone-700" />
+              </div>
+              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
+                AI Roadmaps <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              </h3>
+              <p className="text-stone-600 leading-relaxed">
+                Generate personalized learning paths for any role or skill.
+              </p>
+            </Link>
 
-      {/* How It Works */}
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="bg-gradient-to-br from-void to-black rounded-2xl p-12 text-white">
-          <h2 className="text-3xl font-heading font-bold mb-4 flex items-center gap-3">
-            <Flame size={32} className="text-yellow-400" />
-            How EduVerse Works
-          </h2>
-          <p className="text-white/80 mb-8 text-lg">
-            Your journey to mastery in 4 simple steps:
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.15 }}
-                className="flex items-start gap-4"
-              >
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                  {index + 1}
-                </div>
-                <p className="text-white/90 leading-relaxed pt-1">{step}</p>
-              </motion.div>
-            ))}
+            <Link to="/ai-tutor" className="group block space-y-4">
+              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
+                <Brain className="w-16 h-16 text-stone-700" />
+              </div>
+              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
+                AI Tutor <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              </h3>
+              <p className="text-stone-600 leading-relaxed">
+                Get instant answers and deep explanations for any topic.
+              </p>
+            </Link>
+
+            <Link to="/communities" className="group block space-y-4">
+              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
+                <Users className="w-16 h-16 text-stone-700" />
+              </div>
+              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
+                Communities <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              </h3>
+              <p className="text-stone-600 leading-relaxed">
+                Connect with other learners and share your progress.
+              </p>
+            </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* CTA Section */}
-      <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-        <h2 className="text-4xl font-heading font-bold text-textPrimary mb-6">
-          Ready to Start Learning?
-        </h2>
-        <p className="text-textSecondary text-lg mb-8">
-          Choose your first roadmap and begin your journey today
-        </p>
-        <Link
-          to="/ai-roadmap"
-          className="inline-flex items-center gap-2 px-10 py-5 bg-void hover:bg-black text-white rounded-xl font-bold text-lg transition-all shadow-2xl hover:shadow-3xl"
-        >
-         <Sparkles size={24} /> Generate My Roadmap
-        </Link>
-      </div>
+      {/* "Reading the mind of an AI" Section */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <div className="relative rounded-3xl overflow-hidden bg-stone-900 text-[#fbf7f1]">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2565&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+          <div className="relative p-12 md:p-24 max-w-3xl">
+            <h2 className="text-5xl md:text-7xl font-serif font-medium mb-8 leading-tight">
+              Reading the <br />
+              <span className="text-yellow-500">mind</span> of an AI
+            </h2>
+            <p className="text-xl text-stone-300 mb-12 leading-relaxed">
+              We're building tools to help you understand how AI models think and learn. 
+              Our roadmap generator visualizes the knowledge graph of any topic.
+            </p>
+            <Link
+              to="/ai-roadmap"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#fbf7f1] text-stone-900 rounded-lg font-medium hover:bg-white transition-colors"
+            >
+              <BookOpen size={20} />
+              Read the Research
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function MapIcon({ className }) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z" />
+      <path d="M9 4v13" />
+      <path d="M15 7v13" />
+    </svg>
   );
 }
 
