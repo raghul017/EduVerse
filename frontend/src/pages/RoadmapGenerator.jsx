@@ -20,6 +20,7 @@ import {
 import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 function RoadmapGenerator() {
   const [searchParams] = useSearchParams();
@@ -577,30 +578,66 @@ function RoadmapGenerator() {
                 ) : (
                   /* Chat Interface */
                   <div className="flex flex-col h-full">
-                    <div className="flex-1 space-y-4 pb-4">
+                    <div className="flex-1 space-y-6 pb-4">
                       {chatMessages.length === 0 ? (
                         <div className="text-center py-12 text-stone-500">
-                          <Sparkles size={48} className="mx-auto mb-4 text-stone-300" />
-                          <p className="text-lg font-medium text-stone-700">Ask AI Tutor</p>
-                          <p className="text-sm">Ask questions about {selectedNode.label}!</p>
+                          <div className="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Sparkles size={32} className="text-stone-400" />
+                          </div>
+                          <p className="text-lg font-serif font-medium text-stone-900 mb-2">Ask AI Tutor</p>
+                          <p className="text-sm max-w-[200px] mx-auto leading-relaxed">
+                            I can help you understand <span className="font-semibold text-stone-900">{selectedNode.label}</span> better. Ask me anything!
+                          </p>
                         </div>
                       ) : (
                         chatMessages.map((msg, idx) => (
-                          <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                            <div className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed ${
-                              msg.role === "user" 
-                                ? "bg-stone-900 text-white rounded-br-none" 
-                                : "bg-white border border-stone-200 text-stone-800 rounded-bl-none shadow-sm"
+                          <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                            {/* Avatar */}
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              msg.role === "user" ? "bg-stone-900 text-white" : "bg-yellow-400 text-black"
                             }`}>
-                              {msg.content}
+                              {msg.role === "user" ? <Users size={14} /> : <Sparkles size={14} />}
+                            </div>
+
+                            {/* Message Bubble */}
+                            <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                              msg.role === "user" 
+                                ? "bg-stone-900 text-white rounded-tr-none" 
+                                : "bg-white border border-stone-200 text-stone-800 rounded-tl-none"
+                            }`}>
+                              <ReactMarkdown 
+                                className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-stone-900 prose-pre:text-stone-50"
+                                components={{
+                                  code({node, inline, className, children, ...props}) {
+                                    return !inline ? (
+                                      <div className="bg-stone-900 text-stone-50 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono">
+                                        {children}
+                                      </div>
+                                    ) : (
+                                      <code className="bg-stone-100 text-stone-800 px-1 py-0.5 rounded font-mono text-xs" {...props}>
+                                        {children}
+                                      </code>
+                                    )
+                                  }
+                                }}
+                              >
+                                {msg.content}
+                              </ReactMarkdown>
                             </div>
                           </div>
                         ))
                       )}
                       {isChatLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-stone-100 p-3 rounded-lg rounded-bl-none">
-                            <Loader2 size={16} className="animate-spin text-stone-500" />
+                        <div className="flex gap-3">
+                          <div className="w-8 h-8 rounded-full bg-yellow-400 text-black flex items-center justify-center flex-shrink-0">
+                            <Sparkles size={14} />
+                          </div>
+                          <div className="bg-white border border-stone-200 p-4 rounded-2xl rounded-tl-none shadow-sm">
+                            <div className="flex gap-1">
+                              <div className="w-2 h-2 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                              <div className="w-2 h-2 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                              <div className="w-2 h-2 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -616,12 +653,12 @@ function RoadmapGenerator() {
                           onChange={(e) => setChatInput(e.target.value)}
                           onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                           placeholder="Ask a question..."
-                          className="w-full bg-white border border-stone-300 rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 shadow-sm"
+                          className="w-full bg-white border border-stone-300 rounded-xl py-3.5 pl-4 pr-12 text-sm focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 shadow-sm transition-all placeholder:text-stone-400"
                         />
                         <button
                           onClick={handleSendMessage}
                           disabled={!chatInput.trim() || isChatLoading}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-stone-900 text-white rounded-full disabled:opacity-50 hover:bg-stone-800 transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-stone-900 text-white rounded-lg disabled:opacity-50 hover:bg-stone-800 transition-colors"
                         >
                           <Send size={16} />
                         </button>

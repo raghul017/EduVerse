@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import MainLayout from "./layout/MainLayout.jsx";
+import CommunityLayout from "./layout/CommunityLayout.jsx";
 import Home from "./pages/Home.jsx";
 import Feed from "./pages/Feed.jsx";
 import Login from "./pages/Login.jsx";
@@ -44,22 +45,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Upload />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/communities"
-            element={
-              <ProtectedRoute>
-                <Communities />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/communities/:id"
-            element={
-              <ProtectedRoute>
-                <CommunityDetail />
               </ProtectedRoute>
             }
           />
@@ -139,9 +124,26 @@ function App() {
           <Route path="/posts/:id" element={<PostDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
-        </Routes>
+          <Route element={<CommunityLayout />}>
+          <Route
+            path="/communities"
+            element={
+              <ProtectedRoute>
+                <Communities />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/communities/:id"
+            element={
+              <ProtectedRoute>
+                <CommunityDetail />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
   );
 }
 
 export default App;
-

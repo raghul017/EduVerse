@@ -1,126 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Map, ArrowLeft, Sparkles } from "lucide-react";
+import { Search, Map, ArrowLeft, Sparkles, Code, Database, Cloud, Smartphone, Shield, Globe, Cpu, Layout, Terminal } from "lucide-react";
 import { motion } from "framer-motion";
-import AIUsageStats from "../components/ai/AIUsageStats.jsx";
 
 function AiRoadmap() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const roleBasedRoadmaps = [
-    {
-      id: "frontend",
-      title: "Frontend Developer",
-      description: "Master HTML, CSS, JavaScript, and modern frameworks",
-    },
-    {
-      id: "backend",
-      title: "Backend Developer",
-      description: "Build scalable server-side applications",
-    },
-    {
-      id: "fullstack",
-      title: "Full Stack Developer",
-      description: "Complete web development mastery",
-    },
-    {
-      id: "devops",
-      title: "DevOps Engineer",
-      description: "Automation, CI/CD, and cloud infrastructure",
-    },
-    {
-      id: "mobile",
-      title: "Mobile Developer",
-      description: "iOS and Android app development",
-    },
-    {
-      id: "data-scientist",
-      title: "Data Scientist",
-      description: "Machine learning and data analysis",
-    },
-    {
-      id: "ml-engineer",
-      title: "ML Engineer",
-      description: "Build and deploy ML models at scale",
-    },
-    {
-      id: "cybersecurity",
-      title: "Cybersecurity Specialist",
-      description: "Protect systems and networks",
-    },
-    {
-      id: "cloud-architect",
-      title: "Cloud Architect",
-      description: "Design scalable cloud solutions",
-    },
-    {
-      id: "qa-engineer",
-      title: "QA Engineer",
-      description: "Testing and quality assurance",
-    },
-    {
-      id: "game-dev",
-      title: "Game Developer",
-      description: "Create immersive gaming experiences",
-    },
-    {
-      id: "blockchain",
-      title: "Blockchain Developer",
-      description: "Decentralized apps and smart contracts",
-    },
-    {
-      id: "ar-vr",
-      title: "AR/VR Developer",
-      description: "Augmented and Virtual Reality",
-    },
-    {
-      id: "embedded",
-      title: "Embedded Systems",
-      description: "Hardware-software integration",
-    },
+    { id: "frontend", title: "Frontend Developer", description: "Master HTML, CSS, React, and modern UI engineering", icon: Layout },
+    { id: "backend", title: "Backend Developer", description: "Server-side logic, databases, and API design", icon: Database },
+    { id: "fullstack", title: "Full Stack Developer", description: "Complete web mastery from client to server", icon: Globe },
+    { id: "devops", title: "DevOps Engineer", description: "CI/CD, containerization, and cloud infrastructure", icon: Cloud },
+    { id: "android", title: "Android Developer", description: "Native Android app development with Kotlin", icon: Smartphone },
+    { id: "ios", title: "iOS Developer", description: "Native iOS app development with Swift", icon: Smartphone },
+    { id: "postgresql", title: "PostgreSQL Expert", description: "Advanced relational database management", icon: Database },
+    { id: "ai-engineer", title: "AI Engineer", description: "Machine learning models and neural networks", icon: Brain },
+    { id: "data-scientist", title: "Data Scientist", description: "Analyze complex data to drive decision making", icon: BarChart },
+    { id: "qa-engineer", title: "QA Engineer", description: "Ensure software quality through automated testing", icon: CheckCircle },
+    { id: "cyber-security", title: "Cyber Security", description: "Protect systems from digital attacks", icon: Shield },
+    { id: "blockchain", title: "Blockchain Developer", description: "Decentralized applications and smart contracts", icon: Link },
+    { id: "game-dev", title: "Game Developer", description: "Create immersive interactive experiences", icon: Gamepad },
+    { id: "ux-ui", title: "UX/UI Designer", description: "Design intuitive and beautiful user interfaces", icon: PenTool },
+    { id: "product-manager", title: "Product Manager", description: "Lead product strategy and development", icon: Briefcase },
+    { id: "technical-writer", title: "Technical Writer", description: "Create clear and effective documentation", icon: FileText },
+    { id: "embedded", title: "Embedded Systems", description: "Programming for hardware and IoT devices", icon: Cpu },
+    { id: "sre", title: "Site Reliability Eng.", description: "Ensure scalable and reliable software systems", icon: Server },
   ];
 
-  const skillBasedRoadmaps = [
-    {
-      id: "react",
-      title: "React",
-      description: "Modern UI library for web apps",
-    },
-    {
-      id: "nodejs",
-      title: "Node.js",
-      description: "JavaScript runtime for backend",
-    },
-    {
-      id: "python",
-      title: "Python",
-      description: "Versatile programming language",
-    },
-    {
-      id: "typescript",
-      title: "TypeScript",
-      description: "Typed JavaScript at scale",
-    },
-    { id: "aws", title: "AWS", description: "Amazon cloud services" },
-    { id: "docker", title: "Docker", description: "Containerization platform" },
-    {
-      id: "kubernetes",
-      title: "Kubernetes",
-      description: "Container orchestration",
-    },
-    {
-      id: "postgresql",
-      title: "PostgreSQL",
-      description: "Relational database",
-    },
-    { id: "mongodb", title: "MongoDB", description: "NoSQL document database" },
-    { id: "graphql", title: "GraphQL", description: "API query language" },
-  ];
-
-  const allRoadmaps = [...roleBasedRoadmaps, ...skillBasedRoadmaps];
-
-  const filteredRoadmaps = allRoadmaps.filter(
+  const filteredRoadmaps = roleBasedRoadmaps.filter(
     (roadmap) =>
       roadmap.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       roadmap.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -131,136 +39,98 @@ function AiRoadmap() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8">
+    <div className="min-h-screen bg-[#fbf7f1] font-sans text-stone-900">
       {/* Minimal AI Usage Display */}
-      <div className="max-w-7xl mx-auto px-6 pt-8">
-        <div className="flex items-center justify-between bg-white border border-stone-200 rounded-lg px-6 py-3 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-stone-100 rounded-md">
-              <Sparkles size={18} className="text-stone-700" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-stone-900">AI Usage Limit</p>
-              <p className="text-xs text-stone-500">100,000 tokens / day</p>
-            </div>
+      <div className="w-full border-b border-stone-200 bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-[1600px] mx-auto px-6 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-medium text-stone-500">
+            <Sparkles size={14} className="text-stone-400" />
+            <span>AI Usage Limit: 100,000 tokens/day</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-32 h-2 bg-stone-100 rounded-full overflow-hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-24 h-1.5 bg-stone-100 rounded-full overflow-hidden">
               <div className="h-full bg-stone-800 w-[16%]"></div>
             </div>
-            <span className="text-sm font-medium text-stone-600">16.6% Used</span>
+            <span className="text-xs font-medium text-stone-600">16.6% Used</span>
           </div>
         </div>
       </div>
 
-      {/* Main Content Wrapper */}
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-[1600px] mx-auto px-6 py-12">
         {/* Header */}
-        <div className="max-w-3xl mx-auto pt-12 pb-8 text-center px-6">
-          <button
-            onClick={() => navigate("/")}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <ArrowLeft size={20} className="text-textSecondary" />
-          </button>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-12">
           <div>
-            <h1 className="text-4xl font-heading font-bold text-textPrimary flex items-center gap-3">
-              <Sparkles size={32} className="text-void" />
-              AI Roadmap Generator
+            <button
+              onClick={() => navigate("/")}
+              className="group flex items-center gap-2 text-stone-500 hover:text-stone-900 transition-colors mb-4"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              Back to Home
+            </button>
+            <h1 className="text-4xl md:text-5xl font-serif font-medium text-stone-900 mb-4">
+              Role-Based Roadmaps
             </h1>
-            <p className="text-textSecondary text-lg mt-2">
-              Choose a role or skill to generate your personalized learning
-              roadmap
+            <p className="text-lg text-stone-600 max-w-2xl">
+              Select a role to generate a personalized, AI-curated learning path tailored to your goals.
             </p>
           </div>
-        </div>
 
-        {/* Search Bar */}
-        <div className="relative max-w-2xl">
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search roadmaps..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border-2 border-border focus:border-void rounded-xl px-12 py-3 text-textPrimary placeholder-textMuted focus:outline-none transition-all"
-          />
-        </div>
-
-
-
-        {/* Role-Based Roadmaps */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-heading font-bold text-textPrimary flex items-center gap-2">
-            <Map size={24} className="text-void" />
-            Role-Based Roadmaps
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredRoadmaps
-              .filter((r) => roleBasedRoadmaps.some((rb) => rb.id === r.id))
-              .map((roadmap, index) => (
-                <motion.button
-                  key={roadmap.id}
-                  onClick={() => handleRoadmapSelect(roadmap)}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group p-5 bg-white border-2 border-border hover:border-void rounded-xl text-left transition-all hover:shadow-lg"
-                >
-                  <h3 className="font-bold text-textPrimary text-lg mb-2 group-hover:text-void transition-colors">
-                    {roadmap.title}
-                  </h3>
-                  <p className="text-textSecondary text-sm leading-relaxed">
-                    {roadmap.description}
-                  </p>
-                </motion.button>
-              ))}
+          {/* Search Bar */}
+          <div className="w-full md:w-96 relative group">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-stone-800 transition-colors"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search roles (e.g. 'Frontend')..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-stone-200 focus:border-stone-800 rounded-xl pl-12 pr-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-800 shadow-sm transition-all"
+            />
           </div>
         </div>
 
-        {/* Skill-Based Roadmaps */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-heading font-bold text-textPrimary flex items-center gap-2">
-            <Sparkles size={24} className="text-void" />
-            Skill-Based Roadmaps
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {filteredRoadmaps
-              .filter((r) => skillBasedRoadmaps.some((sb) => sb.id === r.id))
-              .map((roadmap, index) => (
-                <motion.button
-                  key={roadmap.id}
-                  onClick={() => handleRoadmapSelect(roadmap)}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group p-5 bg-white border-2 border-border hover:border-void rounded-xl text-left transition-all hover:shadow-lg"
-                >
-                  <h3 className="font-bold text-textPrimary text-lg mb-2 group-hover:text-void transition-colors">
-                    {roadmap.title}
-                  </h3>
-                  <p className="text-textSecondary text-sm leading-relaxed">
-                    {roadmap.description}
-                  </p>
-                </motion.button>
-              ))}
-          </div>
+        {/* Roadmaps Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          {filteredRoadmaps.map((roadmap, index) => (
+            <motion.button
+              key={roadmap.id}
+              onClick={() => handleRoadmapSelect(roadmap)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className="group flex flex-col items-start p-6 bg-white border border-stone-200 hover:border-stone-800 rounded-xl text-left transition-all hover:shadow-md h-full"
+            >
+              <div className="p-3 bg-stone-50 rounded-lg mb-4 group-hover:bg-stone-100 transition-colors">
+                <roadmap.icon size={24} className="text-stone-700" />
+              </div>
+              <h3 className="font-bold text-stone-900 text-lg mb-2 group-hover:text-stone-700 transition-colors">
+                {roadmap.title}
+              </h3>
+              <p className="text-stone-500 text-sm leading-relaxed">
+                {roadmap.description}
+              </p>
+            </motion.button>
+          ))}
         </div>
 
         {/* No Results */}
         {filteredRoadmaps.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-textMuted text-lg">
-              No roadmaps found matching your search.
-            </p>
+          <div className="text-center py-24 border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-4">
+              <Search size={24} className="text-stone-400" />
+            </div>
+            <h3 className="text-lg font-medium text-stone-900 mb-2">No roles found</h3>
+            <p className="text-stone-500">Try searching for something else like "Backend" or "Data".</p>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+// Icon imports helper (since we used some that might not be imported)
+import { Brain, BarChart, CheckCircle, Link, Gamepad, PenTool, Briefcase, FileText, Server } from "lucide-react";
 
 export default AiRoadmap;
