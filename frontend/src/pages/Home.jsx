@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, BookOpen, Video, Users, Brain } from "lucide-react";
+import { Sparkles, ArrowRight, BookOpen, Video, Users, Brain, Map, Star, FileText, Zap, Cloud, BarChart, Layout, Shield } from "lucide-react";
 
 function Home() {
   return (
@@ -14,13 +14,13 @@ function Home() {
           className="max-w-4xl"
         >
           <h1 className="text-6xl md:text-8xl font-serif font-medium leading-[0.95] tracking-tight mb-12">
-            AI <span className="italic">research</span> and <br />
-            <span className="underline decoration-2 decoration-stone-300 underline-offset-8">products</span> that put <br />
-            safety at the frontier
+            Master your <span className="italic">future</span> with <br />
+            <span className="underline decoration-2 decoration-stone-300 underline-offset-8">AI-powered</span> learning <br />
+            paths for everyone
           </h1>
           
           <p className="text-xl md:text-2xl text-stone-600 max-w-2xl leading-relaxed mb-12">
-            EduVerse is a public benefit corporation dedicated to securing the benefits of AI for everyone through personalized learning paths.
+            EduVerse provides personalized roadmaps, intelligent tutoring, and a supportive community to help you master any skill efficiently.
           </p>
 
           <div className="flex flex-wrap gap-4">
@@ -42,7 +42,7 @@ function Home() {
         </motion.div>
       </section>
 
-      {/* Feature Grid (Anthropic Style) */}
+      {/* Feature Grid */}
       <section className="max-w-7xl mx-auto px-6 pb-32">
         <div className="bg-[#e6e4dd] rounded-3xl p-8 md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -85,26 +85,74 @@ function Home() {
         </div>
       </section>
 
-      {/* "Reading the mind of an AI" Section */}
+      {/* Featured Section (Anthropic Style) */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4">
+            <h2 className="text-3xl font-serif font-medium mb-6">Featured</h2>
+          </div>
+          <div className="lg:col-span-8 space-y-8">
+            {[
+              { title: "Introducing EduVerse 2.0", category: "Announcements", date: "Oct 15, 2025" },
+              { title: "The Future of AI Learning", category: "Research", date: "Sep 29, 2025" },
+              { title: "Community Guidelines Update", category: "Policy", date: "Sep 15, 2025" },
+              { title: "New AI Tutor Capabilities", category: "Product", date: "Aug 05, 2025" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center justify-between py-4 border-b border-stone-200 group cursor-pointer">
+                <h3 className="text-lg font-medium group-hover:text-stone-600 transition-colors">{item.title}</h3>
+                <div className="flex items-center gap-8 text-sm text-stone-500">
+                  <span className="hidden md:block">{item.category}</span>
+                  <span>{item.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Guides Section */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <h2 className="text-4xl font-serif font-medium mb-12">Guides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { title: "Full Stack Developer Guide", icon: Zap },
+            { title: "DevOps Engineering Handbook", icon: Cloud },
+            { title: "Data Science Fundamentals", icon: BarChart },
+            { title: "Machine Learning Basics", icon: Brain },
+            { title: "System Design Primer", icon: Layout },
+            { title: "Cybersecurity Essentials", icon: Shield },
+          ].map((guide, i) => (
+            <Link key={i} to="/ai-roadmap" className="group p-6 bg-white border border-stone-200 rounded-xl hover:border-stone-800 transition-all hover:shadow-md flex items-center gap-4">
+              <div className="p-3 bg-stone-50 rounded-lg group-hover:bg-stone-100 transition-colors">
+                <guide.icon size={24} className="text-stone-700" />
+              </div>
+              <span className="font-bold text-stone-900 group-hover:text-stone-700 transition-colors">{guide.title}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* "Understand Any Topic" Section */}
       <section className="max-w-7xl mx-auto px-6 pb-32">
         <div className="relative rounded-3xl overflow-hidden bg-stone-900 text-[#fbf7f1]">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2565&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
           <div className="relative p-12 md:p-24 max-w-3xl">
             <h2 className="text-5xl md:text-7xl font-serif font-medium mb-8 leading-tight">
-              Reading the <br />
-              <span className="text-yellow-500">mind</span> of an AI
+              Understand <br />
+              <span className="text-yellow-500">any topic</span> deeply
             </h2>
             <p className="text-xl text-stone-300 mb-12 leading-relaxed">
-              We're building tools to help you understand how AI models think and learn. 
+              We're building tools to help you understand how concepts connect. 
               Our roadmap generator visualizes the knowledge graph of any topic.
             </p>
-            <Link
-              to="/ai-roadmap"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#fbf7f1] text-stone-900 rounded-lg font-medium hover:bg-white transition-colors"
-            >
-              <BookOpen size={20} />
-              Read the Research
-            </Link>
+            <div className="flex gap-4">
+              <button className="px-6 py-3 bg-[#fbf7f1] text-stone-900 rounded-lg font-bold hover:bg-white transition-colors">
+                See open roles
+              </button>
+              <button className="px-6 py-3 border border-stone-500 text-[#fbf7f1] rounded-lg font-bold hover:bg-stone-800 transition-colors">
+                Join Community
+              </button>
+            </div>
           </div>
         </div>
       </section>

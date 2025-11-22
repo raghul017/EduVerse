@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Bell, ShoppingCart, User, MessageCircle } from "lucide-react";
+import { Search, Bell, ShoppingCart, User, MessageCircle, ArrowLeft } from "lucide-react";
 
 function CommunityNavbar() {
   return (
@@ -7,6 +7,9 @@ function CommunityNavbar() {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo & Nav */}
         <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center gap-2 text-stone-500 hover:text-stone-900 transition-colors">
+            <ArrowLeft size={20} />
+          </Link>
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
               t

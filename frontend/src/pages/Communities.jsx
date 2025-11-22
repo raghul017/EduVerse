@@ -1,8 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search, ThumbsUp, MessageSquare, Share2, MoreHorizontal, Heart, Users, Hash, Calendar } from "lucide-react";
 
 function Communities() {
-  const [activeTab, setActiveTab] = useState("All Updates");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab");
+  
+  // Map URL params to tab names
+  const getTabName = (param) => {
+    switch(param) {
+      case "feed": return "All Updates";
+      case "groups": return "Groups";
+      case "members": return "Mentions"; // Mapping "Members" to "Mentions" for now as per design, or we can add a Members tab
+      default: return "All Updates";
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabName(initialTab));
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab) {
+      setActiveTab(getTabName(tab));
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    let param = "";
+    switch(tab) {
+      case "All Updates": param = "feed"; break;
+      case "Groups": param = "groups"; break;
+      case "Mentions": param = "members"; break;
+      default: param = "feed";
+    }
+    setSearchParams({ tab: param });
+  };
 
   const posts = [
     {
@@ -125,7 +158,7 @@ function Communities() {
             {["All Updates", "Likes", "Groups", "Mentions"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabChange(tab)}
                 className={`pb-3 text-sm font-bold transition-colors relative ${
                   activeTab === tab ? "text-orange-500" : "text-stone-400 hover:text-stone-600"
                 }`}

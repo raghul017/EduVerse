@@ -621,7 +621,7 @@ function RoadmapGenerator() {
                                   }
                                 }}
                               >
-                                {msg.content}
+                                {msg.content || ""}
                               </ReactMarkdown>
                             </div>
                           </div>

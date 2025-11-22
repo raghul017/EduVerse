@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Map, ArrowLeft, Sparkles, Code, Database, Cloud, Smartphone, Shield, Globe, Cpu, Layout, Terminal } from "lucide-react";
+import { Search, Map, ArrowLeft, Sparkles, Code, Database, Cloud, Smartphone, Shield, Globe, Cpu, Layout, Terminal, Brain, BarChart, CheckCircle, Link as LinkIcon, Gamepad, PenTool, Briefcase, FileText, Server } from "lucide-react";
 import { motion } from "framer-motion";
 
 function AiRoadmap() {
@@ -19,7 +19,7 @@ function AiRoadmap() {
     { id: "data-scientist", title: "Data Scientist", description: "Analyze complex data to drive decision making", icon: BarChart },
     { id: "qa-engineer", title: "QA Engineer", description: "Ensure software quality through automated testing", icon: CheckCircle },
     { id: "cyber-security", title: "Cyber Security", description: "Protect systems from digital attacks", icon: Shield },
-    { id: "blockchain", title: "Blockchain Developer", description: "Decentralized applications and smart contracts", icon: Link },
+    { id: "blockchain", title: "Blockchain Developer", description: "Decentralized applications and smart contracts", icon: LinkIcon },
     { id: "game-dev", title: "Game Developer", description: "Create immersive interactive experiences", icon: Gamepad },
     { id: "ux-ui", title: "UX/UI Designer", description: "Design intuitive and beautiful user interfaces", icon: PenTool },
     { id: "product-manager", title: "Product Manager", description: "Lead product strategy and development", icon: Briefcase },
@@ -28,7 +28,36 @@ function AiRoadmap() {
     { id: "sre", title: "Site Reliability Eng.", description: "Ensure scalable and reliable software systems", icon: Server },
   ];
 
-  const filteredRoadmaps = roleBasedRoadmaps.filter(
+  const skillBasedRoadmaps = [
+    { id: "computer-science", title: "Computer Science", description: "Foundational CS concepts", icon: Brain },
+    { id: "react", title: "React", description: "Modern UI library", icon: Code },
+    { id: "vue", title: "Vue", description: "Progressive JS framework", icon: Code },
+    { id: "angular", title: "Angular", description: "Enterprise web framework", icon: Code },
+    { id: "javascript", title: "JavaScript", description: "Language of the web", icon: Code },
+    { id: "nodejs", title: "Node.js", description: "Server-side JavaScript", icon: Server },
+    { id: "typescript", title: "TypeScript", description: "Typed JavaScript", icon: Code },
+    { id: "python", title: "Python", description: "Versatile programming language", icon: Terminal },
+    { id: "go", title: "Go", description: "Efficient systems programming", icon: Terminal },
+    { id: "java", title: "Java", description: "Enterprise-grade language", icon: Code },
+    { id: "c++", title: "C++", description: "High-performance programming", icon: Code },
+    { id: "rust", title: "Rust", description: "Safe systems programming", icon: Shield },
+    { id: "sql", title: "SQL", description: "Database querying", icon: Database },
+    { id: "mongodb", title: "MongoDB", description: "NoSQL database", icon: Database },
+    { id: "aws", title: "AWS", description: "Cloud computing services", icon: Cloud },
+    { id: "docker", title: "Docker", description: "Containerization platform", icon: Cloud },
+    { id: "kubernetes", title: "Kubernetes", description: "Container orchestration", icon: Cloud },
+    { id: "graphql", title: "GraphQL", description: "API query language", icon: Globe },
+    { id: "system-design", title: "System Design", description: "Designing scalable systems", icon: Layout },
+    { id: "design-patterns", title: "Design Patterns", description: "Reusable software solutions", icon: Layout },
+  ];
+
+  const filteredRoleRoadmaps = roleBasedRoadmaps.filter(
+    (roadmap) =>
+      roadmap.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      roadmap.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredSkillRoadmaps = skillBasedRoadmaps.filter(
     (roadmap) =>
       roadmap.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       roadmap.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -92,8 +121,8 @@ function AiRoadmap() {
         </div>
 
         {/* Roadmaps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          {filteredRoadmaps.map((roadmap, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-16">
+          {filteredRoleRoadmaps.map((roadmap, index) => (
             <motion.button
               key={roadmap.id}
               onClick={() => handleRoadmapSelect(roadmap)}
@@ -115,8 +144,39 @@ function AiRoadmap() {
           ))}
         </div>
 
+        {/* Skill-Based Roadmaps */}
+        {filteredSkillRoadmaps.length > 0 && (
+          <>
+            <h2 className="text-3xl font-serif font-medium text-stone-900 mb-8">
+              Skill-Based Roadmaps
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              {filteredSkillRoadmaps.map((roadmap, index) => (
+                <motion.button
+                  key={roadmap.id}
+                  onClick={() => handleRoadmapSelect(roadmap)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  className="group flex flex-col items-start p-6 bg-white border border-stone-200 hover:border-stone-800 rounded-xl text-left transition-all hover:shadow-md h-full"
+                >
+                  <div className="p-3 bg-stone-50 rounded-lg mb-4 group-hover:bg-stone-100 transition-colors">
+                    <roadmap.icon size={24} className="text-stone-700" />
+                  </div>
+                  <h3 className="font-bold text-stone-900 text-lg mb-2 group-hover:text-stone-700 transition-colors">
+                    {roadmap.title}
+                  </h3>
+                  <p className="text-stone-500 text-sm leading-relaxed">
+                    {roadmap.description}
+                  </p>
+                </motion.button>
+              ))}
+            </div>
+          </>
+        )}
+
         {/* No Results */}
-        {filteredRoadmaps.length === 0 && (
+        {filteredRoleRoadmaps.length === 0 && filteredSkillRoadmaps.length === 0 && (
           <div className="text-center py-24 border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-4">
               <Search size={24} className="text-stone-400" />
@@ -130,7 +190,6 @@ function AiRoadmap() {
   );
 }
 
-// Icon imports helper (since we used some that might not be imported)
-import { Brain, BarChart, CheckCircle, Link, Gamepad, PenTool, Briefcase, FileText, Server } from "lucide-react";
+
 
 export default AiRoadmap;
