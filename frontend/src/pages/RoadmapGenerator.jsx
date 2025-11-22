@@ -16,6 +16,7 @@ import {
   RefreshCw,
   AlertTriangle,
   Send,
+  User,
 } from "lucide-react";
 import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
@@ -47,7 +48,7 @@ function RoadmapGenerator() {
   }, [chatMessages, activeTab]);
 
   const handleSendMessage = async () => {
-    if (!chatInput.trim() || isChatLoading) return;
+    if (!chatInput.trim() || isChatLoading || !selectedNode) return;
 
     const userMessage = { role: "user", content: chatInput };
     setChatMessages((prev) => [...prev, userMessage]);
@@ -57,7 +58,7 @@ function RoadmapGenerator() {
     try {
       const response = await api.post("/paths/ai-chat", {
         message: userMessage.content,
-        context: `Topic: ${selectedNode.label}. Details: ${selectedNode.details || ""}`,
+        context: `Topic: ${selectedNode?.label || "General"}. Details: ${selectedNode?.details || ""}`,
       });
 
       if (response.data.response) {
@@ -596,7 +597,7 @@ function RoadmapGenerator() {
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                               msg.role === "user" ? "bg-stone-900 text-white" : "bg-yellow-400 text-black"
                             }`}>
-                              {msg.role === "user" ? <Users size={14} /> : <Sparkles size={14} />}
+                              {msg.role === "user" ? <User size={14} /> : <Sparkles size={14} />}
                             </div>
 
                             {/* Message Bubble */}
