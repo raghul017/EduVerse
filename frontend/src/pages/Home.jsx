@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, BookOpen, Video, Users, Brain, Map, Star, FileText, Zap, Cloud, BarChart, Layout, Shield } from "lucide-react";
+import Footer from "../components/common/Footer.jsx";
 
 function Home() {
   return (
@@ -48,134 +49,110 @@ function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Link to="/ai-roadmap" className="group block space-y-4">
               <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <MapIcon className="w-16 h-16 text-stone-700" />
+                <Map size={64} className="text-stone-600" />
               </div>
-              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
-                AI Roadmaps <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </h3>
-              <p className="text-stone-600 leading-relaxed">
-                Generate personalized learning paths for any role or skill.
-              </p>
+              <h3 className="text-2xl font-serif font-medium">AI-Generated Roadmaps</h3>
+              <p className="text-stone-600 leading-relaxed">Personalized learning paths tailored to your goals and experience level.</p>
             </Link>
 
-            <Link to="/ai-tutor" className="group block space-y-4">
+            <Link to="/videos" className="group block space-y-4">
               <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <Brain className="w-16 h-16 text-stone-700" />
+                <Video size={64} className="text-stone-600" />
               </div>
-              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
-                AI Tutor <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </h3>
-              <p className="text-stone-600 leading-relaxed">
-                Get instant answers and deep explanations for any topic.
-              </p>
+              <h3 className="text-2xl font-serif font-medium">Curated Videos</h3>
+              <p className="text-stone-600 leading-relaxed">Expert-selected educational content to accelerate your learning journey.</p>
             </Link>
 
             <Link to="/communities" className="group block space-y-4">
               <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <Users className="w-16 h-16 text-stone-700" />
+                <Users size={64} className="text-stone-600" />
               </div>
-              <h3 className="text-2xl font-serif font-medium flex items-center gap-2">
-                Communities <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </h3>
-              <p className="text-stone-600 leading-relaxed">
-                Connect with other learners and share your progress.
-              </p>
+              <h3 className="text-2xl font-serif font-medium">Learning Communities</h3>
+              <p className="text-stone-600 leading-relaxed">Connect with fellow learners and share your progress together.</p>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Section (Anthropic Style) */}
+      {/* Featured Section */}
       <section className="max-w-7xl mx-auto px-6 pb-32">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-4">
-            <h2 className="text-3xl font-serif font-medium mb-6">Featured</h2>
-          </div>
-          <div className="lg:col-span-8 space-y-8">
-            {[
-              { title: "Introducing EduVerse 2.0", category: "Announcements", date: "Oct 15, 2025" },
-              { title: "The Future of AI Learning", category: "Research", date: "Sep 29, 2025" },
-              { title: "Community Guidelines Update", category: "Policy", date: "Sep 15, 2025" },
-              { title: "New AI Tutor Capabilities", category: "Product", date: "Aug 05, 2025" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-4 border-b border-stone-200 group cursor-pointer">
-                <h3 className="text-lg font-medium group-hover:text-stone-600 transition-colors">{item.title}</h3>
-                <div className="flex items-center gap-8 text-sm text-stone-500">
-                  <span className="hidden md:block">{item.category}</span>
-                  <span>{item.date}</span>
+        <h2 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-8">Featured</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <Link to="/ai-roadmap?role=frontend" className="group">
+            <div className="space-y-4">
+              <div className="h-64 bg-stone-200 rounded-2xl overflow-hidden">
+                <div className="h-full flex items-center justify-center bg-gradient-to-br from-stone-300 to-stone-100">
+                  <Brain size={80} className="text-stone-500" />
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-serif font-medium group-hover:text-stone-600 transition-colors">Frontend Development Roadmap</h3>
+                <p className="text-stone-500 leading-relaxed">Comprehensive guide from basics to advanced React and modern frameworks.</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link to="/ai-roadmap?role=backend" className="group">
+            <div className="space-y-4">
+              <div className="h-64 bg-stone-200 rounded-2xl overflow-hidden">
+                <div className="h-full flex items-center justify-center bg-gradient-to-br from-stone-300 to-stone-100">
+                  <Layout size={80} className="text-stone-500" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-serif font-medium group-hover:text-stone-600 transition-colors">Backend Engineering Path</h3>
+                <p className="text-stone-500 leading-relaxed">Master server-side development, databases, and scalable architecture.</p>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 
       {/* Guides Section */}
       <section className="max-w-7xl mx-auto px-6 pb-32">
-        <h2 className="text-4xl font-serif font-medium mb-12">Guides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-8">Guides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { title: "Full Stack Developer Guide", icon: Zap },
-            { title: "DevOps Engineering Handbook", icon: Cloud },
-            { title: "Data Science Fundamentals", icon: BarChart },
-            { title: "Machine Learning Basics", icon: Brain },
-            { title: "System Design Primer", icon: Layout },
-            { title: "Cybersecurity Essentials", icon: Shield },
+            { icon: Star, title: "Getting Started", desc: "Your first steps in learning with EduVerse" },
+            { icon: FileText, title: "Best Practices", desc: "Tips and tricks for effective learning" },
+            { icon: Zap, title: "Quick Wins", desc: "Fast-track your progress with proven techniques" },
           ].map((guide, i) => (
-            <Link key={i} to="/ai-roadmap" className="group p-6 bg-white border border-stone-200 rounded-xl hover:border-stone-800 transition-all hover:shadow-md flex items-center gap-4">
-              <div className="p-3 bg-stone-50 rounded-lg group-hover:bg-stone-100 transition-colors">
-                <guide.icon size={24} className="text-stone-700" />
-              </div>
-              <span className="font-bold text-stone-900 group-hover:text-stone-700 transition-colors">{guide.title}</span>
+            <Link 
+              key={i}
+              to="#"
+              className="group p-8 bg-white border border-stone-200 rounded-2xl hover:border-stone-300 hover:shadow-lg transition-all"
+            >
+              <guide.icon size={32} className="text-stone-600 mb-4" />
+              <h3 className="text-xl font-serif font-medium mb-2">{guide.title}</h3>
+              <p className="text-stone-500 text-sm">{guide.desc}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* "Understand Any Topic" Section */}
+      {/* Understand Any Topic Section */}
       <section className="max-w-7xl mx-auto px-6 pb-32">
-        <div className="relative rounded-3xl overflow-hidden bg-stone-900 text-[#fbf7f1]">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2565&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
-          <div className="relative p-12 md:p-24 max-w-3xl">
-            <h2 className="text-5xl md:text-7xl font-serif font-medium mb-8 leading-tight">
-              Understand <br />
-              <span className="text-yellow-500">any topic</span> deeply
+        <div className="bg-stone-100 rounded-3xl p-12 md:p-20">
+          <div className="max-w-3xl">
+            <h2 className="text-4xl md:text-5xl font-serif font-medium mb-6 leading-tight">
+              Understand any topic, accelerate your learning
             </h2>
-            <p className="text-xl text-stone-300 mb-12 leading-relaxed">
-              We're building tools to help you understand how concepts connect. 
-              Our roadmap generator visualizes the knowledge graph of any topic.
+            <p className="text-xl text-stone-600 leading-relaxed mb-8">
+              Our AI-powered platform adapts to your learning style, providing personalized roadmaps and resources to help you master complex topics faster than ever before.
             </p>
-            <div className="flex gap-4">
-              <button className="px-6 py-3 bg-[#fbf7f1] text-stone-900 rounded-lg font-bold hover:bg-white transition-colors">
-                See open roles
-              </button>
-              <button className="px-6 py-3 border border-stone-500 text-[#fbf7f1] rounded-lg font-bold hover:bg-stone-800 transition-colors">
-                Join Community
-              </button>
-            </div>
+            <Link
+              to="/ai-roadmap"
+              className="inline-flex items-center gap-2 text-stone-900 font-medium text-lg group"
+            >
+              Start Learning <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
-    </div>
-  );
-}
 
-function MapIcon({ className }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z" />
-      <path d="M9 4v13" />
-      <path d="M15 7v13" />
-    </svg>
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 }
 

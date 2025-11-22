@@ -11,19 +11,30 @@ import {
   aiResources,
   getAiUsage,
   aiChat,
+  saveProgress,
+  getProgress,
+  getUserRoadmaps,
 } from "../controllers/path.controller.js";
 
 const router = Router();
 
-router.get("/", optionalAuth, listPaths);
-router.get("/:id", optionalAuth, getPath);
-router.post("/", authenticate, createPath);
-router.get("/:id/progress", authenticate, getPathProgress);
-router.post("/:id/progress", authenticate, updatePathProgress);
+// AI and usage routes (no params)
 router.post("/ai-roadmap", optionalAuth, aiRoadmap);
 router.post("/ai-course", optionalAuth, aiCourse);
 router.post("/ai-resources", optionalAuth, aiResources);
 router.post("/ai-chat", optionalAuth, aiChat);
 router.get("/ai-usage/stats", getAiUsage);
+
+// Roadmap persistence routes (specific routes BEFORE parameterized routes)
+router.get("/roadmaps/user", authenticate, getUserRoadmaps);
+router.post("/roadmap/progress", authenticate, saveProgress);
+router.get("/roadmap/:roadmapId/progress", authenticate, getProgress);
+
+// Path CRUD routes (parameterized - must come AFTER specific routes)
+router.get("/", optionalAuth, listPaths);
+router.post("/", authenticate, createPath);
+router.get("/:id", optionalAuth, getPath);
+router.get("/:id/progress", authenticate, getPathProgress);
+router.post("/:id/progress", authenticate, updatePathProgress);
 
 export default router;

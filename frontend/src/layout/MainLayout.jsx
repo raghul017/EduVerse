@@ -1,6 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/common/Navbar.jsx";
-import Footer from "../components/common/Footer.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 
 function MainLayout() {
@@ -26,8 +25,6 @@ function MainLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
-
-      <Footer />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { query } from "../config/database.js";
 import { aiService } from "../services/ai.service.js";
+import { RoadmapModel, ProgressModel } from "../models/roadmap.model.js";
 
 export const listPaths = async (req, res, next) => {
   try {
@@ -27,15 +28,34 @@ export const listPaths = async (req, res, next) => {
 
 export const aiRoadmap = async (req, res, next) => {
   try {
-    const { role } = req.body;
+    const { role, forceRegenerate } = req.body;
+    const userId = req.user?.id;
+    
     console.log(`[Path Controller] AI Roadmap request for role: ${role}`);
-    console.log(`[Path Controller] Request body:`, JSON.stringify(req.body));
-    console.log(`[Path Controller] User:`, req.user?.id || "anonymous");
+    console.log(`[Path Controller] User:`, userId || "anonymous");
+    console.log(`[Path Controller] Force regenerate:`, forceRegenerate);
 
     if (!role || !role.trim()) {
       return res.status(400).json({ message: "Role is required." });
     }
 
+    // Check for existing roadmap (unless forceRegenerate is true)
+    if (userId && !forceRegenerate) {
+      const existingRoadmap = await RoadmapModel.getRoadmap(userId, role.trim());
+      if (existingRoadmap) {
+        console.log(`✅ [Path Controller] LOADING FROM CACHE for ${role} (user: ${userId})`);
+        console.log(`[Path Controller] No AI call needed - returning cached roadmap`);
+        return res.json({
+          ...existingRoadmap.roadmap_data,
+          fromCache: true,
+          roadmapId: existingRoadmap.id
+        });
+      }
+    }
+
+    // Generate new roadmap
+    console.log(`🤖 [Path Controller] GENERATING NEW ROADMAP with AI for ${role}`);
+    console.log(`[Path Controller] Calling AI service...`);
     const roadmap = await aiService.generateRoadmap(role.trim());
     console.log(
       `[Path Controller] AI Roadmap result: ${roadmap ? "success" : "failed"}`
@@ -52,10 +72,20 @@ export const aiRoadmap = async (req, res, next) => {
       });
     }
 
-    res.json({ data: roadmap });
+    // Save roadmap if user is authenticated
+    if (userId) {
+      const savedRoadmap = await RoadmapModel.saveRoadmap(userId, role.trim(), roadmap);
+      roadmap.roadmapId = savedRoadmap.id;
+    }
+
+    return res.json(roadmap);
   } catch (error) {
-    console.error("[Path Controller] AI Roadmap error:", error);
-    next(error);
+    console.error("[Path Controller] Error in aiRoadmap:", error.message);
+    console.error("[Path Controller] Stack:", error.stack);
+    return res.status(500).json({ 
+      message: "Failed to generate roadmap",
+      error: error.message 
+    });
   }
 };
 
@@ -175,7 +205,63 @@ export const aiResources = async (req, res, next) => {
         resources.description || `Learn ${topic} to enhance your skills.`,
     });
   } catch (error) {
-    console.error("[Path Controller] AI Resources error:", error);
+    console.error("[Path Controller] Chat error:", error);
+    next(error);
+  }
+};
+
+// Save or update progress for a roadmap node
+export const saveProgress = async (req, res, next) => {
+  try {
+    const { roadmapId, nodeId, completed } = req.body;
+    const userId = req.user.id;
+
+    if (!roadmapId || !nodeId || completed === undefined) {
+      return res.status(400).json({ 
+        message: "roadmapId, nodeId, and completed are required" 
+      });
+    }
+
+    const progress = await ProgressModel.saveProgress(
+      userId,
+      roadmapId,
+      nodeId,
+      completed
+    );
+
+    res.json({ data: progress });
+  } catch (error) {
+    console.error("[Path Controller] Save progress error:", error);
+    next(error);
+  }
+};
+
+// Get all progress for a roadmap
+export const getProgress = async (req, res, next) => {
+  try {
+    const { roadmapId } = req.params;
+    const userId = req.user.id;
+
+    if (!roadmapId) {
+      return res.status(400).json({ message: "roadmapId is required" });
+    }
+
+    const progress = await ProgressModel.getRoadmapProgress(userId, roadmapId);
+    res.json({ data: progress });
+  } catch (error) {
+    console.error("[Path Controller] Get progress error:", error);
+    next(error);
+  }
+};
+
+// Get user's roadmaps
+export const getUserRoadmaps = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const roadmaps = await RoadmapModel.getUserRoadmaps(userId);
+    res.json({ data: roadmaps });
+  } catch (error) {
+    console.error("[Path Controller] Get user roadmaps error:", error);
     next(error);
   }
 };

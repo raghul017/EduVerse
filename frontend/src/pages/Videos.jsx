@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePostStore } from "../store/postStore.js";
 import { motion } from "framer-motion";
-import { Play, Clock, Eye, Video } from "lucide-react";
+import { Play, Clock, Eye, Video, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function Videos() {
@@ -61,12 +61,12 @@ function Videos() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <Link to={`/post/${post.id}`} className="group block h-full">
+              <Link to={`/posts/${post.id}`} className="group block h-full">
                 <div className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all h-full flex flex-col">
                   {/* Thumbnail */}
                   <div className="relative aspect-video bg-stone-100 overflow-hidden">
                     <img 
-                      src={post.thumbnail}
+                      src={post.thumbnail_url}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -77,7 +77,7 @@ function Videos() {
                     </div>
                     {post.duration && (
                       <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white rounded text-xs font-bold backdrop-blur-sm">
-                        {post.duration}
+                        {Math.floor(post.duration / 60)}:{String(post.duration % 60).padStart(2, '0')}
                       </div>
                     )}
                   </div>
@@ -87,7 +87,7 @@ function Videos() {
                     <h3 className="font-bold text-stone-900 line-clamp-2 group-hover:text-stone-600 transition-colors mb-2 leading-tight text-lg">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-stone-500 mb-4 flex-1">{post.creator?.name ||  "Unknown Creator"}</p>
+                    <p className="text-sm text-stone-500 mb-4 flex-1">{post.creator_name || "Unknown Creator"}</p>
                     
                     <div className="flex items-center gap-4 text-xs text-stone-400 pt-4 border-t border-stone-100 mt-auto">
                       {post.views && (
@@ -109,17 +109,16 @@ function Videos() {
             </motion.div>
           ))}
         </div>
-
-        {filteredPosts.length === 0 && (
-          <div className="text-center py-24 border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-4">
-              <Video size={24} className="text-stone-400" />
-            </div>
-            <h3 className="text-lg font-medium text-stone-900 mb-2">No videos found</h3>
-            <p className="text-stone-500">Try selecting a different category.</p>
-          </div>
-        )}
       </div>
+
+      {/* Floating Upload Button */}
+      <Link
+        to="/upload"
+        className="fixed bottom-8 right-8 flex items-center gap-3 px-6 py-4 bg-stone-900 text-white rounded-full shadow-2xl hover:bg-stone-800 hover:shadow-3xl transition-all duration-300 hover:scale-105 group z-50"
+      >
+        <Upload size={20} className="group-hover:-translate-y-1 transition-transform" />
+        <span className="font-medium">Upload Video</span>
+      </Link>
     </div>
   );
 }

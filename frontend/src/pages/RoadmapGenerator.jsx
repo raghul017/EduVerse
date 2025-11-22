@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Download,
   Share2,
+  RefreshCw,
   BookOpen,
   CheckCircle,
   Circle,
@@ -13,7 +14,6 @@ import {
   Code,
   Sparkles,
   Loader2,
-  RefreshCw,
   AlertTriangle,
   Send,
   User,
@@ -31,15 +31,34 @@ function RoadmapGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
-  const [progress, setProgress] = useState({});
+  const [activeTab, setActiveTab] = useState("resources");
+  const [resources, setResources] = useState(null);
   const [nodeResources, setNodeResources] = useState({});
   const [loadingResources, setLoadingResources] = useState(false);
-  const [activeTab, setActiveTab] = useState("resources"); // 'resources' | 'chat'
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [isChatLoading, setIsChatLoading] = useState(false);
+  const [roadmapId, setRoadmapId] = useState(null);
+  const [completedNodes, setCompletedNodes] = useState({});
   const roadmapRef = useRef(null);
   const chatEndRef = useRef(null);
+  const hasGeneratedRef = useRef(false);
+
+  // Auto-generate roadmap when role query parameter is present
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam && !hasGeneratedRef.current) {
+      setTopic(roleParam);
+      hasGeneratedRef.current = true;
+      generateRoadmap(roleParam);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
 
   useEffect(() => {
     if (activeTab === "chat" && chatEndRef.current) {
@@ -78,50 +97,93 @@ function RoadmapGenerator() {
     }
   };
 
-  // Auto-generate roadmap when role query parameter is present
-  useEffect(() => {
-    const roleParam = searchParams.get("role");
-    if (roleParam) {
-      setTopic(roleParam);
-      generateRoadmap(roleParam);
-    }
-  }, [searchParams]);
-
-  const generateRoadmap = async (topicToGenerate) => {
+  const generateRoadmap = async (topicToGenerate, forceRegenerate = false) => {
     if (!topicToGenerate?.trim()) return;
+    
+    // Reset the flag when force regenerating
+    if (forceRegenerate) {
+      hasGeneratedRef.current = false;
+    }
     setLoading(true);
     setError(null);
     setRoadmap(null);
+    setCompletedNodes({});
     try {
       const data = await aiGenerate("roadmap", {
         topic: topicToGenerate,
         answerQuestions: false,
+        forceRegenerate,
       });
 
-      // Ensure all nodes have valid IDs
-      if (data?.stages) {
-        data.stages.forEach((stage, stageIdx) => {
-          if (!stage.id) stage.id = `stage-${stageIdx}`;
-          if (stage.nodes) {
-            stage.nodes.forEach((node, nodeIdx) => {
-              if (!node.id) {
-                node.id = `${stage.id}-node-${nodeIdx}`;
-              }
-            });
-          }
-        });
-      }
-
+      console.log("[Frontend API] AI roadmap response:", data);
       console.log("Generated roadmap:", data);
-      setRoadmap(data);
-    } catch (err) {
-      console.error("Roadmap generation error:", err);
+
+      if (data && data.stages) {
+        setRoadmap(data);
+        if (data.roadmapId) {
+          setRoadmapId(data.roadmapId);
+          // Always load progress when we have a roadmapId
+          await loadProgress(data.roadmapId);
+        }
+      } else {
+        throw new Error(
+          "Invalid roadmap data received. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error generating roadmap:", error);
       setError(
-        err.response?.data?.message ||
-          "AI service is currently unavailable. Please try again."
+        error.message || "Failed to generate roadmap. Please try again."
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+;
+
+  // Load progress from backend
+  const loadProgress = async (id) => {
+    if (!id) {
+      console.warn("[Progress] loadProgress called without roadmapId");
+      return;
+    }
+    console.log("[Progress] Loading progress for roadmapId:", id);
+    try {
+      const response = await api.get(`/paths/roadmap/${id}/progress`);
+      console.log("[Progress] Loaded progress data:", response.data);
+      const progressData = {};
+      response.data.data.forEach((item) => {
+        progressData[item.node_id] = item.completed;
+      });
+      setCompletedNodes(progressData);
+      console.log("[Progress] Set completed nodes:", progressData);
+    } catch (error) {
+      console.error("[Progress] Error loading progress:", error.response?.data || error.message);
+    }
+  };
+
+  // Toggle node completion and save to backend
+  const toggleNodeCompletion = async (nodeId) => {
+    const newCompleted = !completedNodes[nodeId];
+    setCompletedNodes(prev => ({ ...prev, [nodeId]: newCompleted }));
+    
+    console.log("[Progress] Toggling node:", nodeId, "to", newCompleted);
+    console.log("[Progress] Current roadmapId:", roadmapId);
+    
+    if (roadmapId) {
+      try {
+        const response = await api.post("/paths/roadmap/progress", {
+          roadmapId,
+          nodeId,
+          completed: newCompleted,
+        });
+        console.log("[Progress] Saved successfully:", response.data);
+      } catch (error) {
+        console.error("[Progress] Error saving progress:",error.response?.data || error.message);
+      }
+    } else {
+      console.warn("[Progress] No roadmapId - progress not saved!");
     }
   };
 
@@ -198,13 +260,20 @@ function RoadmapGenerator() {
   };
 
   const handleDownload = () => {
-    const roadmapText = JSON.stringify(roadmap, null, 2);
-    const blob = new Blob([roadmapText], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${topic}-roadmap.json`;
-    a.click();
+    const element = document.createElement("a");
+    const content = JSON.stringify(roadmap, null, 2);
+    const file = new Blob([content], { type: "application/json" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${topic}-roadmap.json`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleRegenerate = () => {
+    if (confirm("Are you sure you want to generate a new roadmap? Current progress will be saved.")) {
+      generateRoadmap(topic, true);
+    }
   };
 
   const stages = roadmap?.stages || [];
@@ -217,7 +286,7 @@ function RoadmapGenerator() {
     onNodeClick,
     onToggleProgress,
   }) => {
-    const isCompleted = progress[node.id];
+    const isCompleted = completedNodes[node.id];
     const isSelected = selectedNode?.id === node.id;
 
     return (
@@ -257,17 +326,27 @@ function RoadmapGenerator() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-void border-t-transparent rounded-full animate-spin"></div>
-            <Sparkles className="absolute inset-0 m-auto text-void animate-pulse" size={24} />
+      <div className="min-h-screen bg-[#fbf7f1] flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-12 rounded-3xl shadow-2xl border-2 border-stone-200 text-center max-w-md w-full">
+          <div className="relative w-24 h-24 mx-auto mb-8">
+            <div className="absolute inset-0 border-4 border-stone-100 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+            <Sparkles className="absolute inset-0 m-auto text-yellow-500 animate-pulse" size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Generating Roadmap</h2>
-          <p className="text-gray-600">
-            AI is crafting a personalized learning path for <span className="font-semibold text-void">{topic}</span>...
+          <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">
+            {roadmap?.fromCache ? "Loading Roadmap" : "Generating Roadmap"}
+          </h2>
+          <p className="text-lg text-stone-600 leading-relaxed">
+            {roadmap?.fromCache 
+              ? `Retrieving your ${topic} roadmap...`
+              : `AI is crafting a personalized learning path for ${topic}...`
+            }
           </p>
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-stone-600">
+              {roadmap?.fromCache ? "This will only take a moment" : "This may take 10-20 seconds"}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -309,16 +388,84 @@ function RoadmapGenerator() {
   return (
       /* Main Content Area */
       <div className="h-[calc(100vh-140px)] w-full flex overflow-hidden relative rounded-2xl border border-stone-200 shadow-sm bg-[#fbf7f1]">
-        {/* Roadmap Canvas */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[#fbf7f1] relative custom-scrollbar">
-          <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 min-h-full">
-            {/* Back Button (Floating since header is removed) */}
-            <button
-                onClick={() => navigate("/ai-roadmap")}
-                className="absolute top-6 left-6 p-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm hover:bg-white transition-all z-50 group"
-            >
-                <ArrowLeft size={20} className="text-gray-600 group-hover:text-gray-900" />
-            </button>
+        {/* Main Content Area - Full width with controlled max-width */}
+        <div className="relative w-full bg-[#fbf7f1] overflow-y-auto">
+          <div className="max-w-6xl mx-auto px-6 py-8">
+            
+            {/* Header Card */}
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-stone-200 p-8 mb-12">
+              {/* Top Row: Back Button & Action Buttons */}
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={() => navigate("/ai-roadmap")}
+                  className="flex items-center gap-2 text-stone-600 hover:text-stone-900 font-medium transition-colors"
+                >
+                  <ArrowLeft size={20} />
+                  <span>All Roadmaps</span>
+                </button>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleDownload}
+                    className="px-4 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-lg font-bold text-sm hover:bg-yellow-500 transition-all flex items-center gap-2"
+                  >
+                    <Download size={16} />
+                    Download
+                  </button>
+                  <button
+                    onClick={handleRegenerate}
+                    className="px-4 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-lg font-bold text-sm hover:bg-yellow-500 transition-all flex items-center gap-2"
+                  >
+                    <RefreshCw size={16} />
+                    Regenerate
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert("Link copied to clipboard!");
+                    }}
+                    className="px-4 py-2 bg-yellow-400 border-2 border-yellow-500 rounded-lg font-bold text-sm hover:bg-yellow-500 transition-all flex items-center gap-2"
+                  >
+                    <Share2 size={16} />
+                    Share
+                  </button>
+                </div>
+              </div>
+
+              {/* Title & Description */}
+              <h1 className="text-4xl font-bold text-stone-900 mb-3 font-serif">
+                {roadmap?.title || `${topic} Learning Roadmap`}
+              </h1>
+              <p className="text-lg text-stone-600 leading-relaxed">
+                {roadmap?.description || `Step by step guide to becoming a proficient ${topic} developer.`}
+              </p>
+
+              {/* Progress Indicator */}
+              <div className="mt-6 pt-6 border-t-2 border-stone-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-full">
+                      <span className="text-sm font-bold text-yellow-900">
+                        {Math.round((Object.values(completedNodes).filter(Boolean).length / (roadmap?.stages?.reduce((acc, stage) => acc + (stage.nodes?.length || 0), 0) || 1)) * 100)}% DONE
+                      </span>
+                    </div>
+                    <span className="text-sm text-stone-600">
+                      {Object.values(completedNodes).filter(Boolean).length} of {roadmap?.stages?.reduce((acc, stage) => acc + (stage.nodes?.length || 0), 0) || 0} Done
+                    </span>
+                  </div>
+                  {roadmap?.fromCache && (
+                    <div className="flex items-center gap-2 text-sm text-stone-500">
+                      <CheckCircle size={16} className="text-green-600" />
+                      <span>Loaded from cache</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Roadmap Content */}
+            <div className="relative">
+
             {/* Central Spine Line - Moved inside to grow with content */}
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-stone-400 transform -translate-x-1/2 z-0"></div>
 
@@ -369,10 +516,10 @@ function RoadmapGenerator() {
                         {/* Node */}
                         <NodeCard
                           node={node}
-                          progress={progress}
+                          progress={completedNodes}
                           selectedNode={selectedNode}
                           onNodeClick={handleNodeClick}
-                          onToggleProgress={toggleNodeProgress}
+                          onToggleProgress={toggleNodeCompletion}
                         />
                       </div>
                     );
@@ -388,7 +535,11 @@ function RoadmapGenerator() {
               </div>
             </div>
           </div>
+          {/* Closing Roadmap Content div */}
         </div>
+        {/* Closing max-w-6xl div */}
+      </div>
+      {/* Closing overflow-y-auto div */}
 
         {/* Resources Sidebar */}
         <AnimatePresence>
@@ -557,12 +708,12 @@ function RoadmapGenerator() {
                   <button
                     onClick={() => toggleNodeProgress(selectedNode.id)}
                     className={`w-full py-3 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border-2 ${
-                      progress[selectedNode.id]
+                      completedNodes[selectedNode.id]
                         ? "bg-green-100 border-green-500 text-green-700"
                         : "bg-white border-gray-200 text-gray-900 hover:border-gray-900"
                     }`}
                   >
-                    {progress[selectedNode.id] ? (
+                    {completedNodes[selectedNode.id] ? (
                       <>
                         <CheckCircle size={18} />
                         Completed
@@ -606,24 +757,25 @@ function RoadmapGenerator() {
                                 ? "bg-stone-900 text-white rounded-tr-none" 
                                 : "bg-white border border-stone-200 text-stone-800 rounded-tl-none"
                             }`}>
-                              <ReactMarkdown 
-                                className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-stone-900 prose-pre:text-stone-50"
-                                components={{
-                                  code({node, inline, className, children, ...props}) {
-                                    return !inline ? (
-                                      <div className="bg-stone-900 text-stone-50 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono">
-                                        {children}
-                                      </div>
-                                    ) : (
-                                      <code className="bg-stone-100 text-stone-800 px-1 py-0.5 rounded font-mono text-xs" {...props}>
-                                        {children}
-                                      </code>
-                                    )
-                                  }
-                                }}
-                              >
-                                {msg.content || ""}
-                              </ReactMarkdown>
+                              <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-stone-900 prose-pre:text-stone-50">
+                                <ReactMarkdown 
+                                  components={{
+                                    code({node, inline, className, children, ...props}) {
+                                      return !inline ? (
+                                        <div className="bg-stone-900 text-stone-50 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono">
+                                          {children}
+                                        </div>
+                                      ) : (
+                                        <code className="bg-stone-100 text-stone-800 px-1 py-0.5 rounded font-mono text-xs" {...props}>
+                                          {children}
+                                        </code>
+                                      )
+                                    }
+                                  }}
+                                >
+                                  {msg.content || ""}
+                                </ReactMarkdown>
+                              </div>
                             </div>
                           </div>
                         ))
