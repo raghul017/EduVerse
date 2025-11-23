@@ -41,6 +41,21 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: Date.now() });
 });
 
+import { query } from "./config/database.js";
+app.get("/health/db", async (req, res) => {
+  try {
+    const result = await query("SELECT NOW()");
+    res.json({ status: "ok", time: result.rows[0].now });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "error", 
+      message: error.message,
+      code: error.code,
+      detail: error.detail 
+    });
+  }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
