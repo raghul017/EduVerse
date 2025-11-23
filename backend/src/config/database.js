@@ -16,7 +16,8 @@ let debugState = {
   originalHost: null,
   resolvedIp: null,
   resolutionError: null,
-  usingFallback: false
+  usingFallback: false,
+  dnsServer: '8.8.8.8'
 };
 
 // Helper to get IPv4 connection string
@@ -35,18 +36,22 @@ const getIPv4ConnectionString = async () => {
       return env.databaseUrl;
     }
 
-    console.log(`[Database] Looking up IPv4 for ${hostname}...`);
-    // Use lookup instead of resolve4 (uses OS resolver, more reliable)
-    const { address } = await dns.lookup(hostname, { family: 4 });
+    console.log(`[Database] Resolving IPv4 for ${hostname} using Google DNS...`);
     
-    if (address) {
-      console.log(`[Database] Resolved to ${address}`);
-      debugState.resolvedIp = address;
-      url.hostname = address;
+    // Set Google DNS to bypass local resolver
+    dns.setServers(['8.8.8.8', '8.8.4.4']);
+    
+    // Use resolve4 (network query) instead of lookup (OS query)
+    const addresses = await dns.resolve4(hostname);
+    
+    if (addresses && addresses.length > 0) {
+      console.log(`[Database] Resolved to ${addresses[0]}`);
+      debugState.resolvedIp = addresses[0];
+      url.hostname = addresses[0];
       return url.toString();
     }
   } catch (error) {
-    console.error('[Database] DNS Lookup failed:', error);
+    console.error('[Database] DNS Resolution failed:', error);
     debugState.resolutionError = error.message;
     debugState.usingFallback = true;
   }
