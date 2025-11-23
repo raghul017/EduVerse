@@ -18,7 +18,13 @@ const app = express();
 const logger = pino({ level: env.node === "development" ? "debug" : "info" });
 
 const allowedOrigins =
-  env.node === "development" ? [/^http:\/\/localhost:\d+$/] : [env.frontendUrl];
+  env.node === "development"
+    ? [/^http:\/\/localhost:\d+$/]
+    : [
+        env.frontendUrl,
+        /\.vercel\.app$/, // Allow all Vercel preview/production URLs automatically
+        /^https:\/\/eduverse.*\.onrender\.com$/ // Allow self (if needed)
+      ];
 
 app.use(
   cors({
