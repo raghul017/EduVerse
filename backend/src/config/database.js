@@ -1,5 +1,12 @@
 import pg from 'pg';
 import { env } from './environment.js';
+import dns from 'node:dns';
+
+// Force IPv4 to fix "connect ENETUNREACH" errors on Render/Supabase
+// Must be here because this file initializes the pool immediately
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const { Pool } = pg;
 
