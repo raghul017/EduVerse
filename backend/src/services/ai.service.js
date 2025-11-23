@@ -356,19 +356,24 @@ class AIService {
   }
 
   validateAndFixUrl(url, topic) {
-    // If no URL or it's a placeholder/example, fallback to search
-    if (!url || url === "#" || url.includes("example.com") || url.includes("placeholder")) {
-      const searchQuery = encodeURIComponent(topic);
-      return `https://www.google.com/search?q=${searchQuery}`;
+    // FORCE SEARCH STRATEGY
+    // To guarantee 100% working links, we will ignore the AI's specific URL 
+    // (which might be hallucinated/old) and generate a high-quality search link instead.
+    
+    const searchQuery = encodeURIComponent(topic);
+    
+    // If it was meant to be a video (YouTube), search YouTube
+    if (url && (url.includes("youtube") || url.includes("video"))) {
+      return `https://www.youtube.com/results?search_query=${searchQuery}`;
     }
     
-    // If it looks like a valid URL, trust it!
-    // The user prefers a potentially broken direct link over a search link.
-    if (!url.startsWith("http")) {
-      return `https://${url}`;
+    // If it was meant to be a course (Udemy/Coursera), search Google with site:
+    if (url && (url.includes("udemy") || url.includes("coursera"))) {
+       return `https://www.google.com/search?q=${searchQuery}+course`;
     }
-    
-    return url;
+
+    // Default: Google Search
+    return `https://www.google.com/search?q=${searchQuery}`;
   }
 
   async summarize(postId, transcript) {
@@ -492,12 +497,13 @@ Return ONLY valid JSON with this structure:
 }
 
 Requirements:
-1. Create 6-8 stages covering key areas.
-2. Each stage MUST have 3-5 nodes.
-3. Keep all descriptions and summaries VERY concise to save tokens.
+1. Create 8-10 stages covering key areas (beginner to advanced).
+2. Each stage MUST have 4-6 nodes.
+3. Keep descriptions concise (max 10-15 words).
 4. No markdown formatting or code blocks in the JSON output.
 5. Mention exact technologies and tools where relevant.
-6. Add logical dependencies between nodes if applicable.`;
+6. Add logical dependencies between nodes if applicable.
+7. IMPORTANT: For any external links/resources, use Google Search or YouTube Search URLs if you are not 100% sure of the direct link. Example: "https://www.google.com/search?q=topic"`;
 
     try {
       const aiResponse = await this.callAIWithRetry(prompt, "balanced");
@@ -613,6 +619,7 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
   }
 
   async chatWithTutor(message, context) {
+    console.log(`[AI Service] Chat request: "${message}" (Context: ${context?.substring(0, 50)}...)`);
     try {
       if (!this.groq) {
         throw new Error("Groq API key not configured");
@@ -636,6 +643,7 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
       });
 
       const response = completion.choices[0]?.message?.content || "I couldn't generate a response.";
+      console.log(`[AI Service] Chat response length: ${response.length}`);
       this.trackUsage("chat", completion.usage?.total_tokens || 0);
       
       return { response };

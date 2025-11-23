@@ -81,10 +81,13 @@ function RoadmapGenerator() {
       });
 
       if (response.data.response) {
+        console.log("[Chat] Received response:", response.data.response);
         setChatMessages((prev) => [
           ...prev,
           { role: "assistant", content: response.data.response },
         ]);
+      } else {
+        console.warn("[Chat] Empty response received");
       }
     } catch (error) {
       console.error("Chat error:", error);
@@ -278,52 +281,6 @@ function RoadmapGenerator() {
 
   const stages = roadmap?.stages || [];
 
-  // NodeCard Component
-  const NodeCard = ({
-    node,
-    progress,
-    selectedNode,
-    onNodeClick,
-    onToggleProgress,
-  }) => {
-    const isCompleted = completedNodes[node.id];
-    const isSelected = selectedNode?.id === node.id;
-
-    return (
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => onNodeClick(node)}
-        className={`relative group flex items-center justify-between w-64 p-4 rounded-lg border-2 text-left transition-all 
-        ${
-          isCompleted
-            ? "bg-[#e6f4ea] border-green-700 shadow-[4px_4px_0px_0px_rgba(21,128,61,1)]"
-            : isSelected
-            ? "bg-[#fde047] border-stone-900 shadow-[4px_4px_0px_0px_rgba(28,25,23,1)] ring-1 ring-stone-900"
-            : "bg-[#fffbeb] border-stone-400 hover:border-stone-900 hover:shadow-[4px_4px_0px_0px_rgba(28,25,23,1)]"
-        }`}
-      >
-        <span className={`font-bold text-sm ${isCompleted ? "text-green-900" : "text-gray-900"}`}>
-          {node.label}
-        </span>
-        
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleProgress(node.id);
-          }}
-          className={`ml-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-colors border ${
-            isCompleted 
-              ? "bg-green-500 border-green-600 text-white" 
-              : "bg-white border-gray-400 text-gray-300 group-hover:border-gray-600"
-          }`}
-        >
-          {isCompleted ? <CheckCircle size={14} /> : <Circle size={14} />}
-        </div>
-      </motion.button>
-    );
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fbf7f1] flex flex-col items-center justify-center p-4">
@@ -392,6 +349,22 @@ function RoadmapGenerator() {
         <div className="relative w-full bg-[#fbf7f1] overflow-y-auto">
           <div className="max-w-6xl mx-auto px-6 py-8">
             
+            {/* Offline Warning Banner */}
+            {roadmap?.isOffline && (
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg shadow-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                      <span className="font-bold">Database Offline:</span> Your roadmap was generated successfully, but progress cannot be saved right now.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Header Card */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-stone-200 p-8 mb-12">
               {/* Top Row: Back Button & Action Buttons */}
@@ -470,60 +443,85 @@ function RoadmapGenerator() {
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-stone-400 transform -translate-x-1/2 z-0"></div>
 
             {stages.map((stage, stageIndex) => (
-              <div key={stage.id} className="mb-16 relative">
+              <div key={stage.id} className="mb-20 relative">
                 {/* Stage Marker on Spine */}
-                <div className="absolute left-1/2 top-6 w-4 h-4 bg-yellow-400 rounded-full border-4 border-white shadow-sm transform -translate-x-1/2 z-20"></div>
+                <div className="absolute left-1/2 top-0 w-4 h-4 bg-yellow-400 rounded-full border-4 border-white shadow-sm transform -translate-x-1/2 z-20"></div>
 
-                {/* Stage Title */}
-                <div className="flex justify-center mb-10 relative z-20">
-                  <div className="bg-white border-2 border-gray-800 px-8 py-3 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                {/* Stage Title (Root of the Tree) */}
+                <div className="flex justify-center mb-12 relative z-20">
+                  <div className="bg-white border-2 border-gray-800 px-8 py-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative group cursor-default hover:-translate-y-1 transition-transform duration-200">
                     <h2 className="text-xl font-bold text-gray-900 text-center uppercase tracking-wide">
                       {stage.label}
                     </h2>
+                    {/* Connector to children */}
+                    <div className="absolute left-1/2 bottom-0 w-0.5 h-12 bg-gray-400 transform -translate-x-1/2 translate-y-full"></div>
                   </div>
                 </div>
 
-                {/* Nodes Grid */}
-                <div className="grid grid-cols-2 gap-x-24 gap-y-8 relative">
-                  {stage.nodes?.map((node, nodeIndex) => {
-                    const isLeft = nodeIndex % 2 === 0;
-                    return (
-                      <div
-                        key={node.id}
-                        className={`flex ${isLeft ? "justify-end" : "justify-start"} relative items-center`}
-                      >
-                        {/* Curved SVG Connector */}
-                        <svg
-                          className={`absolute top-1/2 w-24 h-12 pointer-events-none
-                            ${isLeft ? "-right-24 -translate-y-1/2" : "-left-24 -translate-y-1/2"}
-                          `}
-                          style={{ overflow: 'visible' }}
-                        >
-                          <path
-                            d={isLeft 
-                              ? "M 96,24 C 48,24 48,24 0,24" // Right to Left curve
-                              : "M 0,24 C 48,24 48,24 96,24"  // Left to Right curve
-                            }
-                            fill="none"
-                            stroke="#a8a29e" // stone-400
-                            strokeWidth="2"
-                            strokeDasharray="6 4"
-                          />
-                          {/* Dot at spine connection */}
-                          <circle cx={isLeft ? 96 : 0} cy="24" r="3" fill="#78716c" />
-                        </svg>
-                        
-                        {/* Node */}
-                        <NodeCard
-                          node={node}
-                          progress={completedNodes}
-                          selectedNode={selectedNode}
-                          onNodeClick={handleNodeClick}
-                          onToggleProgress={toggleNodeCompletion}
-                        />
-                      </div>
-                    );
-                  })}
+                {/* Nodes Tree Layout */}
+                <div className="relative z-10">
+                  {/* Horizontal Bar connecting branches */}
+                  <div className="absolute top-0 left-4 right-4 h-0.5 bg-gray-300 rounded-full hidden md:block"></div>
+                  
+                  <div className="flex flex-wrap justify-center gap-8 md:gap-12 pt-8 relative">
+                    {stage.nodes?.map((node, nodeIndex) => {
+                      const isCompleted = completedNodes[node.id];
+                      const isSelected = selectedNode?.id === node.id;
+                      
+                      return (
+                        <div key={node.id} className="relative flex flex-col items-center w-full md:w-64">
+                          {/* Vertical Line from Horizontal Bar */}
+                          <div className="absolute top-[-32px] left-1/2 w-0.5 h-8 bg-gray-300 transform -translate-x-1/2 hidden md:block"></div>
+                          
+                          {/* Node Card */}
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: nodeIndex * 0.1 }}
+                            whileHover={{ scale: 1.03, translateY: -5 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleNodeClick(node)}
+                            className={`w-full bg-white p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 relative overflow-hidden group ${
+                              isSelected
+                                ? "border-yellow-400 shadow-[0_10px_20px_-5px_rgba(250,204,21,0.3)]"
+                                : isCompleted
+                                ? "border-green-500 shadow-sm"
+                                : "border-stone-200 hover:border-stone-400 shadow-sm hover:shadow-xl"
+                            }`}
+                          >
+                            {/* Hover Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                            {/* Progress Indicator */}
+                            <div className="absolute top-3 right-3 z-10">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleNodeCompletion(node.id);
+                                }}
+                                className={`p-1.5 rounded-full transition-all duration-300 ${
+                                  isCompleted
+                                    ? "bg-green-100 text-green-600 hover:bg-green-200 scale-110"
+                                    : "bg-stone-100 text-stone-400 hover:bg-stone-200 hover:scale-110"
+                                }`}
+                              >
+                                {isCompleted ? <CheckCircle size={18} /> : <Circle size={18} />}
+                              </button>
+                            </div>
+
+                            <h3 className={`font-bold text-lg mb-2 pr-8 relative z-10 ${
+                              isCompleted ? "text-green-700" : "text-gray-900"
+                            }`}>
+                              {node.label}
+                            </h3>
+                            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 relative z-10">
+                              {node.details}
+                            </p>
+                          </motion.div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ))}

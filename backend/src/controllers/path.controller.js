@@ -41,15 +41,20 @@ export const aiRoadmap = async (req, res, next) => {
 
     // Check for existing roadmap (unless forceRegenerate is true)
     if (userId && !forceRegenerate) {
-      const existingRoadmap = await RoadmapModel.getRoadmap(userId, role.trim());
-      if (existingRoadmap) {
-        console.log(`✅ [Path Controller] LOADING FROM CACHE for ${role} (user: ${userId})`);
-        console.log(`[Path Controller] No AI call needed - returning cached roadmap`);
-        return res.json({
-          ...existingRoadmap.roadmap_data,
-          fromCache: true,
-          roadmapId: existingRoadmap.id
-        });
+      try {
+        const existingRoadmap = await RoadmapModel.getRoadmap(userId, role.trim());
+        if (existingRoadmap) {
+          console.log(`✅ [Path Controller] LOADING FROM CACHE for ${role} (user: ${userId})`);
+          console.log(`[Path Controller] No AI call needed - returning cached roadmap`);
+          return res.json({
+            ...existingRoadmap.roadmap_data,
+            fromCache: true,
+            roadmapId: existingRoadmap.id
+          });
+        }
+      } catch (dbError) {
+        console.warn(`⚠️ [Path Controller] Database read failed (continuing with generation): ${dbError.message}`);
+        // We will continue, but mark as offline mode later
       }
     }
 
@@ -57,28 +62,29 @@ export const aiRoadmap = async (req, res, next) => {
     console.log(`🤖 [Path Controller] GENERATING NEW ROADMAP with AI for ${role}`);
     console.log(`[Path Controller] Calling AI service...`);
     const roadmap = await aiService.generateRoadmap(role.trim());
+    
+    if (roadmap.error) {
+       return res.status(500).json({ message: "AI generation failed", error: roadmap.error });
+    }
+
     console.log(
-      `[Path Controller] AI Roadmap result: ${roadmap ? "success" : "failed"}`
+      `[Path Controller] AI Roadmap result: success`
     );
 
-    if (!roadmap || roadmap.error) {
-      const errorMsg = roadmap?.error || "Unknown error";
-      console.error(
-        `[Path Controller] AI Roadmap generation failed: ${errorMsg}`
-      );
-      return res.status(503).json({ 
-        message: "AI service is currently unavailable. Please try again.",
-        error: errorMsg 
-      });
-    }
+    let isOffline = false;
 
     // Save roadmap if user is authenticated
     if (userId) {
-      const savedRoadmap = await RoadmapModel.saveRoadmap(userId, role.trim(), roadmap);
-      roadmap.roadmapId = savedRoadmap.id;
+      try {
+        const savedRoadmap = await RoadmapModel.saveRoadmap(userId, role.trim(), roadmap);
+        roadmap.roadmapId = savedRoadmap.id;
+      } catch (dbError) {
+        console.warn(`⚠️ [Path Controller] Database save failed (returning roadmap without ID): ${dbError.message}`);
+        isOffline = true;
+      }
     }
 
-    return res.json(roadmap);
+    return res.json({ ...roadmap, isOffline });
   } catch (error) {
     console.error("[Path Controller] Error in aiRoadmap:", error.message);
     console.error("[Path Controller] Stack:", error.stack);
