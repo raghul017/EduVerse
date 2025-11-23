@@ -1,8 +1,8 @@
 import axios from "axios";
 import { getToken } from "./auth.js";
 
-const root = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "") || "";
-const baseURL = `${root || ""}/api`;
+const envUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+const baseURL = envUrl.endsWith("/api") ? envUrl : `${envUrl || ""}/api`;
 
 const api = axios.create({
   baseURL,
