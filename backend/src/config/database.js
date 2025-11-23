@@ -1,10 +1,8 @@
 import pg from 'pg';
 import { env } from './environment.js';
-import dns from 'node:dns';
-import util from 'node:util';
+import dns from 'node:dns/promises';
 
 const { Pool } = pg;
-const resolve4 = util.promisify(dns.resolve4);
 
 const needsSSL = env.databaseUrl?.includes('supabase') || env.node !== 'development';
 
@@ -12,6 +10,14 @@ if (needsSSL) {
   pg.defaults.ssl = { rejectUnauthorized: false };
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
+
+// Debug state
+let debugState = {
+  originalHost: null,
+  resolvedIp: null,
+  resolutionError: null,
+  usingFallback: false
+};
 
 // Helper to get IPv4 connection string
 const getIPv4ConnectionString = async () => {
@@ -21,22 +27,28 @@ const getIPv4ConnectionString = async () => {
     // Parse the URL
     const url = new URL(env.databaseUrl);
     const hostname = url.hostname;
+    debugState.originalHost = hostname;
     
     // If it's already an IP, return as is
     if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
+      debugState.resolvedIp = hostname;
       return env.databaseUrl;
     }
 
-    console.log(`[Database] Resolving IPv4 for ${hostname}...`);
-    const addresses = await resolve4(hostname);
+    console.log(`[Database] Looking up IPv4 for ${hostname}...`);
+    // Use lookup instead of resolve4 (uses OS resolver, more reliable)
+    const { address } = await dns.lookup(hostname, { family: 4 });
     
-    if (addresses && addresses.length > 0) {
-      console.log(`[Database] Resolved to ${addresses[0]}`);
-      url.hostname = addresses[0];
+    if (address) {
+      console.log(`[Database] Resolved to ${address}`);
+      debugState.resolvedIp = address;
+      url.hostname = address;
       return url.toString();
     }
   } catch (error) {
-    console.error('[Database] DNS Resolution failed:', error);
+    console.error('[Database] DNS Lookup failed:', error);
+    debugState.resolutionError = error.message;
+    debugState.usingFallback = true;
   }
   return env.databaseUrl; // Fallback to original
 };
@@ -56,7 +68,7 @@ const getPool = async () => {
 
   pool.on('error', (error) => {
     console.error('Unexpected PostgreSQL error', error);
-    process.exit(1);
+    // Don't exit, just log. Exiting causes restart loops.
   });
 
   return pool;
@@ -66,3 +78,5 @@ export const query = async (text, params) => {
   const p = await getPool();
   return p.query(text, params);
 };
+
+export const getDebugInfo = () => debugState;

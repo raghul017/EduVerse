@@ -41,17 +41,21 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: Date.now() });
 });
 
-import { query } from "./config/database.js";
+import { query, getDebugInfo } from "./config/database.js";
 app.get("/health/db", async (req, res) => {
   try {
     const result = await query("SELECT NOW()");
-    res.json({ status: "ok", time: result.rows[0].now });
+    res.json({ 
+      status: "ok", 
+      time: result.rows[0].now,
+      debug: getDebugInfo()
+    });
   } catch (error) {
     res.status(500).json({ 
       status: "error", 
       message: error.message,
       code: error.code,
-      detail: error.detail 
+      debug: getDebugInfo()
     });
   }
 });
