@@ -32,9 +32,9 @@ function LoginForm () {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface rounded-xl p-6 space-y-4 border border-white/5 max-w-md mx-auto"
+      className="bg-white/5 rounded-xl p-6 space-y-4 border border-white/10 max-w-md mx-auto backdrop-blur-sm"
     >
-      <h2 className="text-xl font-semibold">Welcome back</h2>
+      <h2 className="text-xl font-semibold text-white">Welcome back</h2>
       <Input
         label="Email"
         name="email"
@@ -50,7 +50,7 @@ function LoginForm () {
         onChange={handleChange}
       />
       {(formError || error) && (
-        <p className="text-error text-sm">{formError || error}</p>
+        <p className="text-red-400 text-sm">{formError || error}</p>
       )}
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? 'Signing in...' : 'Login'}

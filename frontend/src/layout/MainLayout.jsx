@@ -4,15 +4,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function MainLayout() {
   const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   return (
-    <div className="min-h-screen bg-background relative text-textPrimary font-sans flex flex-col">
-      <div className="bg-noise" />
+    <div className={`min-h-screen relative text-textPrimary font-sans flex flex-col pt-[70px] ${
+      isHomePage ? 'bg-[#0a0a0a]' : 'bg-background'
+    }`}>
+      {!isHomePage && <div className="bg-noise" />}
       
       <Navbar />
       
       {/* Main Content Area */}
-      <main className="p-6 max-w-7xl mx-auto w-full flex-grow">
+      <main className={isHomePage || location.pathname.includes('roadmap') ? "w-full flex-grow" : "p-6 max-w-7xl mx-auto w-full flex-grow"}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -30,4 +33,5 @@ function MainLayout() {
 }
 
 export default MainLayout;
+
 

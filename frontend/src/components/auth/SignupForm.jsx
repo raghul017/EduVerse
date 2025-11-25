@@ -47,9 +47,9 @@ function SignupForm () {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface rounded-xl p-6 space-y-4 border border-white/5 max-w-lg mx-auto"
+      className="bg-white/5 rounded-xl p-6 space-y-4 border border-white/10 max-w-lg mx-auto backdrop-blur-sm"
     >
-      <h2 className="text-xl font-semibold">Create your learning profile</h2>
+      <h2 className="text-xl font-semibold text-white">Create your learning profile</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input label="Name" name="name" value={form.name} onChange={handleChange} />
         <Input
@@ -82,7 +82,7 @@ function SignupForm () {
         onChange={handleChange}
       />
       {(formError || error) && (
-        <p className="text-error text-sm">{formError || error}</p>
+        <p className="text-red-400 text-sm">{formError || error}</p>
       )}
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? 'Creating account...' : 'Sign up'}

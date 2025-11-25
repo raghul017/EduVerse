@@ -30,32 +30,32 @@ function Footer() {
   ];
 
   return (
-    <footer className="bg-stone-900 text-stone-300 border-t border-stone-800">
+    <footer className="bg-black/40 text-slate-400 border-t border-white/5 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#fbf7f1] rounded flex items-center justify-center">
-                <span className="text-stone-900 font-bold text-sm">EV</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <span className="text-white font-bold text-sm">EV</span>
               </div>
-              <span className="text-[#fbf7f1] font-bold text-xl">EDUVERSE</span>
+              <span className="text-white font-bold text-xl tracking-tight">EDUVERSE</span>
             </Link>
-            <p className="text-stone-400 text-sm leading-relaxed max-w-xs">
+            <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
               AI-powered learning platform to help you master any skill efficiently.
             </p>
           </div>
 
           {/* Products */}
           <div>
-            <h3 className="text-[#fbf7f1] font-bold text-sm mb-4">Products</h3>
+            <h3 className="text-white font-semibold text-sm mb-4">Products</h3>
             <ul className="space-y-3">
               {productLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-stone-400 hover:text-[#fbf7f1] transition-colors text-sm"
+                    className="text-slate-500 hover:text-blue-400 transition-colors text-sm"
                   >
                     {link.name}
                   </Link>
@@ -66,13 +66,13 @@ function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-[#fbf7f1] font-bold text-sm mb-4">Resources</h3>
+            <h3 className="text-white font-semibold text-sm mb-4">Resources</h3>
             <ul className="space-y-3">
               {resourceLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.path}
-                    className="text-stone-400 hover:text-[#fbf7f1] transition-colors text-sm"
+                    className="text-slate-500 hover:text-blue-400 transition-colors text-sm"
                   >
                     {link.name}
                   </a>
@@ -83,13 +83,13 @@ function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-[#fbf7f1] font-bold text-sm mb-4">Company</h3>
+            <h3 className="text-white font-semibold text-sm mb-4">Company</h3>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.path}
-                    className="text-stone-400 hover:text-[#fbf7f1] transition-colors text-sm"
+                    className="text-slate-500 hover:text-blue-400 transition-colors text-sm"
                   >
                     {link.name}
                   </a>
@@ -100,13 +100,13 @@ function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-[#fbf7f1] font-bold text-sm mb-4">Legal</h3>
+            <h3 className="text-white font-semibold text-sm mb-4">Legal</h3>
             <ul className="space-y-3">
               {legalLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.path}
-                    className="text-stone-400 hover:text-[#fbf7f1] transition-colors text-sm"
+                    className="text-slate-500 hover:text-blue-400 transition-colors text-sm"
                   >
                     {link.name}
                   </a>
@@ -117,14 +117,14 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-stone-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-stone-500 text-sm">
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-600 text-sm">
             © 2025 EduVerse. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a
               href="#"
-              className="text-stone-400 hover:text-[#fbf7f1] transition-colors"
+              className="text-slate-500 hover:text-blue-400 transition-colors"
               aria-label="Twitter"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@ function Footer() {
             </a>
             <a
               href="#"
-              className="text-stone-400 hover:text-[#fbf7f1] transition-colors"
+              className="text-slate-500 hover:text-blue-400 transition-colors"
               aria-label="LinkedIn"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@ function Footer() {
             </a>
             <a
               href="#"
-              className="text-stone-400 hover:text-[#fbf7f1] transition-colors"
+              className="text-slate-500 hover:text-blue-400 transition-colors"
               aria-label="GitHub"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

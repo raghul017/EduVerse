@@ -50,11 +50,11 @@ function AiTutor() {
     >
       {result && (
         <div className="mt-10 space-y-4">
-          <h2 className="text-2xl font-semibold text-textPrimary">
+          <h2 className="text-2xl font-semibold text-white">
             {result.title}
           </h2>
           {result.description && (
-            <p className="text-textSecondary">{result.description}</p>
+            <p className="text-slate-400">{result.description}</p>
           )}
         </div>
       )}

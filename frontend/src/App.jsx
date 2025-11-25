@@ -19,6 +19,7 @@ import RoadmapGenerator from "./pages/RoadmapGenerator.jsx";
 import GuideGenerator from "./pages/GuideGenerator.jsx";
 import CourseGenerator from "./pages/CourseGenerator.jsx";
 import Videos from "./pages/Videos.jsx";
+import Paths from "./pages/Paths.jsx";
 
 function App() {
   return (
@@ -117,6 +118,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyVideos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/paths"
+            element={
+              <ProtectedRoute>
+                <Paths />
               </ProtectedRoute>
             }
           />

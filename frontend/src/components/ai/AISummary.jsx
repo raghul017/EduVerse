@@ -4,9 +4,9 @@ import api from '../../utils/api.js';
 const SourceBadge = ({ source }) => {
   if (!source) return null;
   const label = source === 'transcript' ? 'Transcript' : 'Description';
-  const colorClass = source === 'transcript' ? 'text-success bg-success/10' : 'text-warning bg-warning/10';
+  const colorClass = source === 'transcript' ? 'text-green-400 bg-green-500/10' : 'text-yellow-400 bg-yellow-500/10';
   return (
-    <span className={`text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-border ${colorClass}`}>
+    <span className={`text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 ${colorClass}`}>
       Using {label}
     </span>
   );
@@ -34,18 +34,18 @@ function AISummary ({ postId }) {
   }, [postId]);
 
   return (
-    <div className="ev-card p-4 space-y-2">
-      <div className="flex items-center gap-2 text-sm font-semibold text-accent">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 backdrop-blur-sm">
+      <div className="flex items-center gap-2 text-sm font-semibold text-blue-400">
         <span>⚡ AI Summary</span>
-        {loading && <span className="text-xs text-textSecondary">thinking...</span>}
+        {loading && <span className="text-xs text-slate-400">thinking...</span>}
         {!loading && <SourceBadge source={source} />}
       </div>
       {source === 'description' && (
-        <p className="text-[11px] text-warning bg-warning/10 inline-flex px-2 py-1 rounded">
+        <p className="text-[11px] text-yellow-400 bg-yellow-500/10 inline-flex px-2 py-1 rounded">
           Transcript still processing. Using description for now.
         </p>
       )}
-      <p className="text-sm text-textSecondary whitespace-pre-line">{summary}</p>
+      <p className="text-sm text-slate-400 whitespace-pre-line">{summary}</p>
     </div>
   );
 }

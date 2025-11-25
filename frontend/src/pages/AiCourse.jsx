@@ -43,27 +43,27 @@ function AiCourse() {
   const stages = course?.stages || [];
 
   return (
-    <div className="min-h-screen flex relative z-10">
+    <div className="min-h-screen flex relative z-10 bg-[#0a0a0a]">
       {/* Left Sidebar */}
-      <aside className="w-64 border-r border-border bg-surface flex flex-col">
-        <div className="p-6 border-b border-border">
+      <aside className="w-64 border-r border-white/10 bg-[#0a0a0a] flex flex-col">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center">
-              <span className="text-background font-bold text-sm">AI</span>
+            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">AI</span>
             </div>
             <div>
-              <div className="text-sm font-semibold text-textPrimary">AI Tutor</div>
-              <div className="text-xs text-textSecondary">by EduVerse</div>
+              <div className="text-sm font-semibold text-white">AI Tutor</div>
+              <div className="text-xs text-slate-400">by EduVerse</div>
             </div>
           </div>
-          <p className="text-xs text-textSecondary mt-2">
+          <p className="text-xs text-slate-400 mt-2">
             Your personalized learning companion for any topic
           </p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
           <div className="mb-4">
-            <div className="text-xs font-semibold text-textSecondary uppercase tracking-wide mb-2 px-2">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 px-2">
               Create with AI
             </div>
             <NavLink
@@ -71,13 +71,13 @@ function AiCourse() {
               className={({ isActive }) =>
                 `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition ${
                   isActive
-                    ? "bg-accent/20 text-accent"
-                    : "text-textSecondary hover:text-textPrimary hover:bg-card"
+                    ? "bg-blue-500/10 text-blue-500"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
                 }`
               }
             >
               <span>Plan</span>
-              <span className="text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded uppercase font-semibold">
+              <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase font-semibold">
                 NEW
               </span>
             </NavLink>
@@ -132,10 +132,10 @@ function AiCourse() {
           </div>
 
           <div className="mb-4">
-            <div className="text-xs font-semibold text-textSecondary uppercase tracking-wide mb-2 px-2">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 px-2">
               My Learning
             </div>
-            <button className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-textSecondary hover:text-textPrimary hover:bg-card transition">
+            <button className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-slate-400 hover:text-white hover:bg-white/5 transition">
               <span>My Courses</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -144,10 +144,10 @@ function AiCourse() {
           </div>
 
           <div className="mb-4">
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-textSecondary hover:text-textPrimary hover:bg-card transition">
+            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-white hover:bg-white/5 transition">
               Ask AI Tutor
             </button>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-textSecondary hover:text-textPrimary hover:bg-card transition">
+            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-white hover:bg-white/5 transition">
               Roadmap Chat
             </button>
           </div>
@@ -162,10 +162,10 @@ function AiCourse() {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-white/10">
           <Link
             to="/signup"
-            className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-card border border-border rounded-md text-sm font-medium text-textPrimary hover:bg-surface transition"
+            className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-sm font-medium text-white hover:bg-white/10 transition"
           >
             <span>Free Signup or Login</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,10 +178,10 @@ function AiCourse() {
       {/* Main Content */}
       <main className="flex-1 p-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-semibold text-textPrimary mb-2">
+          <h1 className="text-4xl font-semibold text-white mb-2">
           What can I help you learn?
         </h1>
-          <p className="text-textSecondary mb-8">
+          <p className="text-slate-400 mb-8">
             Enter a topic below to generate a personalized course for it
           </p>
 
@@ -193,13 +193,13 @@ function AiCourse() {
                 value={topic}
                 onChange={(event) => setTopic(event.target.value)}
                 placeholder="Enter a topic"
-                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-textPrimary placeholder-textSecondary focus:outline-none focus:border-accent transition"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
             </div>
 
             {/* Format Selection */}
             <div>
-              <label className="block text-sm font-medium text-textSecondary mb-3">
+              <label className="block text-sm font-medium text-slate-400 mb-3">
                 Choose the format
               </label>
               <div className="grid grid-cols-3 gap-4">
@@ -214,12 +214,12 @@ function AiCourse() {
                     onClick={() => setFormat(fmt.id)}
                     className={`p-4 border rounded-lg transition text-left ${
                       format === fmt.id
-                        ? "border-accent bg-accent/10"
-                        : "border-border bg-card hover:border-accent/50"
+                        ? "border-blue-500 bg-blue-500/10"
+                        : "border-white/10 bg-white/5 hover:border-blue-500/50 hover:bg-white/10"
                     }`}
                   >
                     <div className="text-2xl mb-2">{fmt.icon}</div>
-                    <div className="text-sm font-medium text-textPrimary">{fmt.label}</div>
+                    <div className="text-sm font-medium text-white">{fmt.label}</div>
               </button>
             ))}
           </div>
@@ -232,9 +232,9 @@ function AiCourse() {
                 id="answerQuestions"
                 checked={answerQuestions}
                 onChange={(e) => setAnswerQuestions(e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-card text-accent focus:ring-accent"
+                className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500"
               />
-              <label htmlFor="answerQuestions" className="text-sm text-textSecondary">
+              <label htmlFor="answerQuestions" className="text-sm text-slate-400">
                 Answer the following questions for a better course
               </label>
             </div>
@@ -243,7 +243,7 @@ function AiCourse() {
             <button
               type="submit"
               disabled={loading || !topic.trim()}
-              className="w-full px-6 py-3 bg-textPrimary text-background rounded-lg font-semibold hover:bg-textSecondary transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -263,7 +263,7 @@ function AiCourse() {
           </form>
 
           {error && (
-            <div className="mt-4 p-4 bg-danger/10 border border-danger/20 rounded-lg text-sm text-danger">
+            <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
               {error}
           </div>
           )}
@@ -271,10 +271,10 @@ function AiCourse() {
           {/* Course/Roadmap Results */}
       {course && (
             <div className="mt-12 space-y-6">
-              <div className="bg-card border border-border rounded-lg p-6 space-y-2">
-                <h2 className="text-2xl font-semibold text-textPrimary">{course.title}</h2>
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6 space-y-2">
+                <h2 className="text-2xl font-semibold text-white">{course.title}</h2>
             {course.description && (
-                  <p className="text-textSecondary">{course.description}</p>
+                  <p className="text-slate-400">{course.description}</p>
             )}
           </div>
 
@@ -283,35 +283,35 @@ function AiCourse() {
             {modules.map((mod) => (
               <div
                 key={mod.id}
-                      className="bg-card border border-border rounded-lg p-4 space-y-3"
+                      className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3"
               >
                   <div>
-                        <p className="text-xs uppercase tracking-wide text-textSecondary mb-1">
+                        <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
                       Module
                     </p>
-                        <h3 className="text-sm font-semibold text-textPrimary">{mod.title}</h3>
+                        <h3 className="text-sm font-semibold text-white">{mod.title}</h3>
                     {mod.summary && (
-                          <p className="text-xs text-textSecondary mt-1">{mod.summary}</p>
+                          <p className="text-xs text-slate-400 mt-1">{mod.summary}</p>
                     )}
                 </div>
                 <div className="space-y-2">
                   {mod.lessons?.map((lesson) => (
                     <div
                       key={lesson.id}
-                            className="border border-border rounded-md p-3 bg-surface space-y-1"
+                            className="border border-white/10 rounded-md p-3 bg-white/5 space-y-1"
                     >
-                            <p className="text-sm font-semibold text-textPrimary">
+                            <p className="text-sm font-semibold text-white">
                         {lesson.title}
                       </p>
                       {lesson.objective && (
-                              <p className="text-xs text-textSecondary">{lesson.objective}</p>
+                              <p className="text-xs text-slate-400">{lesson.objective}</p>
                       )}
                       {lesson.suggestedResources?.length > 0 && (
                               <div className="mt-2 space-y-1">
                           {lesson.suggestedResources.map((res, idx) => (
                             <div
                               key={`${lesson.id}-res-${idx}`}
-                                    className="text-[11px] text-textSecondary flex items-center gap-1"
+                                    className="text-[11px] text-slate-400 flex items-center gap-1"
                             >
                                     <span className="uppercase tracking-wide">{res.type}</span>
                               {res.title && <span>· {res.title}</span>}
@@ -320,7 +320,7 @@ function AiCourse() {
                                   href={res.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                        className="text-accent underline-offset-2 hover:underline ml-1"
+                                        className="text-blue-400 underline-offset-2 hover:underline ml-1"
                                 >
                                   Open
                                 </a>
@@ -343,33 +343,33 @@ function AiCourse() {
                     {stages.map((stage) => (
                       <div
                         key={stage.id}
-                        className="flex-1 min-w-[220px] bg-card border border-border rounded-lg p-4 space-y-3"
+                        className="flex-1 min-w-[220px] bg-white/5 border border-white/10 rounded-lg p-4 space-y-3"
                       >
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-textSecondary mb-1">
+                          <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
                             Stage
                           </p>
-                          <h3 className="text-sm font-semibold text-textPrimary">{stage.label}</h3>
+                          <h3 className="text-sm font-semibold text-white">{stage.label}</h3>
                           {stage.summary && (
-                            <p className="text-xs text-textSecondary mt-1">{stage.summary}</p>
+                            <p className="text-xs text-slate-400 mt-1">{stage.summary}</p>
                           )}
                         </div>
                         <div className="space-y-3">
                           {stage.nodes?.map((node) => (
                             <div
                               key={node.id}
-                              className="border border-border rounded-md p-3 bg-surface space-y-1"
+                              className="border border-white/10 rounded-md p-3 bg-white/5 space-y-1"
                             >
-                              <p className="text-sm font-semibold text-textPrimary">
+                              <p className="text-sm font-semibold text-white">
                                 {node.label}
                               </p>
                               {node.details && (
-                                <p className="text-xs text-textSecondary whitespace-pre-wrap">
+                                <p className="text-xs text-slate-400 whitespace-pre-wrap">
                                   {node.details}
                                 </p>
                               )}
                               {node.dependsOn?.length > 0 && (
-                                <p className="text-[10px] text-textSecondary mt-1">
+                                <p className="text-[10px] text-slate-500 mt-1">
                                   Depends on: {node.dependsOn.join(", ")}
                                 </p>
                               )}
@@ -384,7 +384,7 @@ function AiCourse() {
 
               {((format === "course" && !modules.length) ||
                 (format === "roadmap" && !stages.length)) && (
-                <div className="text-sm text-textSecondary text-center py-8">
+                <div className="text-sm text-slate-500 text-center py-8">
                   AI returned an empty result. Please try again with a different topic.
               </div>
             )}

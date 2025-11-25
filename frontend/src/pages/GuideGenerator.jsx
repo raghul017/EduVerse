@@ -47,12 +47,12 @@ function GuideGenerator() {
     >
       {guide && (
         <div className="mt-10 space-y-6">
-          <div className="bg-card border border-border rounded-lg p-6 space-y-2">
-            <h2 className="text-2xl font-semibold text-textPrimary">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-2 backdrop-blur-sm">
+            <h2 className="text-2xl font-semibold text-white">
               {guide.title}
             </h2>
             {guide.description && (
-              <p className="text-textSecondary">{guide.description}</p>
+              <p className="text-slate-400">{guide.description}</p>
             )}
           </div>
 
@@ -60,19 +60,19 @@ function GuideGenerator() {
             {chapters.map((chapter) => (
               <div
                 key={chapter.id}
-                className="bg-card border border-border rounded-lg p-4 space-y-2"
+                className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 backdrop-blur-sm"
               >
-                <h3 className="text-sm font-semibold text-textPrimary">
+                <h3 className="text-sm font-semibold text-white">
                   {chapter.title}
                 </h3>
                 {chapter.explanation && (
-                  <p className="text-sm text-textSecondary">
+                  <p className="text-sm text-slate-400">
                     {chapter.explanation}
                   </p>
                 )}
                 {chapter.examples?.length > 0 && (
-                  <div className="text-xs text-textSecondary space-y-1">
-                    <p className="font-semibold">Examples</p>
+                  <div className="text-xs text-slate-500 space-y-1">
+                    <p className="font-semibold text-slate-400">Examples</p>
                     <ul className="list-disc list-inside space-y-0.5">
                       {chapter.examples.map((ex, idx) => (
                         <li key={idx}>{ex}</li>
@@ -81,8 +81,8 @@ function GuideGenerator() {
                   </div>
                 )}
                 {chapter.exercises?.length > 0 && (
-                  <div className="text-xs text-textSecondary space-y-1">
-                    <p className="font-semibold">Exercises</p>
+                  <div className="text-xs text-slate-500 space-y-1">
+                    <p className="font-semibold text-slate-400">Exercises</p>
                     <ul className="list-disc list-inside space-y-0.5">
                       {chapter.exercises.map((ex, idx) => (
                         <li key={idx}>{ex}</li>

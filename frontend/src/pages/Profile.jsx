@@ -49,11 +49,11 @@ function Profile () {
   };
 
   if (loading) {
-    return <p className="text-center text-text/60">Loading profile...</p>;
+    return <p className="text-center text-slate-400">Loading profile...</p>;
   }
 
   if (error) {
-    return <p className="text-center text-error">{error}</p>;
+    return <p className="text-center text-red-400">{error}</p>;
   }
 
   return (

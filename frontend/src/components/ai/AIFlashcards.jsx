@@ -25,7 +25,7 @@ function AIFlashcards({ postId }) {
 
   if (loading) {
     return (
-      <div className="ev-card p-4 text-sm text-textSecondary">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-400 backdrop-blur-sm">
         Building flashcards...
       </div>
     );
@@ -33,18 +33,18 @@ function AIFlashcards({ postId }) {
 
   if (!cards.length) {
     return (
-      <div className="ev-card p-4 text-xs text-textSecondary">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-400 backdrop-blur-sm">
         Flashcards are not available for this video yet.
       </div>
     );
   }
 
   return (
-    <div className="ev-card p-4 space-y-3">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm">
       <div className="flex items-center justify-between text-sm">
-        <h3 className="font-semibold text-accent">📚 Flashcards</h3>
+        <h3 className="font-semibold text-blue-400">📚 Flashcards</h3>
         {source && (
-          <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-border text-textSecondary">
+          <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 text-slate-400">
             {source === "transcript" ? "Transcript" : "Description"}
           </span>
         )}
@@ -53,18 +53,18 @@ function AIFlashcards({ postId }) {
         {cards.map((card, index) => (
           <details
             key={index}
-            className="group rounded-lg border border-border bg-surface px-3 py-2 text-sm cursor-pointer transition hover:border-accent"
+            className="group rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm cursor-pointer transition hover:border-blue-500/50 hover:bg-white/10"
           >
             <summary className="list-none flex items-center justify-between gap-2">
-              <span className="font-medium text-textPrimary">{card.front}</span>
-              <span className="text-[11px] text-textSecondary group-open:hidden">
+              <span className="font-medium text-white">{card.front}</span>
+              <span className="text-[11px] text-slate-400 group-open:hidden">
                 Show answer
               </span>
-              <span className="text-[11px] text-textSecondary hidden group-open:inline">
+              <span className="text-[11px] text-slate-400 hidden group-open:inline">
                 Hide answer
               </span>
             </summary>
-            <div className="mt-2 text-textSecondary whitespace-pre-line">
+            <div className="mt-2 text-slate-400 whitespace-pre-line">
               {card.back}
             </div>
           </details>

@@ -29,20 +29,20 @@ function Dashboard() {
 
   if (loading)
     return (
-      <p className="text-center text-textSecondary">Loading dashboard...</p>
+      <p className="text-center text-slate-400">Loading dashboard...</p>
     );
-  if (error) return <p className="text-center text-danger">{error}</p>;
+  if (error) return <p className="text-center text-red-400">{error}</p>;
 
   return (
     <div className="space-y-8">
-      <section className="bg-card border border-border rounded-3xl p-8 shadow-card space-y-3">
-        <p className="text-sm uppercase tracking-wide text-textSecondary">
+      <section className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-sm backdrop-blur-sm space-y-3">
+        <p className="text-sm uppercase tracking-wide text-slate-400">
           Dashboard
         </p>
-        <h1 className="text-3xl font-semibold">
+        <h1 className="text-3xl font-semibold text-white">
           Welcome back, {user?.name?.split(" ")[0] || "Learner"} 👋
         </h1>
-        <p className="text-textSecondary text-base">
+        <p className="text-slate-400 text-base">
           Track how many lessons you’ve watched, which subjects you’re
           exploring, and keep your AI streak alive.
         </p>
@@ -76,33 +76,33 @@ function Dashboard() {
           {/* AI Usage Stats */}
           <AIUsageStats />
 
-          <section className="bg-card border border-border rounded-3xl p-6 shadow-card space-y-4">
+          <section className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-textPrimary">
+              <h2 className="text-lg font-semibold text-white">
                 AI activity
               </h2>
-              <span className="text-xs text-textSecondary">Auto-updated</span>
+              <span className="text-xs text-slate-500">Auto-updated</span>
             </div>
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
-              <div className="p-4 rounded-2xl bg-accent/10 border border-border">
-                <p className="text-xs uppercase text-textSecondary">
+              <div className="p-4 rounded-2xl bg-blue-500/10 border border-white/10">
+                <p className="text-xs uppercase text-slate-400">
                   AI summaries viewed
                 </p>
-                <p className="text-2xl font-semibold text-accent">
+                <p className="text-2xl font-semibold text-blue-400">
                   {Math.max(stats.posts_watched - stats.bookmarks_count, 0)}
                 </p>
               </div>
-              <div className="p-4 rounded-2xl bg-card border border-border">
-                <p className="text-xs uppercase text-textSecondary">
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <p className="text-xs uppercase text-slate-400">
                   Community subjects
                 </p>
-                <p className="text-2xl font-semibold">{stats.subjects_count}</p>
+                <p className="text-2xl font-semibold text-white">{stats.subjects_count}</p>
               </div>
-              <div className="p-4 rounded-2xl bg-success/10 border border-border">
-                <p className="text-xs uppercase text-textSecondary">
+              <div className="p-4 rounded-2xl bg-green-500/10 border border-white/10">
+                <p className="text-xs uppercase text-slate-400">
                   Current streak
                 </p>
-                <p className="text-2xl font-semibold text-success">
+                <p className="text-2xl font-semibold text-green-400">
                   {stats.streak_count} days
                 </p>
               </div>

@@ -27,10 +27,10 @@ function MyVideos() {
     load();
   }, [user]);
 
-  if (!user) return <p className="text-center text-error">Login required.</p>;
+  if (!user) return <p className="text-center text-red-400">Login required.</p>;
   if (loading)
-    return <p className="text-center text-text/60">Loading your channel...</p>;
-  if (error) return <p className="text-center text-error">{error}</p>;
+    return <p className="text-center text-slate-400">Loading your channel...</p>;
+  if (error) return <p className="text-center text-red-400">{error}</p>;
 
   return (
     <div className="space-y-6">

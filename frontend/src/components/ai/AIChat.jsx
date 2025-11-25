@@ -26,27 +26,27 @@ function AIChat ({ postId }) {
   };
 
   return (
-    <div className="ev-card p-4 space-y-3">
-      <h3 className="text-sm font-semibold text-accent">🤖 Ask AI Tutor</h3>
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm">
+      <h3 className="text-sm font-semibold text-blue-400">🤖 Ask AI Tutor</h3>
       <form onSubmit={handleAsk} className="flex gap-2">
         <input
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="Explain photosynthesis in simple terms..."
-          className="flex-1 ev-input rounded px-3 py-2 text-sm"
+          className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
         />
         <Button type="submit" size="sm" disabled={loading}>
           {loading ? 'Thinking...' : 'Ask'}
         </Button>
       </form>
       {answer && (
-        <div className="border border-border rounded p-3 space-y-1 bg-surface">
-          <div className="text-[10px] uppercase text-textSecondary">
+        <div className="border border-white/10 rounded p-3 space-y-1 bg-white/5">
+          <div className="text-[10px] uppercase text-slate-400">
             {source === 'transcript'
               ? 'Response generated from transcript'
               : 'Transcript unavailable, using description'}
           </div>
-          <p className="text-sm text-textSecondary whitespace-pre-line">{answer}</p>
+          <p className="text-sm text-slate-400 whitespace-pre-line">{answer}</p>
         </div>
       )}
     </div>

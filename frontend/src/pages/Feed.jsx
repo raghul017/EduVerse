@@ -54,17 +54,17 @@ function Feed() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen relative z-10">
+    <div className="min-h-screen relative z-10 bg-[#0a0a0a]">
       <div className="max-w-layout mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Filters */}
           <aside className="lg:col-span-3 space-y-6">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-textPrimary mb-4">Filters</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-white mb-4">Filters</h3>
 
               {/* Subjects */}
               <div className="mb-6">
-                <h4 className="text-xs font-medium text-textSecondary mb-3 uppercase tracking-wide">
+                <h4 className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wide">
                   Subjects
                 </h4>
                 <div className="space-y-2">
@@ -72,8 +72,8 @@ function Feed() {
                     onClick={() => setSelectedSubject(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedSubject === null
-                        ? "bg-accent/20 text-accent"
-                        : "text-textSecondary hover:text-textPrimary hover:bg-surface"
+                        ? "bg-blue-500/10 text-blue-500"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     All Subjects
@@ -88,8 +88,8 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         selectedSubject === subject
-                          ? "bg-accent/20 text-accent"
-                          : "text-textSecondary hover:text-textPrimary hover:bg-surface"
+                          ? "bg-blue-500/10 text-blue-500"
+                          : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
                       {subject}
@@ -100,7 +100,7 @@ function Feed() {
 
               {/* Creators */}
               <div className="mb-6">
-                <h4 className="text-xs font-medium text-textSecondary mb-3 uppercase tracking-wide">
+                <h4 className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wide">
                   Creators
                 </h4>
                 <div className="space-y-2">
@@ -108,8 +108,8 @@ function Feed() {
                     onClick={() => setSelectedCreator(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedCreator === null
-                        ? "bg-accent/20 text-accent"
-                        : "text-textSecondary hover:text-textPrimary hover:bg-surface"
+                        ? "bg-blue-500/10 text-blue-500"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     All Creators
@@ -126,8 +126,8 @@ function Feed() {
                         }
                         className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                           selectedCreator === creatorId
-                            ? "bg-accent/20 text-accent"
-                            : "text-textSecondary hover:text-textPrimary hover:bg-surface"
+                            ? "bg-blue-500/10 text-blue-500"
+                            : "text-slate-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
                         {creator?.name || "Creator"}
@@ -139,7 +139,7 @@ function Feed() {
 
               {/* Difficulty */}
               <div>
-                <h4 className="text-xs font-medium text-textSecondary mb-3 uppercase tracking-wide">
+                <h4 className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wide">
                   Difficulty
                 </h4>
                 <div className="space-y-2">
@@ -151,8 +151,8 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         difficulty === level
-                          ? "bg-accent/20 text-accent"
-                          : "text-textSecondary hover:text-textPrimary hover:bg-surface"
+                          ? "bg-blue-500/10 text-blue-500"
+                          : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
                       {level}
@@ -166,10 +166,10 @@ function Feed() {
           {/* Main Feed */}
           <main className="lg:col-span-6 space-y-4">
             <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-textPrimary mb-2">
+              <h1 className="text-2xl font-semibold text-white mb-2">
                 Educational Feed
               </h1>
-              <p className="text-textSecondary text-sm">
+              <p className="text-slate-400 text-sm">
                 Discover bite-sized lessons from verified creators
               </p>
             </div>
@@ -181,8 +181,8 @@ function Feed() {
                 ))}
               </div>
             ) : (
-              <div className="bg-card border border-border rounded-lg p-12 text-center">
-                <p className="text-textSecondary">No posts found. Try adjusting your filters.</p>
+              <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
+                <p className="text-slate-400">No posts found. Try adjusting your filters.</p>
               </div>
             )}
           </main>
@@ -190,8 +190,8 @@ function Feed() {
           {/* Right Sidebar */}
           <aside className="lg:col-span-3 space-y-6">
             {/* Suggested Creators */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-textPrimary mb-4">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-white mb-4">
                 Suggested Creators
               </h3>
               <div className="space-y-3">
@@ -199,18 +199,18 @@ function Feed() {
                   <button
                     key={creator.id}
                     onClick={() => setSelectedCreator(creator.id)}
-                    className="w-full flex items-center justify-between p-2 rounded-md hover:bg-surface transition"
+                    className="w-full flex items-center justify-between p-2 rounded-md hover:bg-white/5 transition"
                   >
-                    <span className="text-sm text-textSecondary">{creator.name}</span>
-                    <span className="text-xs text-textSecondary">{creator.count} posts</span>
+                    <span className="text-sm text-slate-400">{creator.name}</span>
+                    <span className="text-xs text-slate-500">{creator.count} posts</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Trending Topics */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-textPrimary mb-4">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-white mb-4">
                 Trending Topics
               </h3>
               <div className="space-y-2">
@@ -218,10 +218,10 @@ function Feed() {
                   <button
                     key={topic.subject}
                     onClick={() => setSelectedSubject(topic.subject)}
-                    className="w-full flex items-center justify-between p-2 rounded-md hover:bg-surface transition"
+                    className="w-full flex items-center justify-between p-2 rounded-md hover:bg-white/5 transition"
                   >
-                    <span className="text-sm text-textSecondary">{topic.subject}</span>
-                    <span className="text-xs text-textSecondary">{topic.count}</span>
+                    <span className="text-sm text-slate-400">{topic.subject}</span>
+                    <span className="text-xs text-slate-500">{topic.count}</span>
                   </button>
                 ))}
               </div>

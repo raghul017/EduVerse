@@ -18,7 +18,83 @@
 }
 
 @layer components {
-  /* Custom component styles if needed */
+  /* Border Beam Animation */
+  @keyframes beam-move {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .btn-beam {
+    @apply relative;
+  }
+
+  .btn-beam::before {
+    content: "";
+    @apply absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300;
+    padding: 2px; /* Width of the beam */
+    
+    /* Golden beam gradient */
+    background: linear-gradient(90deg, transparent 0%, #fbbf24 45%, #fff 50%, #fbbf24 55%, transparent 100%);
+    background-size: 200% 100%;
+    animation: beam-move 2s linear infinite;
+    
+    /* Mask out the center to show only the border */
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    z-index: 20;
+  }
+
+  .btn-beam:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Remove the old ::after hack */
+  .btn-beam::after {
+    content: none;
+  }
+
+  /* Silver Beam Animation for Homepage */
+  .btn-beam-silver {
+    @apply relative;
+  }
+
+  .btn-beam-silver::before {
+    content: "";
+    @apply absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300;
+    padding: 2.5px; /* Thicker beam width for better visibility */
+    
+    /* Silver/white beam gradient */
+    background: linear-gradient(90deg, transparent 0%, #d1d5db 45%, #ffffff 50%, #d1d5db 55%, transparent 100%);
+    background-size: 200% 100%;
+    animation: beam-move 2s linear infinite;
+    
+    /* Mask out the center to show only the border */
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    z-index: 20;
+  }
+
+  .btn-beam-silver:hover::before {
+    @apply opacity-100;
+  }
+
+  .btn-beam-silver::after {
+    content: none;
+  }
 }
 
 @layer utilities {

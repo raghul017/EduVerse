@@ -31,7 +31,7 @@ function EditProfile ({ profile, onUpdated }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-surface rounded-2xl p-6 border border-white/5 space-y-4">
+    <form onSubmit={handleSubmit} className="bg-white/5 rounded-2xl p-6 border border-white/10 space-y-4">
       <Input label="Name" name="name" value={form.name} onChange={handleChange} />
       <Input label="Bio" name="bio" value={form.bio} onChange={handleChange} />
       <Input
@@ -41,7 +41,7 @@ function EditProfile ({ profile, onUpdated }) {
         onChange={handleChange}
       />
       {status && (
-        <p className={`text-sm ${status.includes('Saved') ? 'text-success' : 'text-error'}`}>
+        <p className={`text-sm ${status.includes('Saved') ? 'text-green-400' : 'text-red-400'}`}>
           {status}
         </p>
       )}

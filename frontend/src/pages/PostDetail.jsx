@@ -91,7 +91,7 @@ function PostDetail() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger text-lg mb-4">{error}</p>
+        <p className="text-red-400 text-lg mb-4">{error}</p>
         <Button onClick={() => navigate('/videos')}>Back to Videos</Button>
       </div>
     );
@@ -132,15 +132,15 @@ function PostDetail() {
           
           <div className="space-y-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-textPrimary leading-tight mb-3">
+              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
                 {post.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-textSecondary">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accentHover flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
                     {post.creator_name?.charAt(0) || 'U'}
                   </div>
-                  <span className="font-semibold text-textPrimary">{post.creator_name || 'Creator'}</span>
+                  <span className="font-semibold text-white">{post.creator_name || 'Creator'}</span>
                 </div>
                 <span>·</span>
                 <span className="flex items-center gap-1">
@@ -157,14 +157,14 @@ function PostDetail() {
                   </>
                 )}
                 <span>·</span>
-                <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/20 text-xs font-medium">
+                <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-medium">
                   {post.subject}
                 </span>
               </div>
             </div>
             
             {/* Action buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
+            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-white/10">
               <Button
                 variant={post.liked ? 'secondary' : 'primary'}
                 size="md"
@@ -197,7 +197,7 @@ function PostDetail() {
                 {post.tags?.map((tag) => (
                   <span 
                     key={tag} 
-                    className="text-xs px-2.5 py-1 rounded-md bg-surface text-textSecondary border border-border"
+                    className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-slate-400 border border-white/10"
                   >
                     #{tag}
                   </span>
@@ -206,13 +206,13 @@ function PostDetail() {
             </div>
             
             {/* Description */}
-            <div className="bg-card border border-border rounded-xl p-6 space-y-3 shadow-sm">
-              <h3 className="font-semibold text-textPrimary text-lg">About this lesson</h3>
-              <p className="text-textSecondary leading-relaxed whitespace-pre-wrap">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-3 shadow-sm backdrop-blur-sm">
+              <h3 className="font-semibold text-white text-lg">About this lesson</h3>
+              <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">
                 {post.description}
               </p>
               {!transcriptReady && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-warning/10 border border-warning/20 rounded-lg text-sm text-warning">
+                <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-400">
                   <span>⏳</span>
                   <span>Transcript is still processing; AI features will use the description for now.</span>
                 </div>

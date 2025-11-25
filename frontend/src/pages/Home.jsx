@@ -1,107 +1,168 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, BookOpen, Video, Users, Brain, Map, Star, FileText, Zap, Cloud, BarChart, Layout, Shield } from "lucide-react";
+import {
+  Sparkles,
+  ArrowRight,
+  Video,
+  Users,
+  Brain,
+  Map,
+  Star,
+  FileText,
+  Zap,
+  PlayCircle,
+} from "lucide-react";
 import Footer from "../components/common/Footer.jsx";
+import { AnimatedButton } from "../components/ui/AnimatedButton";
+import LearningOrbit from "../components/home/LearningOrbit";
+import { WorkflowBento } from "../components/home/WorkflowBento";
+import { AIFeaturesBento } from "../components/home/AIFeaturesBento";
+import "../styles/animations.css";
 
 function Home() {
   return (
-    <div className="min-h-screen bg-[#fbf7f1] text-stone-900 font-sans selection:bg-stone-200">
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 py-24 md:py-32">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="max-w-4xl"
-        >
-          <h1 className="text-6xl md:text-8xl font-serif font-medium leading-[0.95] tracking-tight mb-12">
-            Master your <span className="italic">future</span> with <br />
-            <span className="underline decoration-2 decoration-stone-300 underline-offset-8">AI-powered</span> learning <br />
-            paths for everyone
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-stone-600 max-w-2xl leading-relaxed mb-12">
-            EduVerse provides personalized roadmaps, intelligent tutoring, and a supportive community to help you master any skill efficiently.
-          </p>
+    <div className="min-h-screen text-white selection:bg-blue-500/30 relative overflow-x-hidden">
+      
+      {/* Hero Section - Full Screen with Spline Background */}
+      <section className="relative overflow-hidden min-h-screen">
+        {/* Spline 3D Animation Background - Absolute inside hero */}
+        <div className="absolute top-0 left-0 w-full h-full" style={{ zIndex: 0 }}>
+          <iframe
+            src="https://my.spline.design/retrofuturismbganimation-Lb3VtL1bNaYUnirKNzn0FvaW"
+            frameBorder="0"
+            width="100%"
+            height="100%"
+            id="aura-spline"
+            title="3D Background Animation"
+            style={{ pointerEvents: 'none' }}
+          />
+        </div>
 
-          <div className="flex flex-wrap gap-4">
-            <Link
-              to="/ai-roadmap"
-              className="px-8 py-4 bg-stone-900 text-[#fbf7f1] rounded-lg font-medium text-lg hover:bg-stone-800 transition-colors flex items-center gap-2"
-            >
-              <Sparkles size={20} />
-              Generate Roadmap
-            </Link>
-            <Link
-              to="/videos"
-              className="px-8 py-4 bg-white border border-stone-200 text-stone-900 rounded-lg font-medium text-lg hover:bg-stone-50 transition-colors flex items-center gap-2"
-            >
-              <Video size={20} />
-              Browse Content
-            </Link>
+        {/* Gradient Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent relative" style={{ zIndex: 10 }} />
+
+        {/* Hero Content - Centered */}
+        <div className="container mx-auto px-6 py-16 md:py-32 relative">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+            {/* AI Badge */}
+            <div className="mb-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-600/10 border border-blue-500/30 text-xs font-light text-blue-300 backdrop-blur-sm">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[9px] font-medium text-white">AI</span>
+              <span>New: Studio-grade learning in one prompt</span>
+            </div>
+
+            {/* Main Heading with Gradient */}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tighter mb-6 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                Compose your
+              </span>
+              {' '}
+              <span className="text-white">
+                learning journey in seconds
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-gray-300 text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-extralight tracking-wide">
+              EduVerse turns your goals into personalized roadmaps. Describe your targets—our AI scores, plans and guides you through mastery.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+              <Link
+                to="/ai-roadmap"
+                className="inline-flex items-center justify-center gap-2 bg-white text-black font-light rounded-md px-6 py-3 hover:bg-opacity-90 transition-all"
+              >
+                <Sparkles className="w-5 h-5" />
+                Generate Roadmap
+              </Link>
+
+              <Link
+                to="/videos"
+                className="inline-flex items-center justify-center gap-2 bg-transparent border border-blue-500/30 rounded-md px-6 py-3 hover:bg-blue-500/10 transition-all text-white font-light"
+              >
+                <PlayCircle className="w-5 h-5" />
+                Watch demo
+              </Link>
+            </div>
+            
+            <p className="text-sm text-gray-400 font-extralight">
+              No credit card required. Start learning immediately.
+            </p>
           </div>
-        </motion.div>
-      </section>
 
-      {/* Feature Grid */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
-        <div className="bg-[#e6e4dd] rounded-3xl p-8 md:p-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link to="/ai-roadmap" className="group block space-y-4">
-              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <Map size={64} className="text-stone-600" />
-              </div>
-              <h3 className="text-2xl font-serif font-medium">AI-Generated Roadmaps</h3>
-              <p className="text-stone-600 leading-relaxed">Personalized learning paths tailored to your goals and experience level.</p>
-            </Link>
+          {/* Gradient Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent my-16" />
 
-            <Link to="/videos" className="group block space-y-4">
-              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <Video size={64} className="text-stone-600" />
-              </div>
-              <h3 className="text-2xl font-serif font-medium">Curated Videos</h3>
-              <p className="text-stone-600 leading-relaxed">Expert-selected educational content to accelerate your learning journey.</p>
-            </Link>
-
-            <Link to="/communities" className="group block space-y-4">
-              <div className="h-48 bg-[#dcdad4] rounded-xl flex items-center justify-center group-hover:bg-[#d4d2cc] transition-colors">
-                <Users size={64} className="text-stone-600" />
-              </div>
-              <h3 className="text-2xl font-serif font-medium">Learning Communities</h3>
-              <p className="text-stone-600 leading-relaxed">Connect with fellow learners and share your progress together.</p>
-            </Link>
+          {/* Feature Cards - Services Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
+            {[
+              { icon: Map, title: "AI Roadmaps", desc: "Personalized learning paths", to: "/ai-roadmap" },
+              { icon: Video, title: "Curated Videos", desc: "Expert-selected content", to: "/videos" },
+              { icon: Users, title: "Communities", desc: "Connect with learners", to: "/communities" },
+              { icon: Brain, title: "AI Tutor", desc: "24/7 intelligent help", to: "/ai-roadmap" },
+            ].map((feature, i) => (
+              <Link
+                key={i}
+                to={feature.to}
+                className="group"
+              >
+                <p className="text-2xl font-light mb-1 tracking-tight text-white group-hover:text-blue-400 transition-colors">
+                  {feature.title}
+                </p>
+                <p className="text-gray-400 font-extralight">
+                  {feature.desc}
+                </p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
-        <h2 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-8">Featured</h2>
+
+      {/* Workflow Bento Grid */}
+      <WorkflowBento />
+
+      {/* AI Features Bento Grid */}
+      <AIFeaturesBento />
+
+      {/* Featured Paths Section */}
+      <section className="max-w-7xl mx-auto px-6 pb-32 relative z-10">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-8">Featured Paths</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <Link to="/ai-roadmap?role=frontend" className="group">
             <div className="space-y-4">
-              <div className="h-64 bg-stone-200 rounded-2xl overflow-hidden">
-                <div className="h-full flex items-center justify-center bg-gradient-to-br from-stone-300 to-stone-100">
-                  <Brain size={80} className="text-stone-500" />
+              <div className="h-64 bg-blue-500/10 border border-blue-500/20 rounded-2xl overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="h-full flex items-center justify-center">
+                  <Brain size={80} className="text-blue-400 group-hover:scale-110 transition-all duration-500" />
                 </div>
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-serif font-medium group-hover:text-stone-600 transition-colors">Frontend Development Roadmap</h3>
-                <p className="text-stone-500 leading-relaxed">Comprehensive guide from basics to advanced React and modern frameworks.</p>
+                <h3 className="text-2xl font-medium text-white group-hover:text-blue-400 transition-colors">
+                  Frontend Development Roadmap
+                </h3>
+                <p className="text-slate-400 leading-relaxed">
+                  Comprehensive guide from basics to advanced React and modern frameworks.
+                </p>
               </div>
             </div>
           </Link>
 
           <Link to="/ai-roadmap?role=backend" className="group">
             <div className="space-y-4">
-              <div className="h-64 bg-stone-200 rounded-2xl overflow-hidden">
-                <div className="h-full flex items-center justify-center bg-gradient-to-br from-stone-300 to-stone-100">
-                  <Layout size={80} className="text-stone-500" />
+              <div className="h-64 bg-purple-500/10 border border-purple-500/20 rounded-2xl overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="h-full flex items-center justify-center">
+                  <Map size={80} className="text-purple-400 group-hover:scale-110 transition-all duration-500" />
                 </div>
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-serif font-medium group-hover:text-stone-600 transition-colors">Backend Engineering Path</h3>
-                <p className="text-stone-500 leading-relaxed">Master server-side development, databases, and scalable architecture.</p>
+                <h3 className="text-2xl font-medium text-white group-hover:text-purple-400 transition-colors">
+                  Backend Engineering Path
+                </h3>
+                <p className="text-slate-400 leading-relaxed">
+                  Master server-side development, databases, and scalable architecture.
+                </p>
               </div>
             </div>
           </Link>
@@ -109,43 +170,49 @@ function Home() {
       </section>
 
       {/* Guides Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
-        <h2 className="text-sm font-bold text-stone-400 uppercase tracking-wider mb-8">Guides</h2>
+      <section className="max-w-7xl mx-auto px-6 pb-32 relative z-10">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-8">Guides</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { icon: Star, title: "Getting Started", desc: "Your first steps in learning with EduVerse" },
-            { icon: FileText, title: "Best Practices", desc: "Tips and tricks for effective learning" },
-            { icon: Zap, title: "Quick Wins", desc: "Fast-track your progress with proven techniques" },
+            { icon: Star, title: "Getting Started", desc: "Your first steps in learning with EduVerse", color: "blue" },
+            { icon: FileText, title: "Best Practices", desc: "Tips and tricks for effective learning", color: "purple" },
+            { icon: Zap, title: "Quick Wins", desc: "Fast-track your progress with proven techniques", color: "emerald" },
           ].map((guide, i) => (
-            <Link 
+            <Link
               key={i}
               to="#"
-              className="group p-8 bg-white border border-stone-200 rounded-2xl hover:border-stone-300 hover:shadow-lg transition-all"
+              className="group p-8 bg-white/5 border border-white/10 rounded-2xl hover:border-white/20 hover:bg-white/10 transition-all backdrop-blur-sm"
             >
-              <guide.icon size={32} className="text-stone-600 mb-4" />
-              <h3 className="text-xl font-serif font-medium mb-2">{guide.title}</h3>
-              <p className="text-stone-500 text-sm">{guide.desc}</p>
+              <guide.icon size={32} className={`text-${guide.color}-400 mb-4 transition-colors`} />
+              <h3 className="text-xl font-medium text-white mb-2">{guide.title}</h3>
+              <p className="text-slate-400 text-sm">{guide.desc}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Understand Any Topic Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
-        <div className="bg-stone-100 rounded-3xl p-12 md:p-20">
-          <div className="max-w-3xl">
-            <h2 className="text-4xl md:text-5xl font-serif font-medium mb-6 leading-tight">
-              Understand any topic, accelerate your learning
+      {/* CTA Section */}
+      <section className="max-w-7xl mx-auto px-6 pb-32 relative z-10">
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-white/10 rounded-3xl p-12 md:p-20 relative overflow-hidden backdrop-blur-sm">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
+          
+          <div className="max-w-3xl relative z-10">
+            <h2 className="text-4xl md:text-5xl font-medium mb-6 leading-tight text-white">
+              Master any topic,<br />
+              accelerate your learning
             </h2>
-            <p className="text-xl text-stone-600 leading-relaxed mb-8">
-              Our AI-powered platform adapts to your learning style, providing personalized roadmaps and resources to help you master complex topics faster than ever before.
+            <p className="text-xl text-slate-400 leading-relaxed mb-8">
+              Our AI-powered platform adapts to your learning style, providing
+              personalized roadmaps and resources to help you master complex
+              topics faster than ever before.
             </p>
-            <Link
+            <AnimatedButton
+              variant="pulse"
               to="/ai-roadmap"
-              className="inline-flex items-center gap-2 text-stone-900 font-medium text-lg group"
+              icon={ArrowRight}
             >
-              Start Learning <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+              Start Learning
+            </AnimatedButton>
           </div>
         </div>
       </section>

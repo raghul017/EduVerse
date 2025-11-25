@@ -85,27 +85,27 @@ function Paths() {
 
   return (
     <div className="space-y-8">
-      <section className="bg-card border border-border rounded-3xl p-8 shadow-card space-y-3">
-        <p className="text-sm uppercase tracking-wide text-textSecondary">
+      <section className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-sm backdrop-blur-sm space-y-3">
+        <p className="text-sm uppercase tracking-wide text-slate-400">
           Roadmaps
         </p>
-        <h1 className="text-3xl font-semibold text-textPrimary">
+        <h1 className="text-3xl font-semibold text-white">
           Build structured learning paths.
         </h1>
-        <p className="text-textSecondary text-base">
+        <p className="text-slate-400 text-base">
           Combine your videos into ordered paths and add recommended materials
           for each step.
         </p>
       </section>
 
       {paths.length > 0 && (
-        <section className="bg-card border border-border rounded-3xl p-6 shadow-card space-y-4">
+        <section className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm uppercase tracking-wide text-textSecondary">
+              <p className="text-sm uppercase tracking-wide text-slate-400">
                 Existing paths
               </p>
-              <h2 className="text-xl font-semibold text-textPrimary">
+              <h2 className="text-xl font-semibold text-white">
                 Your learning roadmaps
               </h2>
             </div>
@@ -121,51 +121,51 @@ function Paths() {
       <section className="grid lg:grid-cols-[minmax(0,1.2fr),minmax(0,1.3fr)] gap-6 items-start">
         <form
           onSubmit={handleCreatePath}
-          className="bg-card border border-border rounded-3xl p-6 shadow-card space-y-4"
+          className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-4"
         >
           <div>
-            <p className="text-sm uppercase tracking-wide text-textSecondary">
+            <p className="text-sm uppercase tracking-wide text-slate-400">
               Create new path
             </p>
-            <p className="text-textSecondary text-sm">
+            <p className="text-slate-400 text-sm">
               Define the topic, level, and description, then pick lessons from
               your library.
             </p>
           </div>
-          <label className="text-sm text-textSecondary space-y-1 block">
+          <label className="text-sm text-slate-400 space-y-1 block">
             Title
             <input
-              className="ev-input"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               name="title"
               value={form.title}
               onChange={handleChange}
               placeholder="Intro to Web Development"
             />
           </label>
-          <label className="text-sm text-textSecondary space-y-1 block">
+          <label className="text-sm text-slate-400 space-y-1 block">
             Subject
             <input
-              className="ev-input"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               name="subject"
               value={form.subject}
               onChange={handleChange}
               placeholder="Programming"
             />
           </label>
-          <label className="text-sm text-textSecondary space-y-1 block">
+          <label className="text-sm text-slate-400 space-y-1 block">
             Level
             <input
-              className="ev-input"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               name="level"
               value={form.level}
               onChange={handleChange}
               placeholder="Beginner / Intermediate / Advanced"
             />
           </label>
-          <label className="text-sm text-textSecondary space-y-1 block">
+          <label className="text-sm text-slate-400 space-y-1 block">
             Description
             <textarea
-              className="ev-input min-h-[120px]"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition min-h-[120px]"
               rows={4}
               name="description"
               value={form.description}
@@ -173,11 +173,11 @@ function Paths() {
               placeholder="What will learners achieve by completing this path?"
             />
           </label>
-          {error && <p className="text-sm text-danger">{error}</p>}
-          {success && <p className="text-sm text-success">{success}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          {success && <p className="text-sm text-green-400">{success}</p>}
           <button
             type="submit"
-            className="ev-button ev-button--primary w-full"
+            className="w-full px-6 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition disabled:opacity-50"
             disabled={saving}
           >
             {saving ? "Creating..." : "Create path"}
@@ -185,30 +185,30 @@ function Paths() {
         </form>
 
         <div className="space-y-4">
-          <div className="bg-card border border-border rounded-3xl p-4 shadow-card">
-            <p className="text-sm font-semibold text-textPrimary mb-2">
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-4 shadow-sm backdrop-blur-sm">
+            <p className="text-sm font-semibold text-white mb-2">
               Available lessons
             </p>
-            <p className="text-xs text-textSecondary mb-3">
+            <p className="text-xs text-slate-400 mb-3">
               Add videos from your library into this path.
             </p>
             <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
               {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="flex items-center justify-between gap-3 text-sm"
-                >
-                  <div>
-                    <p className="font-medium text-textPrimary line-clamp-1">
-                      {post.title}
-                    </p>
-                    <p className="text-[11px] text-textSecondary">
-                      {post.subject || "General"}
-                    </p>
-                  </div>
+                  <div
+                    key={post.id}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium text-white line-clamp-1">
+                        {post.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400">
+                        {post.subject || "General"}
+                      </p>
+                    </div>
                   <button
                     type="button"
-                    className="text-xs px-3 py-1 rounded-full border border-border text-textSecondary hover:border-accent"
+                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-400 hover:border-blue-500 hover:text-white transition"
                     onClick={() => handleAddLesson(post.id)}
                   >
                     Add
@@ -216,18 +216,18 @@ function Paths() {
                 </div>
               ))}
               {!posts.length && (
-                <p className="text-xs text-textSecondary">
+                <p className="text-xs text-slate-400">
                   Upload some videos first to create a path.
                 </p>
               )}
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-3xl p-4 shadow-card">
-            <p className="text-sm font-semibold text-textPrimary mb-2">
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-4 shadow-sm backdrop-blur-sm">
+            <p className="text-sm font-semibold text-white mb-2">
               Path outline
             </p>
-            <p className="text-xs text-textSecondary mb-3">
+            <p className="text-xs text-slate-400 mb-3">
               Set the order and add recommended materials for each step.
             </p>
             {lessons.length ? (
@@ -237,27 +237,27 @@ function Paths() {
                   return (
                     <div
                       key={lesson.postId}
-                      className="border border-border rounded-2xl p-3 space-y-2 bg-surface"
+                      className="border border-white/10 rounded-2xl p-3 space-y-2 bg-white/5"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-xs uppercase text-textSecondary">
+                          <p className="text-xs uppercase text-slate-500">
                             Step {index + 1}
                           </p>
-                          <p className="text-sm font-medium text-textPrimary line-clamp-1">
+                          <p className="text-sm font-medium text-white line-clamp-1">
                             {post?.title || "Lesson"}
                           </p>
                         </div>
                         <button
                           type="button"
-                          className="text-xs text-danger"
+                          className="text-xs text-red-400 hover:text-red-300"
                           onClick={() => handleRemoveLesson(lesson.postId)}
                         >
                           Remove
                         </button>
                       </div>
                       <textarea
-                        className="ev-input min-h-[64px]"
+                        className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition min-h-[64px] text-xs"
                         rows={2}
                         placeholder="Links or notes: e.g. article, docs, exercises for this step."
                         value={lesson.resources}
@@ -273,7 +273,7 @@ function Paths() {
                 })}
               </div>
             ) : (
-              <p className="text-xs text-textSecondary">
+              <p className="text-xs text-slate-400">
                 No lessons added yet. Use the list above to add videos.
               </p>
             )}

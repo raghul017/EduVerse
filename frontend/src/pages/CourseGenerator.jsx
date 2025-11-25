@@ -47,12 +47,12 @@ function CourseGenerator() {
     >
       {course && (
         <div className="mt-10 space-y-6">
-          <div className="bg-card border border-border rounded-lg p-6 space-y-2">
-            <h2 className="text-2xl font-semibold text-textPrimary">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-2 backdrop-blur-sm">
+            <h2 className="text-2xl font-semibold text-white">
               {course.title}
             </h2>
             {course.description && (
-              <p className="text-textSecondary">{course.description}</p>
+              <p className="text-slate-400">{course.description}</p>
             )}
           </div>
 
@@ -60,17 +60,17 @@ function CourseGenerator() {
             {modules.map((mod) => (
               <div
                 key={mod.id}
-                className="bg-card border border-border rounded-lg p-4 space-y-3"
+                className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm"
               >
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-textSecondary mb-1">
+                  <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
                     Module
                   </p>
-                  <h3 className="text-sm font-semibold text-textPrimary">
+                  <h3 className="text-sm font-semibold text-white">
                     {mod.title}
                   </h3>
                   {mod.summary && (
-                    <p className="text-xs text-textSecondary mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       {mod.summary}
                     </p>
                   )}
@@ -79,13 +79,13 @@ function CourseGenerator() {
                   {mod.lessons?.map((lesson) => (
                     <div
                       key={lesson.id}
-                      className="border border-border rounded-md p-3 bg-surface space-y-1"
+                      className="border border-white/10 rounded-xl p-3 bg-white/5 space-y-1"
                     >
-                      <p className="text-sm font-semibold text-textPrimary">
+                      <p className="text-sm font-semibold text-white">
                         {lesson.title}
                       </p>
                       {lesson.objective && (
-                        <p className="text-xs text-textSecondary">
+                        <p className="text-xs text-slate-400">
                           {lesson.objective}
                         </p>
                       )}

@@ -12,6 +12,8 @@ function Navbar() {
   
   const profileRef = useRef(null);
   const communityRef = useRef(null);
+  
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -38,9 +40,9 @@ function Navbar() {
   ];
 
   return (
-    <header className="h-[70px] flex items-center justify-between px-8 sticky top-0 z-40 bg-[#fbf7f1]/95 backdrop-blur-lg border-b border-stone-200">
+    <header className="h-[70px] flex items-center justify-between px-8 fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-black/20 border-b border-white/10">
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 text-stone-900 font-heading font-bold text-xl tracking-tight">
+      <Link to="/" className="flex items-center gap-2 font-heading font-bold text-xl tracking-tight text-white">
         EDUVERSE
       </Link>
 
@@ -48,17 +50,13 @@ function Navbar() {
       <nav className="hidden md:flex items-center gap-8">
         <Link
           to="/ai-roadmap"
-          className={`text-sm font-medium transition-colors ${
-            location.pathname === "/ai-roadmap" ? "text-stone-900" : "text-stone-500 hover:text-stone-900"
-          }`}
+          className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
         >
           Roadmaps
         </Link>
         <Link
           to="/videos"
-          className={`text-sm font-medium transition-colors ${
-            location.pathname === "/videos" ? "text-stone-900" : "text-stone-500 hover:text-stone-900"
-          }`}
+          className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
         >
           Videos
         </Link>
@@ -67,23 +65,21 @@ function Navbar() {
         <div className="relative" ref={communityRef}>
           <button
             onClick={() => setIsCommunityOpen(!isCommunityOpen)}
-            className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-              location.pathname.includes("/communities") ? "text-stone-900" : "text-stone-500 hover:text-stone-900"
-            }`}
+            className="flex items-center gap-1 text-sm font-medium text-slate-300 hover:text-white transition-colors"
           >
             Communities <ChevronDown size={14} className={`transition-transform ${isCommunityOpen ? "rotate-180" : ""}`} />
           </button>
           
           {isCommunityOpen && (
-            <div className="absolute top-full left-0 mt-3 w-56 bg-white border border-stone-200 rounded-2xl shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute top-full left-0 mt-3 w-56 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
               {communityLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
                   onClick={() => setIsCommunityOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                 >
-                  <link.icon size={18} className="text-stone-500" />
+                  <link.icon size={18} className="text-slate-300" />
                   <span className="font-medium">{link.name}</span>
                 </Link>
               ))}
@@ -93,9 +89,7 @@ function Navbar() {
 
         <Link
           to="/ai-tutor"
-          className={`text-sm font-medium transition-colors ${
-            location.pathname === "/ai-tutor" ? "text-stone-900" : "text-stone-500 hover:text-stone-900"
-          }`}
+          className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
         >
           AI Tutor
         </Link>
@@ -107,50 +101,45 @@ function Navbar() {
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full hover:bg-stone-100 transition-all duration-200 border border-transparent hover:border-stone-200 hover:shadow-sm"
+              className="w-10 h-10 rounded-full bg-white/10 border border-white/20 overflow-hidden ring-2 ring-white/20 hover:ring-white/40 transition-all duration-200"
             >
-              <span className="text-sm font-medium text-stone-700 hidden sm:block">
-                {user.name}
-              </span>
-              <div className="w-9 h-9 rounded-full bg-stone-200 overflow-hidden ring-2 ring-stone-300 ring-offset-2">
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-stone-800 text-white font-bold text-sm">
-                    {user.name?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white font-bold text-sm">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
             </button>
 
             {isProfileOpen && (
-              <div className="absolute top-full right-0 mt-3 w-64 bg-white border border-stone-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-4 py-4 border-b border-stone-100 bg-stone-50">
-                  <p className="text-sm font-bold text-stone-900 truncate">{user.name}</p>
-                  <p className="text-xs text-stone-500 truncate mt-0.5">{user.email}</p>
+              <div className="absolute top-full right-0 mt-3 w-64 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-4 border-b border-white/20 bg-white/5">
+                  <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                  <p className="text-xs text-slate-300 truncate mt-0.5">{user.email}</p>
                 </div>
                 <div className="py-2">
                   <Link
                     to={`/profile/${user._id}`}
                     onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                   >
-                    <User size={18} className="text-stone-500" />
+                    <User size={18} className="text-slate-300" />
                     <span className="font-medium">Profile</span>
                   </Link>
                   <Link
                     to="/dashboard"
                     onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                   >
-                    <Settings size={18} className="text-stone-500" />
+                    <Settings size={18} className="text-slate-300" />
                     <span className="font-medium">Dashboard</span>
                   </Link>
                 </div>
-                <div className="border-t border-stone-100 py-2">
+                <div className="border-t border-white/20 py-2">
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
                   >
                     <LogOut size={18} />
                     <span className="font-medium">Log Out</span>
@@ -161,15 +150,15 @@ function Navbar() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link to="/login" className="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
               Log in
             </Link>
             <Link
               to="/signup"
-              className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-[#fbf7f1] rounded-full text-sm font-medium hover:bg-stone-800 transition-all hover:shadow-lg"
+              className="group relative inline-flex cursor-pointer transition-all duration-300 hover:scale-105 text-sm font-semibold text-white tracking-tight rounded-full px-5 py-2.5 items-center justify-center border border-white/20 bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Sparkles size={16} />
-              <span>Get Started</span>
+              <Sparkles size={16} className="mr-2" />
+              <span className="relative z-10">Sign Up</span>
             </Link>
           </div>
         )}

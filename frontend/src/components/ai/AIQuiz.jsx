@@ -3,7 +3,7 @@ import api from "../../utils/api.js";
 
 const SourcePill = ({ source }) =>
   source && (
-    <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-border text-textSecondary">
+    <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 text-slate-400">
       {source === "transcript" ? "Transcript" : "Description"}
     </span>
   );
@@ -32,7 +32,7 @@ function AIQuiz({ postId }) {
 
   if (loading) {
     return (
-      <div className="ev-card p-4 text-sm text-textSecondary">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-400 backdrop-blur-sm">
         Generating quiz...
       </div>
     );
@@ -40,22 +40,22 @@ function AIQuiz({ postId }) {
 
   if (!quiz.length) {
     return (
-      <div className="ev-card p-4 text-xs text-textSecondary">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-400 backdrop-blur-sm">
         AI quiz is not available for this video yet.
       </div>
     );
   }
 
   return (
-    <div className="ev-card p-4 space-y-4">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4 backdrop-blur-sm">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-accent">🧠 Quick Quiz</h3>
+        <h3 className="text-sm font-semibold text-blue-400">🧠 Quick Quiz</h3>
         <SourcePill source={source} />
       </div>
       <div className="space-y-3">
         {quiz.map((question, index) => (
           <div key={index} className="space-y-2">
-            <p className="text-sm text-textPrimary">{question.question}</p>
+            <p className="text-sm text-white">{question.question}</p>
             <div className="grid gap-2">
               {question.options.map((option, optionIndex) => {
                 const selected = answers[index] === optionIndex;
@@ -66,9 +66,9 @@ function AIQuiz({ postId }) {
                     className={`text-left text-xs px-3 py-2 rounded border transition ${
                       selected
                         ? isCorrect
-                          ? "bg-success/10 text-success border-success"
-                          : "bg-danger/10 text-danger border-danger"
-                        : "text-textSecondary border-border hover:border-accent"
+                          ? "bg-green-500/10 text-green-400 border-green-500/50"
+                          : "bg-red-500/10 text-red-400 border-red-500/50"
+                        : "text-slate-400 border-white/10 hover:border-blue-500/50 hover:text-white"
                     }`}
                     onClick={() =>
                       setAnswers((prev) => ({
