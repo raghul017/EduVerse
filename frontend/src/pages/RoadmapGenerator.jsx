@@ -127,6 +127,8 @@ function RoadmapGenerator() {
           setRoadmapId(data.roadmapId);
           // Always load progress when we have a roadmapId
           await loadProgress(data.roadmapId);
+        } else {
+          console.warn("No roadmapId returned from backend. Database might be offline.");
         }
       } else {
         throw new Error(
@@ -141,9 +143,7 @@ function RoadmapGenerator() {
     } finally {
       setLoading(false);
     }
-  }
-
-;
+  };
 
   // Load progress from backend
   const loadProgress = async (id) => {
@@ -167,13 +167,13 @@ function RoadmapGenerator() {
   };
 
   // Toggle node completion and save to backend
-  // Toggle node completion and save to backend
   const toggleNodeCompletion = async (nodeId) => {
     // Optimistic update
     const newCompleted = !completedNodes[nodeId];
     setCompletedNodes(prev => ({ ...prev, [nodeId]: newCompleted }));
     
     console.log("[Progress] Toggling node:", nodeId, "to", newCompleted);
+    console.log("[Progress] Current roadmapId:", roadmapId);
     
     if (roadmapId) {
       try {
@@ -187,14 +187,15 @@ function RoadmapGenerator() {
         console.error("[Progress] Error saving progress:", error.response?.data || error.message);
         // Revert on error
         setCompletedNodes(prev => ({ ...prev, [nodeId]: !newCompleted }));
-        alert("Failed to save progress. Please try again.");
+        alert("Failed to save progress to database. Please check your connection.");
       }
     } else {
       const token = localStorage.getItem("eduverse_token");
       if (!token) {
         alert("Please login to save your progress.");
       } else {
-        console.warn("[Progress] No roadmapId - progress not saved!");
+        console.warn("[Progress] No roadmapId - progress not saved! (Is the roadmap generated?)");
+        alert("Cannot save progress: Roadmap was not saved to database. Please try regenerating.");
       }
     }
   };
@@ -283,7 +284,7 @@ function RoadmapGenerator() {
   };
 
   const handleRegenerate = () => {
-    if (confirm("Are you sure you want to generate a new roadmap? Current progress will be saved.")) {
+    if (confirm("Are you sure you want to generate a new roadmap? Current progress will be lost if not saved.")) {
       generateRoadmap(topic, true);
     }
   };
@@ -293,7 +294,7 @@ function RoadmapGenerator() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
-        <div className="bg-white/5 p-12 rounded-3xl shadow-2xl border border-white/10 text-center w-full max-w-2xl backdrop-blur-sm">
+        <div className="bg-white/5 p-12 rounded-[32px] shadow-2xl border border-white/10 text-center w-full max-w-2xl backdrop-blur-sm">
           <div className="relative w-24 h-24 mx-auto mb-8">
             <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -321,7 +322,7 @@ function RoadmapGenerator() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-        <div className="bg-white/5 p-8 rounded-2xl shadow-xl text-center max-w-md w-full border-l-4 border-red-500 backdrop-blur-sm border-y border-r border-white/10">
+        <div className="bg-white/5 p-8 rounded-[24px] shadow-xl text-center max-w-md w-full border-l-4 border-red-500 backdrop-blur-sm border-y border-r border-white/10">
           <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="text-red-500" size={32} />
           </div>
@@ -615,7 +616,7 @@ function RoadmapGenerator() {
             )}
 
             {/* Header Card */}
-            <div className="bg-white/5 rounded-3xl shadow-lg border border-white/10 p-8 mb-12 backdrop-blur-sm">
+            <div className="bg-white/5 rounded-[32px] shadow-lg border border-white/10 p-8 mb-12 backdrop-blur-sm">
               {/* Top Row: Back Button & Action Buttons */}
               <div className="flex items-center justify-between mb-6">
                 <button
@@ -730,7 +731,7 @@ function RoadmapGenerator() {
                             whileHover={{ scale: 1.03, translateY: -5 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleNodeClick(node)}
-                            className={`w-full bg-white/5 p-5 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden group backdrop-blur-sm ${
+                            className={`w-full bg-white/5 p-5 rounded-[24px] border cursor-pointer transition-all duration-300 relative overflow-hidden group backdrop-blur-sm ${
                               isSelected
                                 ? "border-blue-500 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
                                 : isCompleted
@@ -742,7 +743,7 @@ function RoadmapGenerator() {
                             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
                             {/* Progress Indicator */}
-                            <div className="absolute top-3 right-3 z-10">
+                            <div className="absolute top-3 right-3 z-50">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();

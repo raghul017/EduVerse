@@ -22,7 +22,7 @@ function Videos() {
       {/* Header */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-white/10 rounded-lg">
+          <div className="p-2 bg-white/10 rounded-2xl">
             <Video size={24} className="text-blue-400" />
           </div>
           <h1 className="text-4xl font-serif font-medium text-white">
@@ -62,7 +62,7 @@ function Videos() {
               transition={{ delay: index * 0.05 }}
             >
               <Link to={`/posts/${post.id}`} className="group block h-full">
-                <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all h-full flex flex-col backdrop-blur-sm">
+                <div className="bg-white/5 border border-white/10 rounded-[24px] overflow-hidden hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all h-full flex flex-col backdrop-blur-sm">
                   {/* Thumbnail */}
                   <div className="relative aspect-video bg-white/5 overflow-hidden">
                     <img 

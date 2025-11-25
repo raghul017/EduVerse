@@ -106,7 +106,7 @@ function Communities() {
               { title: "Visiting Amsterdam on a Budget", date: "May 8, 2019", img: "https://images.unsplash.com/photo-1512470876302-687da745313d?w=100&h=100&fit=crop" },
             ].map((item, i) => (
               <div key={i} className="flex gap-3 group cursor-pointer">
-                <img src={item.img} alt="" className="w-16 h-16 rounded-lg object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                <img src={item.img} alt="" className="w-16 h-16 rounded-2xl object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                 <div>
                   <h4 className="text-sm font-bold text-slate-200 leading-tight group-hover:text-blue-400 transition-colors">{item.title}</h4>
                   <p className="text-xs text-slate-500 mt-1">{item.date}</p>
@@ -139,7 +139,7 @@ function Communities() {
         </div>
 
         {/* Post Input */}
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm mb-8 backdrop-blur-sm">
+        <div className="bg-white/5 p-6 rounded-[24px] border border-white/10 shadow-sm mb-8 backdrop-blur-sm">
           <div className="flex gap-4 mb-4">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="" className="w-10 h-10 rounded-full bg-white/10" />
             <div className="flex-1">
@@ -183,7 +183,7 @@ function Communities() {
         {/* Posts Stream */}
         <div className="space-y-6">
           {posts.map((post) => (
-            <div key={post.id} className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-sm">
+            <div key={post.id} className="bg-white/5 p-6 rounded-[24px] border border-white/10 shadow-sm backdrop-blur-sm">
               <div className="flex gap-4">
                 <img src={post.avatar} alt="" className="w-12 h-12 rounded-full bg-white/10" />
                 <div className="flex-1">
@@ -219,7 +219,7 @@ function Communities() {
       {/* Right Sidebar */}
       <div className="lg:col-span-3 space-y-8">
         {/* Latest Updates */}
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-sm">
+        <div className="bg-white/5 p-6 rounded-[24px] border border-white/10 shadow-sm backdrop-blur-sm">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">LATEST UPDATES</h3>
           <div className="space-y-4">
             {members.map((member, i) => (
@@ -237,7 +237,7 @@ function Communities() {
         </div>
 
         {/* Recently Active Members */}
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-sm">
+        <div className="bg-white/5 p-6 rounded-[24px] border border-white/10 shadow-sm backdrop-blur-sm">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">RECENTLY ACTIVE MEMBERS</h3>
           <div className="grid grid-cols-4 gap-2">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -253,7 +253,7 @@ function Communities() {
         </div>
 
         {/* Groups */}
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-sm">
+        <div className="bg-white/5 p-6 rounded-[24px] border border-white/10 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">GROUPS</h3>
             <div className="flex gap-2 text-xs font-bold text-slate-500">
@@ -264,7 +264,7 @@ function Communities() {
           <div className="space-y-4">
             {groups.map((group, i) => (
               <div key={i} className="flex items-center gap-3 group cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl group-hover:bg-blue-500/20 transition-colors border border-white/5">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-xl group-hover:bg-blue-500/20 transition-colors border border-white/5">
                   {group.icon}
                 </div>
                 <div>
