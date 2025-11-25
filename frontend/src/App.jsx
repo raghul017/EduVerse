@@ -1,35 +1,38 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import MainLayout from "./layout/MainLayout.jsx";
-import Home from "./pages/Home.jsx";
-import Feed from "./pages/Feed.jsx";
-import Login from "./pages/Login.jsx";
-import Signup from "./pages/Signup.jsx";
-import Profile from "./pages/Profile.jsx";
-import Upload from "./pages/Upload.jsx";
-import Communities from "./pages/Communities.jsx";
-import CommunityDetail from "./pages/CommunityDetail.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import PostDetail from "./pages/PostDetail.jsx";
-import MyVideos from "./pages/MyVideos.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
-import AiCourse from "./pages/AiCourse.jsx";
-import AiTutor from "./pages/AiTutor.jsx";
-import AiRoadmap from "./pages/AiRoadmap.jsx";
-import RoadmapGenerator from "./pages/RoadmapGenerator.jsx";
-import GuideGenerator from "./pages/GuideGenerator.jsx";
-import CourseGenerator from "./pages/CourseGenerator.jsx";
-import Videos from "./pages/Videos.jsx";
-import Paths from "./pages/Paths.jsx";
+import Loader from "./components/common/Loader.jsx";
+
+// Lazy load pages
+const Home = lazy(() => import("./pages/Home.jsx"));
+const Feed = lazy(() => import("./pages/Feed.jsx"));
+const Login = lazy(() => import("./pages/Login.jsx"));
+const Signup = lazy(() => import("./pages/Signup.jsx"));
+const Profile = lazy(() => import("./pages/Profile.jsx"));
+const Upload = lazy(() => import("./pages/Upload.jsx"));
+const Communities = lazy(() => import("./pages/Communities.jsx"));
+const CommunityDetail = lazy(() => import("./pages/CommunityDetail.jsx"));
+const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
+const PostDetail = lazy(() => import("./pages/PostDetail.jsx"));
+const MyVideos = lazy(() => import("./pages/MyVideos.jsx"));
+const AiCourse = lazy(() => import("./pages/AiCourse.jsx"));
+const AiTutor = lazy(() => import("./pages/AiTutor.jsx"));
+const AiRoadmap = lazy(() => import("./pages/AiRoadmap.jsx"));
+const RoadmapGenerator = lazy(() => import("./pages/RoadmapGenerator.jsx"));
+const GuideGenerator = lazy(() => import("./pages/GuideGenerator.jsx"));
+const CourseGenerator = lazy(() => import("./pages/CourseGenerator.jsx"));
+const Videos = lazy(() => import("./pages/Videos.jsx"));
+const Paths = lazy(() => import("./pages/Paths.jsx"));
 
 function App() {
   return (
-        <Routes>
-      <Route
-        element={<MainLayout />}
-      >
-        <Route path="/" element={<Home />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/videos" element={<Videos />} />
+    <Suspense fallback={<Loader />}>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/videos" element={<Videos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
@@ -73,46 +76,46 @@ function App() {
               </ProtectedRoute>
             }
           />
-        <Route
-          path="/ai-tutor"
-          element={
-            <ProtectedRoute>
-              <AiTutor />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ai-roadmap"
-          element={
-            <ProtectedRoute>
-              <AiRoadmap />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/roadmap-generator"
-          element={
-            <ProtectedRoute>
-              <RoadmapGenerator />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/guide-generator"
-          element={
-            <ProtectedRoute>
-              <GuideGenerator />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/course-generator"
-          element={
-            <ProtectedRoute>
-              <CourseGenerator />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/ai-tutor"
+            element={
+              <ProtectedRoute>
+                <AiTutor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-roadmap"
+            element={
+              <ProtectedRoute>
+                <AiRoadmap />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roadmap-generator"
+            element={
+              <ProtectedRoute>
+                <RoadmapGenerator />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/guide-generator"
+            element={
+              <ProtectedRoute>
+                <GuideGenerator />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/course-generator"
+            element={
+              <ProtectedRoute>
+                <CourseGenerator />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/my-videos"
             element={
@@ -147,8 +150,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-      </Route>
+        </Route>
       </Routes>
+    </Suspense>
   );
 }
 

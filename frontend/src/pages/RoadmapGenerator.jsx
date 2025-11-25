@@ -294,30 +294,49 @@ function RoadmapGenerator() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
-        <div className="bg-white/5 p-12 rounded-[32px] shadow-2xl border border-white/10 text-center w-full max-w-2xl backdrop-blur-sm">
-          <div className="relative w-24 h-24 mx-auto mb-8">
-            <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <Sparkles className="absolute inset-0 m-auto text-blue-400 animate-pulse" size={32} />
+        <div className="bg-white/5 p-12 rounded-[32px] shadow-2xl border border-white/10 text-center w-full max-w-2xl backdrop-blur-sm relative overflow-hidden">
+          {/* Background Glow */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-gradient-x"></div>
+          
+          <div className="relative w-32 h-32 mx-auto mb-8">
+            {/* Outer Ring */}
+            <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
+            
+            {/* Spinning Rings */}
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 border-4 border-blue-500/30 border-t-blue-500 rounded-full"
+            ></motion.div>
+            <motion.div 
+              animate={{ rotate: -360 }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-2 border-4 border-purple-500/30 border-b-purple-500 rounded-full"
+            ></motion.div>
+            
+            {/* Center Icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Sparkles className="text-white animate-pulse" size={40} />
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4 font-serif">
-            {roadmap?.fromCache ? "Loading Roadmap" : "Generating Roadmap"}
+
+          <h2 className="text-3xl font-bold text-white mb-6 font-serif">
+            {roadmap?.fromCache ? "Retrieving Roadmap" : "Constructing Your Path"}
           </h2>
-          <p className="text-lg text-slate-400 leading-relaxed">
-            {roadmap?.fromCache 
-              ? `Retrieving your ${topic} roadmap...`
-              : `AI is crafting a personalized learning path for ${topic}...`
-            }
-          </p>
-          <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg inline-block">
-            <p className="text-sm text-blue-300">
-              {roadmap?.fromCache ? "This will only take a moment" : "This may take 10-20 seconds"}
-            </p>
+
+          {/* Progress Steps */}
+          <div className="space-y-4 max-w-sm mx-auto text-left">
+            <LoadingStep label="Analyzing topic requirements..." delay={0} />
+            <LoadingStep label="Structuring learning modules..." delay={1.5} />
+            <LoadingStep label="Curating expert resources..." delay={3} />
+            <LoadingStep label="Finalizing your personalized roadmap..." delay={4.5} />
           </div>
         </div>
       </div>
     );
   }
+
+
 
   if (error) {
     return (
@@ -789,6 +808,27 @@ function RoadmapGenerator() {
       </div>
       {/* Closing relative w-full bg-[#0a0a0a] overflow-y-auto div */}
     </div>
+  );
+}
+
+
+// Helper component for loading steps
+function LoadingStep({ label, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.5 }}
+      className="flex items-center gap-3 text-slate-400"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: delay + 0.2 }}
+        className="w-2 h-2 rounded-full bg-blue-500"
+      />
+      <span className="text-sm">{label}</span>
+    </motion.div>
   );
 }
 
