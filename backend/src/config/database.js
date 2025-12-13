@@ -12,7 +12,8 @@ if (needsSSL) {
 
 export const pool = new Pool({
   connectionString: env.databaseUrl,
-  ssl: needsSSL ? { rejectUnauthorized: false } : false
+  ssl: needsSSL ? { rejectUnauthorized: false } : false,
+  max: 1 // Limit to 1 connection for Supabase Session Pooler compliance
 });
 
 pool.on('error', (error) => {
