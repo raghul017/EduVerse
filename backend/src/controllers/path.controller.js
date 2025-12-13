@@ -2,6 +2,7 @@ import { query } from "../config/database.js";
 import { aiService } from "../services/ai.service.js";
 import { RoadmapModel, ProgressModel } from "../models/roadmap.model.js";
 
+
 export const listPaths = async (req, res, next) => {
   try {
     const rows = await query(
