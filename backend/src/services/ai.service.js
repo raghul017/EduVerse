@@ -356,24 +356,73 @@ class AIService {
   }
 
   validateAndFixUrl(url, topic) {
-    // FORCE SEARCH STRATEGY
-    // To guarantee 100% working links, we will ignore the AI's specific URL 
-    // (which might be hallucinated/old) and generate a high-quality search link instead.
+    // List of known valid resource domains
+    const validDomains = [
+      'youtube.com', 'youtu.be',
+      'developer.mozilla.org', 'mdn.io',
+      'freecodecamp.org', 'codecademy.com',
+      'w3schools.com', 'geeksforgeeks.org',
+      'stackoverflow.com', 'github.com',
+      'medium.com', 'dev.to', 'hashnode.com',
+      'udemy.com', 'coursera.org', 'edx.org',
+      'pluralsight.com', 'skillshare.com',
+      'khanacademy.org', 'brilliant.org',
+      'learn.microsoft.com', 'docs.oracle.com',
+      'reactjs.org', 'react.dev', 'vuejs.org', 'angular.io',
+      'nodejs.org', 'python.org', 'rust-lang.org', 'go.dev',
+      'digitalocean.com/community',
+      'tutorialspoint.com', 'javatpoint.com',
+      'roadmap.sh', 'leetcode.com', 'hackerrank.com'
+    ];
     
+    // Check if URL is valid and from a known domain
+    if (url && typeof url === 'string' && url.startsWith('http')) {
+      // Reject obviously fake URLs
+      if (url.includes('example.com') || url === '#' || url.includes('placeholder')) {
+        // Fall through to search generation
+      } else {
+        // Check if it's from a known valid domain
+        const isValidDomain = validDomains.some(domain => url.includes(domain));
+        if (isValidDomain) {
+          return url; // Keep the real URL!
+        }
+        
+        // Even if domain is unknown, if it looks like a real URL, keep it
+        try {
+          const parsed = new URL(url);
+          if (parsed.hostname && parsed.hostname !== 'example.com') {
+            return url; // Looks like a real URL
+          }
+        } catch {
+          // Invalid URL, fall through
+        }
+      }
+    }
+    
+    // Generate intelligent search URL as fallback
     const searchQuery = encodeURIComponent(topic);
     
-    // If it was meant to be a video (YouTube), search YouTube
-    if (url && (url.includes("youtube") || url.includes("video"))) {
+    // If original URL mentioned video/YouTube, use YouTube search
+    if (url && (url.includes('youtube') || url.includes('video'))) {
       return `https://www.youtube.com/results?search_query=${searchQuery}`;
     }
     
-    // If it was meant to be a course (Udemy/Coursera), search Google with site:
-    if (url && (url.includes("udemy") || url.includes("coursera"))) {
-       return `https://www.google.com/search?q=${searchQuery}+course`;
+    // If it mentioned a course platform, use that platform's search
+    if (url && url.includes('udemy')) {
+      return `https://www.udemy.com/courses/search/?q=${searchQuery}`;
     }
-
-    // Default: Google Search
-    return `https://www.google.com/search?q=${searchQuery}`;
+    if (url && url.includes('coursera')) {
+      return `https://www.coursera.org/search?query=${searchQuery}`;
+    }
+    
+    // For documentation, try MDN first for web topics
+    const webTopics = ['javascript', 'html', 'css', 'dom', 'web'];
+    if (webTopics.some(t => topic.toLowerCase().includes(t))) {
+      return `https://developer.mozilla.org/en-US/search?q=${searchQuery}`;
+    }
+    
+    // Default: DuckDuckGo search (no tracking, cleaner)
+    return `https://duckduckgo.com/?q=${searchQuery}+tutorial`;
   }
 
   async summarize(postId, transcript) {

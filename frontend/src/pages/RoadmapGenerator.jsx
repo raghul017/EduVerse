@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -22,6 +22,78 @@ import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+
+// Memoized Node Card component to prevent unnecessary re-renders
+const NodeCard = memo(function NodeCard({ 
+  node, 
+  isCompleted, 
+  isSelected, 
+  onNodeClick, 
+  onToggleComplete,
+  nodeIndex 
+}) {
+  return (
+    <div
+      onClick={() => onNodeClick(node)}
+      className={`w-full bg-white/5 p-5 rounded-[24px] border cursor-pointer transition-all duration-200 relative overflow-hidden group backdrop-blur-sm ${
+        isSelected
+          ? "border-blue-500 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+          : isCompleted
+          ? "border-green-500/50 shadow-sm bg-green-500/5"
+          : "border-white/10 hover:border-white/30 shadow-sm hover:shadow-xl hover:bg-white/10"
+      }`}
+      style={{ animationDelay: `${nodeIndex * 50}ms` }}
+    >
+      {/* Hover Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+
+      {/* Progress Indicator */}
+      <div className="absolute top-3 right-3 z-50">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleComplete(node.id);
+          }}
+          className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer relative z-50 ${
+            isCompleted
+              ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 scale-110"
+              : "bg-white/10 text-slate-500 hover:bg-white/20 hover:scale-110"
+          }`}
+        >
+          {isCompleted ? <CheckCircle size={18} /> : <Circle size={18} />}
+        </button>
+      </div>
+
+      <h3 className={`font-bold text-lg mb-2 pr-8 relative z-10 ${
+        isCompleted ? "text-green-400" : "text-white"
+      }`}>
+        {node.label}
+      </h3>
+      <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 relative z-10">
+        {node.details}
+      </p>
+    </div>
+  );
+});
+
+// Memoized Loading Step component
+const LoadingStep = memo(function LoadingStep({ label, delay }) {
+  const [visible, setVisible] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), delay * 1000);
+    return () => clearTimeout(timer);
+  }, [delay]);
+  
+  return (
+    <div className={`flex items-center gap-3 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-30'}`}>
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${visible ? 'border-blue-500 bg-blue-500/20' : 'border-white/20'}`}>
+        {visible && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+      </div>
+      <span className="text-slate-300 text-sm">{label}</span>
+    </div>
+  );
+});
 
 function RoadmapGenerator() {
   const [searchParams] = useSearchParams();
@@ -198,13 +270,6 @@ function RoadmapGenerator() {
         alert("Cannot save progress: Roadmap was not saved to database. Please try regenerating.");
       }
     }
-  };
-
-  const toggleNodeProgress = (nodeId) => {
-    setProgress((prev) => ({
-      ...prev,
-      [nodeId]: !prev[nodeId],
-    }));
   };
 
   const generateNodeResources = async (node) => {
@@ -811,25 +876,5 @@ function RoadmapGenerator() {
   );
 }
 
-
-// Helper component for loading steps
-function LoadingStep({ label, delay }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.5 }}
-      className="flex items-center gap-3 text-slate-400"
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: delay + 0.2 }}
-        className="w-2 h-2 rounded-full bg-blue-500"
-      />
-      <span className="text-sm">{label}</span>
-    </motion.div>
-  );
-}
-
 export default RoadmapGenerator;
+

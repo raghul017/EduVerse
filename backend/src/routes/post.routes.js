@@ -27,9 +27,11 @@ router.delete("/:id/like", authenticate, unlikePost);
 router.post("/:id/bookmark", authenticate, bookmarkPost);
 router.delete("/:id/bookmark", authenticate, unbookmarkPost);
 router.delete("/:id", authenticate, deletePost);
-router.get("/:id/ai-summary", aiSummary);
-router.get("/:id/ai-quiz", aiQuiz);
-router.post("/:id/ai-explain", aiExplain);
-router.get("/:id/ai-flashcards", aiFlashcards);
+
+// AI endpoints - require authentication to prevent API abuse
+router.get("/:id/ai-summary", authenticate, aiSummary);
+router.get("/:id/ai-quiz", authenticate, aiQuiz);
+router.post("/:id/ai-explain", authenticate, aiExplain);
+router.get("/:id/ai-flashcards", authenticate, aiFlashcards);
 
 export default router;

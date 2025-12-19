@@ -17,18 +17,36 @@ ensureEnv();
 const app = express();
 const logger = pino({ level: env.node === "development" ? "debug" : "info" });
 
-const allowedOrigins =
-  env.node === "development"
-    ? [/^http:\/\/localhost:\d+$/]
-    : [
-        env.frontendUrl,
-        /\.vercel\.app$/, // Allow all Vercel preview/production URLs automatically
-        /^https:\/\/eduverse.*\.onrender\.com$/ // Allow self (if needed)
-      ];
+const getAllowedOrigins = () => {
+  if (env.node === 'development') {
+    return [/^http:\/\/localhost:\d+$/];
+  }
+  
+  const origins = [env.frontendUrl];
+  
+  // Allow additional origins from env if specified (comma-separated)
+  if (process.env.CORS_ALLOWED_ORIGINS) {
+    const additional = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
+    origins.push(...additional);
+  }
+  
+  // For Vercel deployments, allow specific project URLs (more secure than wildcards)
+  // Format: https://project-name-*.vercel.app or exact URLs
+  if (env.frontendUrl?.includes('vercel.app')) {
+    // Extract project name from frontend URL and allow its variations
+    const match = env.frontendUrl.match(/https:\/\/([^-]+)/);
+    if (match) {
+      const projectPrefix = match[1];
+      origins.push(new RegExp(`^https://${projectPrefix}[a-z0-9-]*\\.vercel\\.app$`));
+    }
+  }
+  
+  return origins;
+};
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: getAllowedOrigins(),
     credentials: true,
   })
 );

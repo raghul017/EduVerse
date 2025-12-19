@@ -23,9 +23,30 @@ export const env = {
 };
 
 export const ensureEnv = () => {
-  const required = ['databaseUrl', 'jwtSecret'];
-  const missing = required.filter((key) => !env[key]);
-  if (missing.length) {
-    throw new Error(`Missing required env vars: ${missing.join(', ')}`);
+  const missing = [];
+  const warnings = [];
+
+  // Critical - app won't work without these
+  if (!env.databaseUrl) missing.push('DATABASE_URL');
+  if (!env.jwtSecret) missing.push('JWT_SECRET');
+
+  // Important - features will be broken
+  if (!env.groqApiKey && !env.geminiApiKey) {
+    warnings.push('Neither GROQ_API_KEY nor GEMINI_API_KEY is set. AI features will not work.');
   }
+  
+  if (!env.cloudinary.cloudName || !env.cloudinary.apiKey || !env.cloudinary.apiSecret) {
+    warnings.push('CLOUDINARY credentials missing. Video uploads will fail.');
+  }
+
+  // Show warnings
+  warnings.forEach(w => console.warn(`[Env Warning] ${w}`));
+
+  // Fail on missing critical vars
+  if (missing.length) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+
+  console.info(`[Env] Loaded successfully (${env.node} mode)`);
 };
+

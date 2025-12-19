@@ -27,6 +27,7 @@ router.get("/ai-usage/stats", getAiUsage);
 
 // Roadmap persistence routes (specific routes BEFORE parameterized routes)
 router.get("/roadmaps/user", authenticate, getUserRoadmaps);
+router.get("/my-roadmaps", authenticate, getUserRoadmaps); // Alias for easier frontend access
 router.post("/roadmap/progress", authenticate, saveProgress);
 router.get("/roadmap/:roadmapId/progress", authenticate, getProgress);
 

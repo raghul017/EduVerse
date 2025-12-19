@@ -6,7 +6,7 @@ export const UserModel = {
   create: ({ name, email, passwordHash, bio, interests }) =>
     query(
       `INSERT INTO users (name, email, password_hash, bio, interests)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, bio, interests`,
+       VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, bio, interests, role`,
       [name, email, passwordHash, bio, interests]
     ).then((res) => res.rows[0]),
   findById: (id) =>
@@ -16,7 +16,12 @@ export const UserModel = {
         (SELECT COUNT(*) FROM follows WHERE follower_id = users.id) as following_count
        FROM users WHERE id = $1`,
       [id]
-    ).then((res) => res.rows[0])
+    ).then((res) => res.rows[0]),
+  updatePassword: (id, passwordHash) =>
+    query(
+      `UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
+      [passwordHash, id]
+    )
 };
 
 export const PostModel = {

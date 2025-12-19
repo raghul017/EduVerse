@@ -1,12 +1,13 @@
 import { validationResult } from "express-validator";
 import { query } from "../config/database.js";
 import { PostModel } from "../models/queries.js";
-import { uploadVideoBuffer } from "../services/video.service.js";
+import { uploadVideoBuffer, uploadVideoFile } from "../services/video.service.js";
 import { aiService } from "../services/ai.service.js";
 import {
   transcribeVideoBuffer,
   transcribeVideoUrl,
 } from "../services/transcript.service.js";
+import fs from "fs";
 
 export const listPosts = async (req, res, next) => {
   try {
@@ -24,7 +25,14 @@ export const listPosts = async (req, res, next) => {
 export const getPost = async (req, res, next) => {
   try {
     const userId = req.user?.id || null;
+    const postId = req.params.id;
     let post;
+    
+    // Increment views_count (fire and forget, don't wait)
+    query(
+      'UPDATE posts SET views_count = views_count + 1 WHERE id = $1',
+      [postId]
+    ).catch(err => console.warn('[Post] Failed to increment views:', err.message));
     
     if (userId) {
       post = await query(
@@ -37,7 +45,7 @@ export const getPost = async (req, res, next) => {
          FROM posts
          LEFT JOIN users ON users.id = posts.creator_id
          WHERE posts.id = $1`,
-        [req.params.id, userId]
+        [postId, userId]
       ).then((result) => result.rows[0]);
     } else {
       post = await query(
@@ -50,7 +58,7 @@ export const getPost = async (req, res, next) => {
          FROM posts
          LEFT JOIN users ON users.id = posts.creator_id
          WHERE posts.id = $1`,
-        [req.params.id]
+        [postId]
       ).then((result) => result.rows[0]);
     }
     
@@ -137,19 +145,30 @@ export const createPost = async (req, res, next) => {
         : null;
     
     console.log('[Post Controller] Uploading to Cloudinary...');
-    const upload = await uploadVideoBuffer(
-      req.file.buffer,
-      req.file.originalname,
-      req.file.mimetype
-    );
+    
+    // Use file path (disk storage) or buffer (memory storage) depending on what's available
+    let upload;
+    const filePath = req.file.path; // From disk storage
+    const buffer = req.file.buffer; // From memory storage (legacy)
+    
+    if (filePath) {
+      // Disk storage - preferred method (avoids memory issues)
+      upload = await uploadVideoFile(filePath, req.file.originalname);
+    } else if (buffer) {
+      // Memory storage (legacy fallback)
+      upload = await uploadVideoBuffer(buffer, req.file.originalname, req.file.mimetype);
+    } else {
+      return res.status(400).json({ message: 'Video file data not found' });
+    }
+    
     console.log('[Post Controller] Cloudinary upload successful:', upload.url);
     
-    // Try to get transcript, but don't block on it
+    // Try to get transcript from the uploaded URL (since we cleaned up local file)
     let transcript = null;
     try {
       transcript = await Promise.race([
-        transcribeVideoBuffer(req.file.buffer, req.file.originalname, req.file.mimetype),
-        new Promise((resolve) => setTimeout(() => resolve(null), 10000)) // 10s timeout
+        transcribeVideoUrl(upload.url),
+        new Promise((resolve) => setTimeout(() => resolve(null), 15000)) // 15s timeout
       ]);
       if (transcript) {
         console.log('[Post Controller] Transcript generated during upload');
@@ -174,11 +193,7 @@ export const createPost = async (req, res, next) => {
     
     // Update transcript in background after post is created if we didn't get it
     if (!transcript && post?.id) {
-      transcribeVideoBuffer(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype
-      ).then(t => {
+      transcribeVideoUrl(upload.url).then(t => {
         if (t && post.id) {
           console.log('[Post Controller] Transcript generated, updating post');
           query("UPDATE posts SET transcript=$1 WHERE id=$2", [t, post.id]).catch(err => 
@@ -193,6 +208,16 @@ export const createPost = async (req, res, next) => {
     res.status(201).json({ data: post });
   } catch (error) {
     console.error('[Post Controller] Upload error:', error.message, error.stack);
+    
+    // Clean up temp file on error if disk storage was used
+    if (req.file?.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupErr) {
+        // Ignore cleanup errors
+      }
+    }
+    
     // Provide more specific error messages
     if (error.message.includes('Cloudinary')) {
       return res.status(500).json({ message: 'Video upload service is unavailable. Please check server configuration.' });
@@ -311,13 +336,27 @@ export const aiFlashcards = async (req, res, next) => {
 
 export const aiExplain = async (req, res, next) => {
   try {
+    const { question } = req.body;
+    
+    // Validate question
+    if (!question || typeof question !== 'string' || question.trim().length < 2) {
+      return res.status(400).json({ message: "Question is required (min 2 characters)" });
+    }
+    
+    if (question.length > 500) {
+      return res.status(400).json({ message: "Question is too long (max 500 characters)" });
+    }
+    
     const post = await query("SELECT * FROM posts WHERE id=$1", [
       req.params.id,
     ]).then((result) => result.rows[0]);
     if (!post) return res.status(404).json({ message: "Post not found" });
     await ensureTranscript(post);
     const content = getContentSource(post);
-    const answer = await aiService.explain(req.body.question, content.text);
+    
+    // Sanitize user input before sending to AI
+    const sanitizedQuestion = question.trim().substring(0, 500);
+    const answer = await aiService.explain(sanitizedQuestion, content.text);
     res.json({ answer, source: content.source });
   } catch (error) {
     next(error);
