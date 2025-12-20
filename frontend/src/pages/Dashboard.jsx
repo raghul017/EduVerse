@@ -4,7 +4,6 @@ import { useAuthStore } from "../state/store.js";
 import StatsCard from "../components/dashboard/StatsCard.jsx";
 import StreakDisplay from "../components/dashboard/StreakDisplay.jsx";
 import ProgressChart from "../components/dashboard/ProgressChart.jsx";
-import AIUsageStats from "../components/ai/AIUsageStats.jsx";
 import { BookOpen, Bookmark, Flame, TrendingUp } from "lucide-react";
 
 function Dashboard() {
@@ -105,9 +104,6 @@ function Dashboard() {
             <StreakDisplay streak={stats.streak_count || 0} />
             <ProgressChart subjects={stats.subjects_progress || []} />
           </div>
-
-          {/* AI Usage Stats */}
-          <AIUsageStats />
 
           {/* Quick Stats Summary */}
           <section className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm">

@@ -1,5 +1,4 @@
 import Button from "../common/Button.jsx";
-import AIUsageStats from "./AIUsageStats.jsx";
 
 function GeneratorLayout({
   title,
@@ -25,11 +24,6 @@ function GeneratorLayout({
             {title}
           </h1>
           <p className="text-slate-400 mb-8">{subtitle}</p>
-
-          {/* AI Usage Stats */}
-          <div className="mb-6">
-            <AIUsageStats />
-          </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
             <div>

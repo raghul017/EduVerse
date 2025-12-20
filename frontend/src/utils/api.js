@@ -43,14 +43,15 @@ export async function aiGenerate(type, payload) {
   }
 
   if (type === "roadmap") {
-    console.log("[Frontend API] Calling AI roadmap with role:", topic);
+    console.log("[Frontend API] Calling AI roadmap with role:", topic, "detail:", payload?.detailLevel);
     try {
       const { data } = await api.post("/paths/ai-roadmap", { 
         role: topic,
-        forceRegenerate: payload?.forceRegenerate || false 
+        forceRegenerate: payload?.forceRegenerate || false,
+        detailLevel: payload?.detailLevel || "standard"
       });
       console.log("[Frontend API] AI roadmap response:", data);
-      return data; // Backend returns roadmap directly now, not wrapped in data.data
+      return data;
     } catch (error) {
       console.error("[Frontend API] AI roadmap error:", error.response?.data || error.message);
       throw error;

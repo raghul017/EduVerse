@@ -119,10 +119,11 @@ function RoadmapGenerator() {
   // Auto-generate roadmap when role query parameter is present
   useEffect(() => {
     const roleParam = searchParams.get("role");
+    const detailParam = searchParams.get("detail") || "standard";
     if (roleParam && !hasGeneratedRef.current) {
       setTopic(roleParam);
       hasGeneratedRef.current = true;
-      generateRoadmap(roleParam);
+      generateRoadmap(roleParam, false, detailParam);
     }
   }, [searchParams]);
 
@@ -172,7 +173,7 @@ function RoadmapGenerator() {
     }
   };
 
-  const generateRoadmap = async (topicToGenerate, forceRegenerate = false) => {
+  const generateRoadmap = async (topicToGenerate, forceRegenerate = false, detailLevel = "standard") => {
     if (!topicToGenerate?.trim()) return;
     
     // Reset the flag when force regenerating
@@ -188,6 +189,7 @@ function RoadmapGenerator() {
         topic: topicToGenerate,
         answerQuestions: false,
         forceRegenerate,
+        detailLevel,
       });
 
       console.log("[Frontend API] AI roadmap response:", data);

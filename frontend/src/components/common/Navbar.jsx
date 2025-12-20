@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, ChevronDown, LogOut, User, Settings, Users, MessageSquare, Hash } from "lucide-react";
+import { Sparkles, LogOut, User, Settings } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../../store/authStore";
 
@@ -8,20 +8,13 @@ function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isCommunityOpen, setIsCommunityOpen] = useState(false);
   
   const profileRef = useRef(null);
-  const communityRef = useRef(null);
-  
-  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
-      }
-      if (communityRef.current && !communityRef.current.contains(event.target)) {
-        setIsCommunityOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -32,12 +25,6 @@ function Navbar() {
     await logout();
     navigate("/login");
   };
-
-  const communityLinks = [
-    { name: "Feed", path: "/communities?tab=feed", icon: MessageSquare },
-    { name: "Groups", path: "/communities?tab=groups", icon: Hash },
-    { name: "Members", path: "/communities?tab=members", icon: Users },
-  ];
 
   return (
     <header className="h-[70px] flex items-center justify-between px-8 fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-black/20 border-b border-white/10">
@@ -61,31 +48,12 @@ function Navbar() {
           Videos
         </Link>
         
-        {/* Community Dropdown - Improved Styling */}
-        <div className="relative" ref={communityRef}>
-          <button
-            onClick={() => setIsCommunityOpen(!isCommunityOpen)}
-            className="flex items-center gap-1 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-          >
-            Communities <ChevronDown size={14} className={`transition-transform ${isCommunityOpen ? "rotate-180" : ""}`} />
-          </button>
-          
-          {isCommunityOpen && (
-            <div className="absolute top-full left-0 mt-3 w-56 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-              {communityLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setIsCommunityOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition-colors"
-                >
-                  <link.icon size={18} className="text-slate-300" />
-                  <span className="font-medium">{link.name}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        <Link
+          to="/communities"
+          className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+        >
+          Communities
+        </Link>
 
         <Link
           to="/ai-tutor"
@@ -120,7 +88,7 @@ function Navbar() {
                 </div>
                 <div className="py-2">
                   <Link
-                    to={`/profile/${user._id}`}
+                    to={`/profile/${user.id}`}
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                   >

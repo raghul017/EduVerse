@@ -29,11 +29,12 @@ export const listPaths = async (req, res, next) => {
 
 export const aiRoadmap = async (req, res, next) => {
   try {
-    const { role, forceRegenerate } = req.body;
+    const { role, forceRegenerate, detailLevel = "standard" } = req.body;
     const userId = req.user?.id;
     
     console.log(`[Path Controller] AI Roadmap request for role: ${role}`);
     console.log(`[Path Controller] User:`, userId || "anonymous");
+    console.log(`[Path Controller] Detail level:`, detailLevel);
     console.log(`[Path Controller] Force regenerate:`, forceRegenerate);
 
     if (!role || !role.trim()) {
@@ -55,21 +56,20 @@ export const aiRoadmap = async (req, res, next) => {
         }
       } catch (dbError) {
         console.warn(`⚠️ [Path Controller] Database read failed (continuing with generation): ${dbError.message}`);
-        // We will continue, but mark as offline mode later
       }
     }
 
-    // Generate new roadmap
-    console.log(`🤖 [Path Controller] GENERATING NEW ROADMAP with AI for ${role}`);
+    // Generate new roadmap with detail level
+    console.log(`🤖 [Path Controller] GENERATING NEW ROADMAP with AI for ${role} (${detailLevel})`);
     console.log(`[Path Controller] Calling AI service...`);
-    const roadmap = await aiService.generateRoadmap(role.trim());
+    const roadmap = await aiService.generateRoadmap(role.trim(), { detailLevel });
     
     if (roadmap.error) {
        return res.status(500).json({ message: "AI generation failed", error: roadmap.error });
     }
 
     console.log(
-      `[Path Controller] AI Roadmap result: success`
+      `[Path Controller] AI Roadmap result: success (${roadmap.stages?.length || 0} stages)`
     );
 
     let isOffline = false;
@@ -436,3 +436,26 @@ export const aiChat = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteRoadmap = async (req, res, next) => {
+  try {
+    const { roadmapId } = req.params;
+    const userId = req.user.id;
+
+    if (!roadmapId) {
+      return res.status(400).json({ message: "Roadmap ID is required." });
+    }
+
+    // Delete roadmap by ID (user can only delete their own)
+    await query(
+      `DELETE FROM user_roadmaps WHERE id = $1 AND user_id = $2`,
+      [roadmapId, userId]
+    );
+
+    res.json({ message: "Roadmap deleted successfully." });
+  } catch (error) {
+    console.error("[Path Controller] Delete roadmap error:", error.message);
+    next(error);
+  }
+};
+

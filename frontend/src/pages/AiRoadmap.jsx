@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Search, ArrowRight, Clock, Loader2, Zap } from "lucide-react";
+import { Sparkles, Search, ArrowRight, Clock, Loader2, Zap, Trash2, Settings2 } from "lucide-react";
 import api from "../utils/api.js";
 
 function AiRoadmap() {
@@ -9,8 +9,10 @@ function AiRoadmap() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRoadmaps, setGeneratedRoadmaps] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [detailLevel, setDetailLevel] = useState("standard"); // quick, standard, comprehensive
+  const [showSettings, setShowSettings] = useState(false);
 
-  // Role-based roadmaps
+  // Role-based roadmaps (preset)
   const roleRoadmaps = [
     "Frontend", "Backend", "Full Stack",
     "DevOps", "Data Analyst", "AI Engineer",
@@ -23,7 +25,7 @@ function AiRoadmap() {
     "BI Analyst"
   ];
 
-  // Skill-based roadmaps  
+  // Skill-based roadmaps (preset)
   const skillRoadmaps = [
     "SQL", "Computer Science", "React",
     "Vue", "Angular", "JavaScript",
@@ -41,6 +43,8 @@ function AiRoadmap() {
     "HTML", "CSS", "Swift & Swift UI",
     "Shell / Bash", "Laravel", "Elasticsearch"
   ];
+
+  const allPresets = [...roleRoadmaps, ...skillRoadmaps].map(r => r.toLowerCase());
 
   // Load user's generated roadmaps
   useEffect(() => {
@@ -67,8 +71,16 @@ function AiRoadmap() {
     skill.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleRoadmapClick = (roadmap) => {
-    navigate(`/roadmap?role=${encodeURIComponent(roadmap.toLowerCase())}`);
+  // Separate custom vs preset roadmaps
+  const customRoadmaps = generatedRoadmaps.filter(r => 
+    !allPresets.includes(r.role.toLowerCase())
+  );
+  const presetRoadmaps = generatedRoadmaps.filter(r => 
+    allPresets.includes(r.role.toLowerCase())
+  );
+
+  const handleRoadmapClick = (roadmap, level = detailLevel) => {
+    navigate(`/roadmap?role=${encodeURIComponent(roadmap.toLowerCase())}&detail=${level}`);
   };
 
   const handleCustomGenerate = async (e) => {
@@ -76,8 +88,7 @@ function AiRoadmap() {
     if (!searchQuery.trim() || isGenerating) return;
     
     setIsGenerating(true);
-    // Navigate directly - the roadmap page will handle generation
-    navigate(`/roadmap?role=${encodeURIComponent(searchQuery.trim())}`);
+    navigate(`/roadmap?role=${encodeURIComponent(searchQuery.trim())}&detail=${detailLevel}`);
   };
 
   const handleKeyDown = (e) => {
@@ -86,18 +97,37 @@ function AiRoadmap() {
     }
   };
 
-  // Check if search matches any predefined roadmap
+  const handleDeleteRoadmap = async (e, roadmapId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Optimistic update
+    setGeneratedRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
+    try {
+      await api.delete(`/paths/roadmaps/${roadmapId}`);
+    } catch {
+      // Reload on error
+      const response = await api.get("/paths/my-roadmaps");
+      if (response.data.data) setGeneratedRoadmaps(response.data.data);
+    }
+  };
+
   const hasExactMatch = [...roleRoadmaps, ...skillRoadmaps].some(
     r => r.toLowerCase() === searchQuery.toLowerCase()
   );
 
   const showCustomOption = searchQuery.trim().length >= 2 && !hasExactMatch;
 
+  const detailLevels = [
+    { id: "quick", label: "Quick", stages: "5-7", desc: "Fast overview" },
+    { id: "standard", label: "Standard", stages: "8-12", desc: "Balanced depth" },
+    { id: "comprehensive", label: "Comprehensive", stages: "15-20", desc: "In-depth path" }
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-4 font-serif flex items-center justify-center gap-3">
             <Sparkles className="text-blue-500" size={40} />
             AI Roadmap Generator
@@ -108,7 +138,7 @@ function AiRoadmap() {
         </div>
 
         {/* Search Bar with Generate Button */}
-        <div className="mb-12 max-w-2xl mx-auto">
+        <div className="mb-6 max-w-2xl mx-auto">
           <form onSubmit={handleCustomGenerate} className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input
@@ -150,19 +180,86 @@ function AiRoadmap() {
           )}
         </div>
 
-        {/* Previously Generated Roadmaps */}
-        {generatedRoadmaps.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6 flex items-center gap-2">
-              <Clock size={14} />
-              YOUR GENERATED ROADMAPS
+        {/* Detail Level Selector */}
+        <div className="mb-12 max-w-2xl mx-auto">
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white mx-auto mb-3 transition-colors"
+          >
+            <Settings2 size={16} />
+            Detail Level: <span className="text-blue-400 font-medium capitalize">{detailLevel}</span>
+          </button>
+          
+          {showSettings && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-3">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 text-center">Select Detail Level</p>
+              <div className="grid grid-cols-3 gap-3">
+                {detailLevels.map(level => (
+                  <button
+                    key={level.id}
+                    onClick={() => setDetailLevel(level.id)}
+                    className={`p-3 rounded-xl border transition-all text-center ${
+                      detailLevel === level.id
+                        ? "bg-blue-500/20 border-blue-500/50 text-white"
+                        : "bg-white/5 border-white/10 text-slate-400 hover:border-white/30"
+                    }`}
+                  >
+                    <p className="font-bold text-sm">{level.label}</p>
+                    <p className="text-xs opacity-70">{level.stages} stages</p>
+                    <p className="text-xs opacity-50 mt-1">{level.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Your Custom Roadmaps */}
+        {customRoadmaps.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+              <Sparkles size={14} />
+              YOUR CUSTOM ROADMAPS
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {generatedRoadmaps.slice(0, 6).map((roadmap) => (
+              {customRoadmaps.map((roadmap) => (
                 <button
                   key={roadmap.id}
                   onClick={() => navigate(`/roadmap?role=${encodeURIComponent(roadmap.role)}`)}
-                  className="group bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 hover:border-blue-500/50 hover:shadow-lg transition-all duration-200 text-left"
+                  className="group relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 hover:border-blue-500/50 hover:shadow-lg transition-all duration-200 text-left"
+                >
+                  <button
+                    onClick={(e) => handleDeleteRoadmap(e, roadmap.id)}
+                    className="absolute top-3 right-3 p-1.5 bg-red-500/10 hover:bg-red-500/30 rounded-lg text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Delete roadmap"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors capitalize pr-8">
+                    {roadmap.role}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Generated {new Date(roadmap.created_at).toLocaleDateString()}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Previously Generated Preset Roadmaps */}
+        {presetRoadmaps.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6 flex items-center gap-2">
+              <Clock size={14} />
+              YOUR SAVED ROADMAPS
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+              {presetRoadmaps.slice(0, 6).map((roadmap) => (
+                <button
+                  key={roadmap.id}
+                  onClick={() => navigate(`/roadmap?role=${encodeURIComponent(roadmap.role)}`)}
+                  className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:border-blue-500/50 hover:bg-white/10 hover:shadow-lg transition-all duration-200 text-left"
                 >
                   <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors capitalize">
                     {roadmap.role}
@@ -178,7 +275,7 @@ function AiRoadmap() {
 
         {/* Loading History Skeleton */}
         {loadingHistory && (
-          <section className="mb-16">
+          <section className="mb-12">
             <div className="h-4 w-48 bg-white/5 rounded mb-6 animate-pulse" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
@@ -261,4 +358,3 @@ function AiRoadmap() {
 }
 
 export default AiRoadmap;
-

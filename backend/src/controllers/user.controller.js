@@ -3,6 +3,12 @@ import { FollowModel, UserModel } from '../models/queries.js';
 
 export const getProfile = async (req, res, next) => {
   try {
+    // Validate UUID format to prevent database errors
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!req.params.id || !uuidRegex.test(req.params.id)) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
     const user = await UserModel.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 

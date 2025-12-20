@@ -14,6 +14,7 @@ import {
   saveProgress,
   getProgress,
   getUserRoadmaps,
+  deleteRoadmap,
 } from "../controllers/path.controller.js";
 
 const router = Router();
@@ -30,6 +31,7 @@ router.get("/roadmaps/user", authenticate, getUserRoadmaps);
 router.get("/my-roadmaps", authenticate, getUserRoadmaps); // Alias for easier frontend access
 router.post("/roadmap/progress", authenticate, saveProgress);
 router.get("/roadmap/:roadmapId/progress", authenticate, getProgress);
+router.delete("/roadmaps/:roadmapId", authenticate, deleteRoadmap);
 
 // Path CRUD routes (parameterized - must come AFTER specific routes)
 router.get("/", optionalAuth, listPaths);
@@ -39,3 +41,4 @@ router.get("/:id/progress", authenticate, getPathProgress);
 router.post("/:id/progress", authenticate, updatePathProgress);
 
 export default router;
+

@@ -512,16 +512,32 @@ Content: ${transcript.substring(0, 2000)}`;
     }
   }
 
-  async generateRoadmap(role) {
+  async generateRoadmap(role, options = {}) {
+    const { detailLevel = "standard" } = options;
     const key = role.trim().toLowerCase();
-    const cacheKey = `roadmap_${key}`;
+    
+    // Include detail level in cache key so different levels are cached separately
+    const cacheKey = `roadmap_${key}_${detailLevel}`;
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log(`[AI Service] Returning cached roadmap for: ${role}`);
+      console.log(`[AI Service] Returning cached roadmap for: ${role} (${detailLevel})`);
       return cached;
     }
 
-    console.log(`[AI Service] Generating detailed roadmap for role: ${role}`);
+    console.log(`[AI Service] Generating detailed roadmap for role: ${role} (detail: ${detailLevel})`);
+
+    // Adjust stage counts based on detail level
+    let stageConfig;
+    switch (detailLevel) {
+      case "quick":
+        stageConfig = { stages: "5-7", nodesPerStage: "3-4", description: "Focus on essential topics only." };
+        break;
+      case "comprehensive":
+        stageConfig = { stages: "15-20", nodesPerStage: "5-7", description: "Cover all aspects in depth including advanced topics." };
+        break;
+      default: // standard
+        stageConfig = { stages: "8-12", nodesPerStage: "4-6", description: "Balanced coverage of all key topics." };
+    }
 
     const prompt = `Generate a detailed learning roadmap for becoming a "${role}".
 
@@ -546,8 +562,8 @@ Return ONLY valid JSON with this structure:
 }
 
 Requirements:
-1. Create 8-10 stages covering key areas (beginner to advanced).
-2. Each stage MUST have 4-6 nodes.
+1. Create ${stageConfig.stages} stages covering key areas (beginner to advanced). ${stageConfig.description}
+2. Each stage MUST have ${stageConfig.nodesPerStage} nodes.
 3. Keep descriptions concise (max 10-15 words).
 4. No markdown formatting or code blocks in the JSON output.
 5. Mention exact technologies and tools where relevant.
