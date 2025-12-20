@@ -49,7 +49,6 @@ function Communities() {
     }
   };
 
-  // Get subject emoji based on name
   const getSubjectEmoji = (subject) => {
     const emojiMap = {
       'programming': '💻', 'javascript': '🟨', 'python': '🐍', 'react': '⚛️',
@@ -65,190 +64,173 @@ function Communities() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] py-8 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
+      <div className="max-w-[1200px] mx-auto">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-start justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Communities</h1>
-            <p className="text-slate-400">Join communities to learn and discuss with others</p>
+            <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
+              <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
+              [ LEARNING COMMUNITIES ]
+            </div>
+            <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
+              Communities
+            </h1>
+            <p className="text-[#666] text-[16px] max-w-xl">
+              Join communities to learn and discuss with others
+            </p>
           </div>
+          
           {user && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+              className="flex items-center gap-2 px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] text-black font-bold text-[13px] transition-all"
             >
-              <Plus size={18} />
-              Create Community
+              <Plus size={16} /> CREATE COMMUNITY
             </button>
           )}
         </div>
 
         {/* Search */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+        <div className="mb-10">
+          <div className="max-w-md bg-[#111] border border-[#2a2a2a] flex items-center gap-3 px-4">
+            <Search size={18} className="text-[#555]" />
             <input
               type="text"
-              placeholder="Search communities..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50"
+              placeholder="Search communities..."
+              className="flex-1 bg-transparent py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none font-mono"
             />
           </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 animate-pulse">
-                <div className="w-12 h-12 bg-white/10 rounded-xl mb-4" />
-                <div className="h-5 w-32 bg-white/10 rounded mb-2" />
-                <div className="h-4 w-full bg-white/10 rounded mb-4" />
-                <div className="h-8 w-20 bg-white/10 rounded-lg" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center">
-            <p className="text-red-400">{error}</p>
-            <button onClick={fetchCommunities} className="mt-2 text-sm text-red-300 underline">
-              Try again
-            </button>
-          </div>
-        )}
-
         {/* Communities Grid */}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCommunities.map(community => (
-              <Link
-                key={community.id}
-                to={`/communities/${community.id}`}
-                className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-blue-500/30 hover:bg-white/[0.07] transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-2xl">
-                    {getSubjectEmoji(community.subject)}
+        <div>
+          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ ALL_COMMUNITIES</h2>
+          
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 size={32} className="text-[#FF6B35] animate-spin" />
+            </div>
+          ) : filteredCommunities.length === 0 ? (
+            <div className="text-center py-20 bg-[#0f0f0f] border border-[#1f1f1f]">
+              <Users size={48} className="text-[#333] mx-auto mb-4" />
+              <p className="text-[#555] text-[14px]">No communities found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredCommunities.map((community) => (
+                <Link
+                  key={community.id}
+                  to={`/communities/${community.id}`}
+                  className="group block"
+                >
+                  <div className="relative bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#333] p-5 transition-all">
+                    <div className="absolute left-0 top-4 bottom-4 w-[3px] bg-[#FF6B35]"></div>
+                    
+                    <div className="pl-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{getSubjectEmoji(community.subject)}</span>
+                          <div>
+                            <h3 className="font-bold text-white text-[16px] group-hover:text-[#FF6B35] transition-colors">
+                              {community.name}
+                            </h3>
+                            <span className="text-[11px] text-[#555] font-mono uppercase">{community.subject}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-[#666] text-[13px] mb-4 line-clamp-2">
+                        {community.description || "A community for learning and discussion"}
+                      </p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-[11px] text-[#555]">
+                          <span className="flex items-center gap-1">
+                            <Users size={12} /> {community.member_count || 0}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageSquare size={12} /> {community.post_count || 0}
+                          </span>
+                        </div>
+                        
+                        <button
+                          onClick={(e) => handleJoinLeave(e, community)}
+                          className={`px-3 py-1.5 text-[11px] font-semibold transition-all ${
+                            community.joined
+                              ? 'bg-[#1a1a1a] text-[#FF6B35] border border-[#FF6B35]'
+                              : 'bg-[#FF6B35] text-black'
+                          }`}
+                        >
+                          {community.joined ? 'JOINED' : 'JOIN'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={(e) => handleJoinLeave(e, community)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      community.joined
-                        ? "bg-white/10 text-slate-300 hover:bg-red-500/20 hover:text-red-400"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
-                  >
-                    {community.joined ? "Leave" : "Join"}
-                  </button>
-                </div>
-                
-                <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors mb-1">
-                  {community.name}
-                </h3>
-                <p className="text-sm text-slate-400 line-clamp-2 mb-4">
-                  {community.description || `Discuss everything about ${community.subject}`}
-                </p>
-                
-                <div className="flex items-center gap-4 text-xs text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <Users size={14} />
-                    {community.member_count || 0} members
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Hash size={14} />
-                    {community.subject}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && !error && filteredCommunities.length === 0 && (
-          <div className="text-center py-16">
-            <MessageSquare className="mx-auto text-slate-600 mb-4" size={48} />
-            <h3 className="text-xl font-bold text-white mb-2">No communities found</h3>
-            <p className="text-slate-400 mb-4">
-              {searchQuery ? "Try a different search term" : "Be the first to create a community!"}
-            </p>
-            {user && !searchQuery && (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
-              >
-                Create Community
-              </button>
-            )}
-          </div>
-        )}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Create Community Modal */}
+      {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Create Community</h2>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-white">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-[#111] border border-[#2a2a2a] w-full max-w-md">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]">
+              <h2 className="text-white font-bold text-[16px]">Create Community</h2>
+              <button onClick={() => setShowCreateModal(false)} className="text-[#555] hover:text-white">
                 <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleCreateCommunity} className="space-y-4">
+            <form onSubmit={handleCreateCommunity} className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Name</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">NAME</label>
                 <input
                   type="text"
-                  placeholder="e.g., React Developers"
                   value={newCommunity.name}
                   onChange={(e) => setNewCommunity({ ...newCommunity, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50"
+                  placeholder="Community name"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Subject</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">SUBJECT</label>
                 <input
                   type="text"
-                  placeholder="e.g., React"
                   value={newCommunity.subject}
                   onChange={(e) => setNewCommunity({ ...newCommunity, subject: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50"
+                  placeholder="e.g. React, Python, Machine Learning"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">DESCRIPTION</label>
                 <textarea
-                  placeholder="What's this community about?"
                   value={newCommunity.description}
                   onChange={(e) => setNewCommunity({ ...newCommunity, description: e.target.value })}
+                  placeholder="Brief description..."
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50 resize-none"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35] resize-none"
                 />
               </div>
               
               <button
                 type="submit"
                 disabled={creating || !newCommunity.name.trim() || !newCommunity.subject.trim()}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                className="w-full px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all"
               >
-                {creating ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Community"
-                )}
+                {creating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                CREATE COMMUNITY
               </button>
             </form>
           </div>

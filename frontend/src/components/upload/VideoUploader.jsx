@@ -22,7 +22,7 @@ function VideoUploader ({ onFileSelect, file }) {
   };
 
   return (
-    <div className="border border-dashed border-border rounded-xl p-6 text-center space-y-3 bg-surface">
+    <div className="border border-dashed border-border  p-6 text-center space-y-3 bg-surface">
       <p className="text-textSecondary">
         Upload short-form educational videos ({MAX_DURATION_MINUTES} min limit)
       </p>

@@ -533,28 +533,28 @@ Content: ${transcript.substring(0, 2000)}`;
         stageConfig = { stages: "5-7", nodesPerStage: "3-4", description: "Focus on essential topics only." };
         break;
       case "comprehensive":
-        stageConfig = { stages: "15-20", nodesPerStage: "5-7", description: "Cover all aspects in depth including advanced topics." };
+        stageConfig = { stages: "12-15", nodesPerStage: "4-5", description: "Cover all aspects including advanced topics." };
         break;
       default: // standard
-        stageConfig = { stages: "8-12", nodesPerStage: "4-6", description: "Balanced coverage of all key topics." };
+        stageConfig = { stages: "8-10", nodesPerStage: "3-5", description: "Balanced coverage of all key topics." };
     }
 
-    const prompt = `Generate a detailed learning roadmap for becoming a "${role}".
+    const prompt = `Generate a learning roadmap for becoming a "${role}".
 
-Return ONLY valid JSON with this structure:
+Return ONLY valid JSON (no markdown, no code blocks, no explanations) with this structure:
 {
   "title": "${role} Learning Roadmap",
-  "description": "Brief overview of the roadmap.",
+  "description": "Brief overview of the roadmap (1-2 sentences).",
   "stages": [
     {
       "id": "stage-1",
       "label": "Stage Name",
-      "summary": "Short, concise summary of this stage.",
+      "summary": "1 sentence summary.",
       "nodes": [
         {
           "id": "node-1-1",
-          "label": "Specific Topic/Skill",
-          "details": "Concise explanation (max 1 sentence)."
+          "label": "Topic/Skill Name",
+          "details": "1 sentence explanation."
         }
       ]
     }
@@ -562,13 +562,10 @@ Return ONLY valid JSON with this structure:
 }
 
 Requirements:
-1. Create ${stageConfig.stages} stages covering key areas (beginner to advanced). ${stageConfig.description}
+1. Create ${stageConfig.stages} stages (beginner to advanced). ${stageConfig.description}
 2. Each stage MUST have ${stageConfig.nodesPerStage} nodes.
-3. Keep descriptions concise (max 10-15 words).
-4. No markdown formatting or code blocks in the JSON output.
-5. Mention exact technologies and tools where relevant.
-6. Add logical dependencies between nodes if applicable.
-7. IMPORTANT: For any external links/resources, use Google Search or YouTube Search URLs if you are not 100% sure of the direct link. Example: "https://www.google.com/search?q=topic"`;
+3. Keep ALL text short (under 15 words per field).
+4. Output ONLY the JSON object, nothing else.`;
 
     try {
       const aiResponse = await this.callAIWithRetry(prompt, "balanced");
@@ -583,6 +580,7 @@ Requirements:
       try {
         // Clean up markdown if present
         let cleanResponse = responseText.replace(/```json|```/g, "").trim();
+        
         // Find the first { and last } to extract JSON
         const firstBrace = cleanResponse.indexOf("{");
         const lastBrace = cleanResponse.lastIndexOf("}");
@@ -591,8 +589,77 @@ Requirements:
           throw new Error("No JSON object found in response");
         }
 
-        const jsonStr = cleanResponse.substring(firstBrace, lastBrace + 1);
-        parsed = JSON.parse(jsonStr);
+        let jsonStr = cleanResponse.substring(firstBrace, lastBrace + 1);
+        
+        // Try to fix common JSON issues
+        // 1. Remove trailing commas before ] or }
+        jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
+        
+        // 2. Try to parse
+        try {
+          parsed = JSON.parse(jsonStr);
+        } catch (firstParseError) {
+          console.warn(`[AI Service] First parse attempt failed: ${firstParseError.message}`);
+          
+          // 3. If parse failed, try more aggressive cleanup
+          // Remove any non-JSON text after the last complete stage
+          const stagesMatch = jsonStr.match(/"stages"\s*:\s*\[/);
+          if (stagesMatch) {
+            // Find balanced brackets for stages array
+            let bracketCount = 0;
+            let inString = false;
+            let escapeNext = false;
+            let stagesStart = jsonStr.indexOf(stagesMatch[0]) + stagesMatch[0].length;
+            let stagesEnd = stagesStart;
+            
+            for (let i = stagesStart; i < jsonStr.length; i++) {
+              const char = jsonStr[i];
+              
+              if (escapeNext) {
+                escapeNext = false;
+                continue;
+              }
+              
+              if (char === '\\') {
+                escapeNext = true;
+                continue;
+              }
+              
+              if (char === '"' && !escapeNext) {
+                inString = !inString;
+                continue;
+              }
+              
+              if (!inString) {
+                if (char === '[') bracketCount++;
+                if (char === ']') {
+                  if (bracketCount === 0) {
+                    stagesEnd = i + 1;
+                    break;
+                  }
+                  bracketCount--;
+                }
+              }
+            }
+            
+            // Rebuild JSON with fixed stages
+            const fixedStages = jsonStr.substring(stagesStart - 1, stagesEnd);
+            const beforeStages = jsonStr.substring(0, stagesStart - 1);
+            const afterJson = "}";
+            
+            jsonStr = beforeStages + fixedStages + afterJson;
+            jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
+          }
+          
+          // Try parsing again
+          try {
+            parsed = JSON.parse(jsonStr);
+          } catch (secondParseError) {
+            // Last resort: try to manually construct a valid object
+            console.warn(`[AI Service] Second parse attempt failed: ${secondParseError.message}`);
+            throw firstParseError; // throw the original error
+          }
+        }
       } catch (parseError) {
         console.error(`[AI Service] JSON parse error: ${parseError.message}`);
         console.error(
@@ -620,7 +687,6 @@ Requirements:
       return parsed;
     } catch (error) {
       console.error(`[AI Service] Roadmap generation error: ${error.message}`);
-      // Don't cache errors - return error object so controller can display it
       // Clear any existing cache for this key to allow retry
       cache.del(cacheKey);
       return { error: error.message };

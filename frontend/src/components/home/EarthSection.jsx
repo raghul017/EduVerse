@@ -18,7 +18,7 @@ export function EarthSection() {
           
           {/* Badge */}
           <div className="flex items-center gap-2 mb-6">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 text-blue-400">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#FF6B35]/20 text-[#FF6B35]">
               <Star size={12} fill="currentColor" />
             </div>
             <span className="text-sm font-medium text-slate-400">About EduVerse</span>
@@ -36,7 +36,7 @@ export function EarthSection() {
           </p>
 
           {/* Button */}
-          <button className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors w-fit mb-12 group">
+          <button className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FF6B35] text-white font-medium hover:bg-[#FF6B35] transition-colors w-fit mb-12 group">
             Explore Features
             <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </button>
@@ -44,7 +44,7 @@ export function EarthSection() {
           {/* Feature Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Card 1 */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="p-5  bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <Zap size={24} className="text-white mb-3" />
               <h3 className="text-white font-semibold mb-1">Lightning Fast</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -53,7 +53,7 @@ export function EarthSection() {
             </div>
 
             {/* Card 2 */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="p-5  bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <Brain size={24} className="text-white mb-3" />
               <h3 className="text-white font-semibold mb-1">AI-Powered</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -62,7 +62,7 @@ export function EarthSection() {
             </div>
 
             {/* Card 3 */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="p-5  bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <Box size={24} className="text-white mb-3" />
               <h3 className="text-white font-semibold mb-1">Fully Scalable</h3>
               <p className="text-xs text-slate-400 leading-relaxed">

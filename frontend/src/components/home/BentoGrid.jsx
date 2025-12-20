@@ -40,7 +40,7 @@ export function BentoGrid() {
         
         {/* Card 1: Community Hub (Large Top Left) */}
         <div 
-          className="relative overflow-hidden rounded-3xl border-gradient md:col-span-3 lg:col-span-6 md:row-span-2 animate-on-scroll" 
+          className="relative overflow-hidden  border-gradient md:col-span-3 lg:col-span-6 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -53,7 +53,7 @@ export function BentoGrid() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 to-transparent"></div>
           <div className="absolute left-4 top-4">
-            <span className="inline-flex items-center gap-1 text-[11px] border-gradient text-slate-300 bg-white/5 rounded-full px-2.5 py-1 backdrop-blur" style={{borderRadius: '9999px'}}>
+            <span className="inline-flex items-center gap-1 text-[11px] border-gradient text-slate-300 bg-white/5 rounded-full px-2.5 py-1 " style={{borderRadius: '9999px'}}>
               Community Hub
             </span>
           </div>
@@ -71,7 +71,7 @@ export function BentoGrid() {
 
         {/* Card 2: 10k+ Roadmaps (Small Top Center) */}
         <div 
-          className="rounded-3xl bg-white text-neutral-900 p-6 border-gradient md:col-span-3 lg:col-span-3 animate-on-scroll" 
+          className=" bg-white text-neutral-900 p-6 border-gradient md:col-span-3 lg:col-span-3 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.95) 100%)',
             borderRadius: '24px'
@@ -79,7 +79,7 @@ export function BentoGrid() {
         >
           <p className="text-4xl tracking-tighter">10k+</p>
           <p className="mt-2 text-sm text-neutral-600 font-medium">Roadmaps Generated</p>
-          <div className="mt-4 flex items-center gap-2 text-blue-600">
+          <div className="mt-4 flex items-center gap-2 text-[#FF6B35]">
             <TrendingUp size={16} />
             <span className="text-xs font-medium">Q4 growth 23%</span>
           </div>
@@ -87,7 +87,7 @@ export function BentoGrid() {
 
         {/* Card 3: Generate Instantly (Tall Right) */}
         <article 
-          className="overflow-hidden border-gradient rounded-3xl relative md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className="overflow-hidden border-gradient  relative md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -96,7 +96,7 @@ export function BentoGrid() {
           <div className="h-full p-6 relative flex flex-col">
             <div className="relative mx-auto h-full w-full flex items-center justify-center flex-1">
               <div className="scale-[0.85] w-full">
-                <div className="backdrop-blur-[2px] bg-white/[0.03] border-gradient rounded-2xl">
+                <div className="-[2px] bg-white/[0.03] border-gradient ">
                   <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
                     <Code size={16} className="text-white/70" />
                     <span className="text-[11px] font-medium text-white/80">roadmap.json</span>
@@ -125,7 +125,7 @@ export function BentoGrid() {
 
         {/* Card 4: Learning Velocity (Chart - Middle Center) */}
         <div 
-          className="rounded-3xl border-gradient p-6 md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className=" border-gradient p-6 md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -133,12 +133,12 @@ export function BentoGrid() {
         >
           <h3 className="text-base font-semibold tracking-tight text-white">Learning Velocity</h3>
           <p className="mt-1 text-sm text-neutral-300">Last 30 days</p>
-          <div className="mt-4 rounded-xl bg-black/30 p-3 border-gradient h-32">
+          <div className="mt-4  bg-black/30 p-3 border-gradient h-32">
             <Bar data={chartData} options={chartOptions} />
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-blue-400">
-              <span className="h-2 w-2 rounded-full bg-blue-400"></span>
+            <div className="flex items-center gap-2 text-[#FF6B35]">
+              <span className="h-2 w-2 rounded-full bg-[#FF6B35]"></span>
               <span className="text-sm font-semibold tracking-tight">97.8%</span>
             </div>
             <span className="text-xs text-neutral-300 font-medium">GOAL MET</span>
@@ -147,7 +147,7 @@ export function BentoGrid() {
 
         {/* Card 5: Global Reach (Bottom Left) */}
         <div 
-          className="relative overflow-hidden rounded-3xl border-gradient md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className="relative overflow-hidden  border-gradient md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -158,7 +158,7 @@ export function BentoGrid() {
             <p className="mt-1 text-sm text-neutral-300">Countries Reached</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {['USA', 'India', 'UK'].map(c => (
-                <span key={c} className="inline-flex items-center rounded-full bg-blue-400/15 text-blue-300 px-2.5 py-1 text-xs font-medium border-gradient" style={{borderRadius: '9999px'}}>
+                <span key={c} className="inline-flex items-center rounded-full bg-[#FF6B35]/15 text-[#FF6B35] px-2.5 py-1 text-xs font-medium border-gradient" style={{borderRadius: '9999px'}}>
                   {c}
                 </span>
               ))}
@@ -172,7 +172,7 @@ export function BentoGrid() {
 
         {/* Card 6: AI Tutors (Bottom Center) */}
         <article 
-          className="relative overflow-hidden hover:bg-white/[0.08] transition-all group rounded-3xl border-gradient md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className="relative overflow-hidden hover:bg-white/[0.08] transition-all group  border-gradient md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -186,17 +186,17 @@ export function BentoGrid() {
           </div>
           <div className="flex-1 flex p-6 pt-0 items-center">
             <div className="relative w-full">
-              <div className="hover:bg-black/50 transition-all bg-black/60 border-gradient rounded-xl p-3 backdrop-blur">
+              <div className="hover:bg-black/50 transition-all bg-black/60 border-gradient  p-3 ">
                 <div className="flex gap-1 mb-2 items-center">
                   <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80"></span>
                   <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80"></span>
-                  <span className="h-2.5 w-2.5 rounded-full bg-blue-400/80"></span>
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#FF6B35]/80"></span>
                 </div>
                 <div className="overflow-x-auto">
                   <pre className="text-[10px] leading-tight min-w-max text-slate-300 font-mono">
                     <span className="text-purple-400">class</span> <span className="text-yellow-200">TutorAgent</span>:<br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">def</span> <span className="text-yellow-200">__init__</span>(self):<br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-blue-400">self</span>.mode = <span className="text-green-400">"adaptive"</span>
+                    &nbsp;&nbsp;<span className="text-[#FF6B35]">def</span> <span className="text-yellow-200">__init__</span>(self):<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#FF6B35]">self</span>.mode = <span className="text-green-400">"adaptive"</span>
                   </pre>
                 </div>
               </div>
@@ -206,7 +206,7 @@ export function BentoGrid() {
 
         {/* Card 7: Smart Tracking (Bottom Right) */}
         <section 
-          className="group relative overflow-hidden border-gradient rounded-3xl md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className="group relative overflow-hidden border-gradient  md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -217,7 +217,7 @@ export function BentoGrid() {
                <div className="relative w-32 h-32 flex items-center justify-center">
                   <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
                   <div className="absolute inset-4 border border-white/10 rounded-full animate-[spin_8s_linear_infinite_reverse]"></div>
-                  <div className="absolute inset-8 bg-white/5 rounded-full backdrop-blur-md flex items-center justify-center">
+                  <div className="absolute inset-8 bg-white/5 rounded-full  flex items-center justify-center">
                     <Sparkles size={20} className="text-white" />
                   </div>
                </div>
@@ -233,7 +233,7 @@ export function BentoGrid() {
 
         {/* Card 8: Student Success (Filler to match 12-col grid) */}
         <div 
-          className="flex flex-col rounded-3xl border-gradient p-6 backdrop-blur-md transition md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
+          className="flex flex-col  border-gradient p-6  transition md:col-span-3 lg:col-span-3 md:row-span-2 animate-on-scroll" 
           style={{
             background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)',
             borderRadius: '24px'
@@ -251,7 +251,7 @@ export function BentoGrid() {
           <p className="leading-snug text-sm font-medium mb-4 text-white">
             "EduVerse helped me master Python in record time. The AI roadmap was spot on."
           </p>
-          <div className="mb-4 rounded-lg border-gradient p-3">
+          <div className="mb-4  border-gradient p-3">
             <p className="text-xs text-white/80 mb-2 font-medium">Key Results:</p>
             <ul className="text-xs text-white/70 space-y-1">
               <li>• 3x faster learning</li>

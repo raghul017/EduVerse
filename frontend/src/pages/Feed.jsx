@@ -59,7 +59,7 @@ function Feed() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Filters */}
           <aside className="lg:col-span-3 space-y-6">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+            <div className="bg-white/5 border border-white/10  p-4">
               <h3 className="text-sm font-semibold text-white mb-4">Filters</h3>
 
               {/* Subjects */}
@@ -72,7 +72,7 @@ function Feed() {
                     onClick={() => setSelectedSubject(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedSubject === null
-                        ? "bg-blue-500/10 text-blue-500"
+                        ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -88,7 +88,7 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         selectedSubject === subject
-                          ? "bg-blue-500/10 text-blue-500"
+                          ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                           : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
@@ -108,7 +108,7 @@ function Feed() {
                     onClick={() => setSelectedCreator(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedCreator === null
-                        ? "bg-blue-500/10 text-blue-500"
+                        ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -126,7 +126,7 @@ function Feed() {
                         }
                         className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                           selectedCreator === creatorId
-                            ? "bg-blue-500/10 text-blue-500"
+                            ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                             : "text-slate-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
@@ -151,7 +151,7 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         difficulty === level
-                          ? "bg-blue-500/10 text-blue-500"
+                          ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                           : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
@@ -181,7 +181,7 @@ function Feed() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
+              <div className="bg-white/5 border border-white/10  p-12 text-center">
                 <p className="text-slate-400">No posts found. Try adjusting your filters.</p>
               </div>
             )}
@@ -190,7 +190,7 @@ function Feed() {
           {/* Right Sidebar */}
           <aside className="lg:col-span-3 space-y-6">
             {/* Suggested Creators */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+            <div className="bg-white/5 border border-white/10  p-4">
               <h3 className="text-sm font-semibold text-white mb-4">
                 Suggested Creators
               </h3>
@@ -209,7 +209,7 @@ function Feed() {
             </div>
 
             {/* Trending Topics */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+            <div className="bg-white/5 border border-white/10  p-4">
               <h3 className="text-sm font-semibold text-white mb-4">
                 Trending Topics
               </h3>

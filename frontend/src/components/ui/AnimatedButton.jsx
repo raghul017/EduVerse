@@ -85,7 +85,7 @@ export const AnimatedButton = ({
       <div className="inline-block group relative">
         <Component
           {...componentProps}
-          className={`${baseClasses} text-white/80 hover:text-white bg-white/5 backdrop-blur-xl border border-white/10 hover:-translate-y-1 hover:scale-105 ${className}`}
+          className={`${baseClasses} text-white/80 hover:text-white bg-white/5  border border-white/10 hover:-translate-y-1 hover:scale-105 ${className}`}
         >
           {Icon && <Icon className="w-5 h-5" />}
           <span className="relative">{children}</span>
@@ -117,7 +117,7 @@ export const AnimatedButton = ({
     return (
       <Component
         {...componentProps}
-        className={`${baseClasses} text-white bg-blue-600 hover:bg-blue-700 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50 ${className}`}
+        className={`${baseClasses} text-white bg-[#FF6B35] hover:bg-[#ff7a4a] hover:scale-105 hover:shadow-lg hover:shadow-[#ff7a4a]/50 ${className}`}
       >
         {Icon && <Icon className="w-5 h-5" />}
         {children}

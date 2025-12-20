@@ -47,7 +47,7 @@ function GuideGenerator() {
     >
       {guide && (
         <div className="mt-10 space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-2 backdrop-blur-sm">
+          <div className="bg-white/5 border border-white/10  p-6 space-y-2 ">
             <h2 className="text-2xl font-semibold text-white">
               {guide.title}
             </h2>
@@ -60,7 +60,7 @@ function GuideGenerator() {
             {chapters.map((chapter) => (
               <div
                 key={chapter.id}
-                className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 backdrop-blur-sm"
+                className="bg-white/5 border border-white/10  p-4 space-y-2 "
               >
                 <h3 className="text-sm font-semibold text-white">
                   {chapter.title}

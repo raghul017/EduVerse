@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { motion } from 'framer-motion';
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
   Heart, Bookmark, Share2, Eye, Clock, ArrowLeft, 
-  ThumbsUp, MessageSquare, Download, Flag 
+  Loader2
 } from 'lucide-react';
 import VideoPlayer from "../components/feed/VideoPlayer.jsx";
 import AISummary from "../components/ai/AISummary.jsx";
 import AIQuiz from "../components/ai/AIQuiz.jsx";
 import AIFlashcards from "../components/ai/AIFlashcards.jsx";
 import AIChat from "../components/ai/AIChat.jsx";
-import Button from "../components/ui/Button.jsx";
-import IconButton from "../components/ui/IconButton.jsx";
 import api from "../utils/api.js";
 import { usePostStore } from "../store/postStore.js";
 import { useAuthStore } from "../store/authStore.js";
@@ -46,7 +43,6 @@ function PostDetail() {
       return;
     }
     await toggleLike(post.id);
-    // Refresh post to get updated like count
     const { data } = await api.get(`/posts/${id}`);
     setPost(data.data);
   };
@@ -57,7 +53,6 @@ function PostDetail() {
       return;
     }
     await toggleBookmark(post.id);
-    // Refresh post to get updated bookmark status
     const { data } = await api.get(`/posts/${id}`);
     setPost(data.data);
   };
@@ -71,10 +66,9 @@ function PostDetail() {
           url: window.location.href,
         });
       } catch (err) {
-        // User cancelled or error
+        // User cancelled
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     }
@@ -82,17 +76,21 @@ function PostDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <Loader2 size={32} className="text-[#FF6B35] animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-400 text-lg mb-4">{error}</p>
-        <Button onClick={() => navigate('/videos')}>Back to Videos</Button>
+      <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
+        <div className="max-w-[800px] mx-auto text-center">
+          <p className="text-red-400 text-[16px] mb-4">{error}</p>
+          <Link to="/videos" className="text-[#FF6B35] text-[13px] hover:underline">
+            ← Back to Videos
+          </Link>
+        </div>
       </div>
     );
   }
@@ -102,137 +100,122 @@ function PostDetail() {
   const transcriptReady = Boolean(post.transcript && post.transcript.length > 20);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Back button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back
-      </Button>
-
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr),minmax(0,1fr)]">
-        {/* Main video + metadata */}
-        <motion.section 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-5"
+    <div className="min-h-screen bg-[#0a0a0a] py-8 px-6">
+      <div className="max-w-[1400px] mx-auto">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-[#666] hover:text-white text-[13px] mb-6 transition-colors"
         >
-          <div className="relative rounded-2xl overflow-hidden bg-black shadow-2xl">
-            <VideoPlayer
-              source={post.video_url}
-              thumbnail={post.thumbnail_url}
-              title={post.title}
-            />
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
-                {post.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                    {post.creator_name?.charAt(0) || 'U'}
+          <ArrowLeft size={16} />
+          BACK
+        </button>
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,2.2fr),minmax(0,1fr)]">
+          {/* Main video + metadata */}
+          <section className="space-y-6">
+            <div className="relative overflow-hidden bg-black">
+              <VideoPlayer
+                source={post.video_url}
+                thumbnail={post.thumbnail_url}
+                title={post.title}
+              />
+            </div>
+            
+            <div className="space-y-5">
+              <div>
+                <h1 className="text-[24px] md:text-[28px] font-bold text-white leading-tight mb-4">
+                  {post.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-[13px] text-[#666]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-[#FF6B35] flex items-center justify-center text-black font-bold text-[12px]">
+                      {post.creator_name?.charAt(0) || 'U'}
+                    </div>
+                    <span className="font-semibold text-white">{post.creator_name || 'Creator'}</span>
                   </div>
-                  <span className="font-semibold text-white">{post.creator_name || 'Creator'}</span>
-                </div>
-                <span>·</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  {post.views_count || 0} views
-                </span>
-                {post.duration && (
-                  <>
-                    <span>·</span>
+                  <span className="flex items-center gap-1">
+                    <Eye size={14} />
+                    {post.views_count || 0} views
+                  </span>
+                  {post.duration && (
                     <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
+                      <Clock size={14} />
                       {Math.round(post.duration / 60)} min
                     </span>
-                  </>
-                )}
-                <span>·</span>
-                <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-medium">
-                  {post.subject}
-                </span>
-              </div>
-            </div>
-            
-            {/* Action buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-white/10">
-              <Button
-                variant={post.liked ? 'secondary' : 'primary'}
-                size="md"
-                onClick={handleLike}
-                className="flex items-center gap-2"
-              >
-                <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
-                <span>{post.likes_count || 0}</span>
-                <span className="hidden sm:inline">{post.liked ? 'Liked' : 'Like'}</span>
-              </Button>
-              <Button
-                variant={post.bookmarked ? 'secondary' : 'ghost'}
-                size="md"
-                onClick={handleBookmark}
-                className="flex items-center gap-2"
-              >
-                <Bookmark className={`w-5 h-5 ${post.bookmarked ? 'fill-current' : ''}`} />
-                <span className="hidden sm:inline">{post.bookmarked ? 'Saved' : 'Save'}</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="md"
-                onClick={handleShare}
-                className="flex items-center gap-2"
-              >
-                <Share2 className="w-5 h-5" />
-                <span className="hidden sm:inline">Share</span>
-              </Button>
-              <div className="ml-auto flex items-center gap-2">
-                {post.tags?.map((tag) => (
-                  <span 
-                    key={tag} 
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-slate-400 border border-white/10"
-                  >
-                    #{tag}
+                  )}
+                  <span className="px-2 py-1 bg-[#1a1a1a] border border-[#2a2a2a] text-[#FF6B35] text-[11px] font-mono uppercase">
+                    {post.subject}
                   </span>
-                ))}
+                </div>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-[#1f1f1f]">
+                <button
+                  onClick={handleLike}
+                  className={`px-4 py-2 flex items-center gap-2 text-[13px] font-semibold transition-all ${
+                    post.liked 
+                      ? 'bg-[#FF6B35] text-black' 
+                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35]'
+                  }`}
+                >
+                  <Heart size={16} className={post.liked ? 'fill-current' : ''} />
+                  {post.likes_count || 0}
+                </button>
+                <button
+                  onClick={handleBookmark}
+                  className={`px-4 py-2 flex items-center gap-2 text-[13px] font-semibold transition-all ${
+                    post.bookmarked 
+                      ? 'bg-[#FF6B35] text-black' 
+                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35]'
+                  }`}
+                >
+                  <Bookmark size={16} className={post.bookmarked ? 'fill-current' : ''} />
+                  {post.bookmarked ? 'SAVED' : 'SAVE'}
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="px-4 py-2 flex items-center gap-2 text-[13px] font-semibold bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35] transition-all"
+                >
+                  <Share2 size={16} />
+                  SHARE
+                </button>
+                <div className="ml-auto flex items-center gap-2">
+                  {post.tags?.map((tag) => (
+                    <span 
+                      key={tag} 
+                      className="text-[11px] px-2 py-1 bg-[#111] border border-[#2a2a2a] text-[#666] font-mono"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Description */}
+              <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-6 space-y-3">
+                <h3 className="text-[14px] font-mono text-[#FF6B35] tracking-wide">&gt;_ ABOUT_THIS_LESSON</h3>
+                <p className="text-[#999] leading-relaxed text-[14px] whitespace-pre-wrap">
+                  {post.description}
+                </p>
+                {!transcriptReady && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 border border-yellow-500/30 text-[12px] text-yellow-400">
+                    ⏳ Transcript is still processing; AI features will use the description for now.
+                  </div>
+                )}
               </div>
             </div>
-            
-            {/* Description */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-3 shadow-sm backdrop-blur-sm">
-              <h3 className="font-semibold text-white text-lg">About this lesson</h3>
-              <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">
-                {post.description}
-              </p>
-              {!transcriptReady && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-400">
-                  <span>⏳</span>
-                  <span>Transcript is still processing; AI features will use the description for now.</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.section>
+          </section>
 
-        {/* AI tutor side panel */}
-        <motion.aside 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="space-y-4"
-        >
-          <AISummary postId={post.id} transcriptReady={transcriptReady} />
-          <AIQuiz postId={post.id} transcriptReady={transcriptReady} />
-          <AIFlashcards postId={post.id} transcriptReady={transcriptReady} />
-          <AIChat postId={post.id} transcriptReady={transcriptReady} />
-        </motion.aside>
+          {/* AI tutor side panel */}
+          <aside className="space-y-4">
+            <AISummary postId={post.id} transcriptReady={transcriptReady} />
+            <AIQuiz postId={post.id} transcriptReady={transcriptReady} />
+            <AIFlashcards postId={post.id} transcriptReady={transcriptReady} />
+            <AIChat postId={post.id} transcriptReady={transcriptReady} />
+          </aside>
+        </div>
       </div>
     </div>
   );

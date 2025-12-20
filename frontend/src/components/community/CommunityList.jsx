@@ -7,7 +7,7 @@ function CommunityList ({ communities, loading, error, onSelect }) {
 
   if (!communities.length) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 text-center text-muted">
+      <div className=" border border-slate-100 bg-white p-6 text-center text-muted">
         No communities yet. Be the first to create one!
       </div>
     );

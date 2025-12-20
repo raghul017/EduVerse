@@ -7,15 +7,14 @@ function MainLayout() {
   const isHomePage = location.pathname === "/";
 
   return (
-    <div className={`min-h-screen relative text-textPrimary font-sans flex flex-col pt-[70px] ${
-      isHomePage ? 'bg-[#0a0a0a]' : 'bg-background'
+    <div className={`min-h-screen relative font-sans flex flex-col bg-[#0a0a0a] text-white ${
+      isHomePage ? 'pt-0' : 'pt-[60px]'
     }`}>
-      {!isHomePage && <div className="bg-noise" />}
-      
-      <Navbar />
+      {/* Only show Navbar on non-home pages */}
+      {!isHomePage && <Navbar />}
       
       {/* Main Content Area */}
-      <main className={isHomePage || location.pathname.includes('roadmap') ? "w-full flex-grow" : "p-6 max-w-7xl mx-auto w-full flex-grow"}>
+      <main className={isHomePage || location.pathname.includes('roadmap') ? "w-full flex-grow" : "p-6 max-w-[1400px] mx-auto w-full flex-grow"}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -33,5 +32,3 @@ function MainLayout() {
 }
 
 export default MainLayout;
-
-

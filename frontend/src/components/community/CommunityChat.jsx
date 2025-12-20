@@ -101,7 +101,7 @@ function CommunityChat({ communityId }) {
               className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
             >
               <div
-                className={`relative max-w-[75%] rounded-2xl px-4 py-2.5 shadow-sm ${
+                className={`relative max-w-[75%]  px-4 py-2.5 shadow-sm ${
                   isOwn 
                     ? "bg-accent text-white" 
                     : "bg-surface/50 text-textPrimary border border-border"
@@ -152,12 +152,12 @@ function CommunityChat({ communityId }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a message..."
-              className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+              className="flex-1 bg-background border border-border  px-4 py-2.5 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent/90 disabled:bg-accent/50 disabled:cursor-not-allowed text-white text-sm font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+              className="px-5 py-2.5  bg-accent hover:bg-accent/90 disabled:bg-accent/50 disabled:cursor-not-allowed text-white text-sm font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
             >
               <Send size={16} />
               {sending ? "..." : "Send"}

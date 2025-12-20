@@ -5,7 +5,7 @@ function CommunityCard ({ community, onSelect }) {
   const { toggleMembership } = useCommunityStore();
 
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-3 shadow-sm">
+    <div className="bg-white border border-slate-100  p-5 space-y-3 shadow-sm">
       <div className="flex items-center justify-between">
         <button type="button" className="text-left" onClick={onSelect}>
           <h3 className="text-lg font-semibold text-text hover:text-primary transition">

@@ -71,7 +71,7 @@ function VideoPlayer({ source, thumbnail, title }) {
   };
 
   return (
-    <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden">
+    <div className="relative w-full aspect-video bg-black  overflow-hidden">
       {source ? (
         <video
           ref={videoRef}
@@ -94,7 +94,7 @@ function VideoPlayer({ source, thumbnail, title }) {
               onClick={togglePlay}
               className="absolute inset-0 flex items-center justify-center text-white"
             >
-              <span className="h-16 w-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center border border-white/30">
+              <span className="h-16 w-16 rounded-full bg-white/20  flex items-center justify-center border border-white/30">
                 <span className="ml-1 text-3xl">▶</span>
               </span>
             </button>

@@ -86,7 +86,7 @@ function UploadModal () {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-card border border-border rounded-xl p-4"
+      className="space-y-4 bg-card border border-border  p-4"
     >
       <VideoUploader onFileSelect={setFile} file={file} />
       <Input label="Title" name="title" value={form.title} onChange={handleChange} />
@@ -108,7 +108,7 @@ function UploadModal () {
           Subject
           <select
             name="subject"
-            className="bg-card border border-border rounded-xl px-3 py-2 text-textPrimary focus:outline-none focus:border-accent"
+            className="bg-card border border-border  px-3 py-2 text-textPrimary focus:outline-none focus:border-accent"
             value={form.subject}
             onChange={handleChange}
           >

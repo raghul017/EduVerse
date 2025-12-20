@@ -1,14 +1,15 @@
+import { Flame } from 'lucide-react';
+
 function StreakDisplay({ streak }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center shadow-sm space-y-3 backdrop-blur-sm">
-      <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-wide text-slate-400">
-        <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-semibold">
-          🔥 Streak
-        </span>
+    <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-6 text-center">
+      <div className="flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.15em] text-[#555] mb-4 font-mono">
+        <Flame size={14} className="text-[#FF6B35]" />
+        CURRENT STREAK
       </div>
-      <p className="text-5xl font-bold text-blue-400 leading-none">{streak}</p>
-      <p className="text-sm text-slate-400">
-        Keep learning every day to grow this number.
+      <p className="text-[56px] font-bold text-[#FF6B35] leading-none mb-2">{streak}</p>
+      <p className="text-[13px] text-[#555]">
+        Keep learning every day to grow this number
       </p>
     </div>
   );

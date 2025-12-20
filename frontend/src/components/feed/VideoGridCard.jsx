@@ -17,7 +17,7 @@ function VideoGridCard({ post }) {
       to={`/posts/${post.id}`}
       className="group block space-y-3 transition-smooth hover-lift"
     >
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-card border border-border">
+      <div className="relative aspect-video  overflow-hidden bg-card border border-border">
         {thumbnail ? (
           <img
             src={thumbnail}

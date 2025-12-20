@@ -1,120 +1,105 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Search, ArrowRight, Clock, Loader2, Zap, Trash2, Settings2 } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Trash2, Loader2, Route, Star, Play, ChevronDown, Settings2 } from "lucide-react";
 import api from "../utils/api.js";
+import PlaceholdersAndVanishInput from "../components/ui/PlaceholdersAndVanishInput.jsx";
+
+// Animated input placeholders
+const placeholders = [
+  "Master React from scratch...",
+  "Become a DevOps Engineer...",
+  "Learn Machine Learning...",
+  "Full Stack Development path...",
+  "Data Science roadmap...",
+];
 
 function AiRoadmap() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedRoadmaps, setGeneratedRoadmaps] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
-  const [detailLevel, setDetailLevel] = useState("standard"); // quick, standard, comprehensive
+  const [detailLevel, setDetailLevel] = useState("standard");
   const [showSettings, setShowSettings] = useState(false);
+  const [generatedRoadmaps, setGeneratedRoadmaps] = useState([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Role-based roadmaps (preset)
+  // Extensive preset roadmaps - Roles
   const roleRoadmaps = [
-    "Frontend", "Backend", "Full Stack",
-    "DevOps", "Data Analyst", "AI Engineer",
-    "AI and Data Scientist", "Data Engineer", "Android",
-    "Machine Learning", "PostgreSQL", "iOS",
-    "Blockchain", "QA", "Software Architect",
-    "Cyber Security", "UX Design", "Technical Writer",
-    "Game Developer", "Server Side Game Developer", "MLOps",
-    "Product Manager", "Engineering Manager", "Developer Relations",
-    "BI Analyst"
+    "Frontend Developer",
+    "Backend Developer", 
+    "Full Stack Developer",
+    "DevOps Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Mobile Developer",
+    "Cloud Architect",
+    "Security Engineer",
+    "QA Engineer",
+    "Product Manager",
+    "UI/UX Designer"
   ];
-
-  // Skill-based roadmaps (preset)
+  
+  // Skill-based roadmaps
   const skillRoadmaps = [
-    "SQL", "Computer Science", "React",
-    "Vue", "Angular", "JavaScript",
-    "TypeScript", "Node.js", "Python",
-    "System Design", "Java", "ASP.NET Core",
-    "API Design", "Spring Boot", "Flutter",
-    "C++", "Rust", "Go",
-    "Software Design and Architecture", "GraphQL", "React Native",
-    "Design System", "Prompt Engineering", "MongoDB",
-    "Linux", "Kubernetes", "Docker",
-    "AWS", "Terraform", "Data Structures & Algorithms",
-    "Redis", "Git and GitHub", "PHP",
-    "Cloudflare", "AI Red Teaming", "AI Agents",
-    "Next.js", "Code Review", "Kotlin",
-    "HTML", "CSS", "Swift & Swift UI",
-    "Shell / Bash", "Laravel", "Elasticsearch"
+    "React",
+    "Node.js",
+    "Python",
+    "TypeScript",
+    "Docker",
+    "AWS",
+    "Kubernetes",
+    "PostgreSQL",
+    "MongoDB",
+    "GraphQL",
+    "Next.js",
+    "TensorFlow"
   ];
 
-  const allPresets = [...roleRoadmaps, ...skillRoadmaps].map(r => r.toLowerCase());
+  // Topic-based roadmaps
+  const topicRoadmaps = [
+    "System Design",
+    "Data Structures & Algorithms",
+    "Computer Networks",
+    "Operating Systems",
+    "Database Design",
+    "API Development"
+  ];
 
-  // Load user's generated roadmaps
   useEffect(() => {
-    const loadGeneratedRoadmaps = async () => {
-      try {
-        const response = await api.get("/paths/my-roadmaps");
-        if (response.data.data) {
-          setGeneratedRoadmaps(response.data.data);
-        }
-      } catch (error) {
-        console.log("No saved roadmaps or not logged in");
-      } finally {
-        setLoadingHistory(false);
-      }
-    };
     loadGeneratedRoadmaps();
   }, []);
 
-  const filteredRoleRoadmaps = roleRoadmaps.filter(role =>
-    role.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredSkillRoadmaps = skillRoadmaps.filter(skill =>
-    skill.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Separate custom vs preset roadmaps
-  const customRoadmaps = generatedRoadmaps.filter(r => 
-    !allPresets.includes(r.role.toLowerCase())
-  );
-  const presetRoadmaps = generatedRoadmaps.filter(r => 
-    allPresets.includes(r.role.toLowerCase())
-  );
+  const loadGeneratedRoadmaps = async () => {
+    try {
+      const { data } = await api.get("/paths/my-roadmaps");
+      setGeneratedRoadmaps(data.data || []);
+    } catch (err) {
+      console.error("Failed to load roadmaps:", err);
+    }
+  };
 
   const handleRoadmapClick = (roadmap, level = detailLevel) => {
-    navigate(`/roadmap?role=${encodeURIComponent(roadmap.toLowerCase())}&detail=${level}`);
+    const encodedRole = encodeURIComponent(roadmap);
+    navigate(`/roadmap?role=${encodedRole}&detail=${level}`);
   };
 
-  const handleCustomGenerate = async (e) => {
-    e?.preventDefault();
-    if (!searchQuery.trim() || isGenerating) return;
-    
-    setIsGenerating(true);
-    navigate(`/roadmap?role=${encodeURIComponent(searchQuery.trim())}&detail=${detailLevel}`);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && searchQuery.trim()) {
-      handleCustomGenerate(e);
-    }
+  const handleVanishSubmit = (e, value) => {
+    if (!value?.trim()) return;
+    handleRoadmapClick(value.trim());
   };
 
   const handleDeleteRoadmap = async (e, roadmapId) => {
-    e.preventDefault();
     e.stopPropagation();
-    // Optimistic update
-    setGeneratedRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
     try {
       await api.delete(`/paths/roadmaps/${roadmapId}`);
-    } catch {
-      // Reload on error
-      const response = await api.get("/paths/my-roadmaps");
-      if (response.data.data) setGeneratedRoadmaps(response.data.data);
+      setGeneratedRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
+    } catch (err) {
+      console.error("Failed to delete:", err);
     }
   };
 
-  const hasExactMatch = [...roleRoadmaps, ...skillRoadmaps].some(
+  // Check for exact match in presets
+  const hasExactMatch = [...roleRoadmaps, ...skillRoadmaps, ...topicRoadmaps].some(
     r => r.toLowerCase() === searchQuery.toLowerCase()
   );
-
   const showCustomOption = searchQuery.trim().length >= 2 && !hasExactMatch;
 
   const detailLevels = [
@@ -124,89 +109,81 @@ function AiRoadmap() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0a0a0a] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] py-12 px-6">
+      <div className="max-w-[1400px] mx-auto">
+        
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-4 font-serif flex items-center justify-center gap-3">
-            <Sparkles className="text-blue-500" size={40} />
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
+            <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
+            [ AI ROADMAP GENERATOR ]
+          </div>
+          <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
             AI Roadmap Generator
           </h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Choose a role/skill or <span className="text-blue-400 font-medium">enter any topic</span> to generate a personalized learning roadmap
+          <p className="text-[#666] text-[16px] max-w-xl mx-auto">
+            Choose a role/skill or <span className="text-[#FF6B35]">enter any topic</span> to generate a personalized learning roadmap
           </p>
         </div>
 
-        {/* Search Bar with Generate Button */}
-        <div className="mb-6 max-w-2xl mx-auto">
-          <form onSubmit={handleCustomGenerate} className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-            <input
-              type="text"
-              placeholder="Search or enter any topic to generate..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full pl-12 pr-32 py-4 rounded-xl border border-white/10 focus:border-blue-500/50 focus:outline-none text-lg bg-white/5 text-white placeholder:text-slate-600 shadow-sm transition-all"
-              disabled={isGenerating}
-            />
-            {searchQuery.trim() && (
-              <button
-                type="submit"
+        {/* Animated Search Bar */}
+        <div className="max-w-[700px] mx-auto mb-6">
+          <div className="bg-[#111] border border-[#2a2a2a]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]">
+              <code className="text-[12px] text-[#555] tracking-wide font-mono">USER@EDUVERSE:~/ROADMAP</code>
+              <div className="flex gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+              </div>
+            </div>
+            <div className="p-4">
+              <PlaceholdersAndVanishInput
+                placeholders={placeholders}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onSubmit={handleVanishSubmit}
                 disabled={isGenerating}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Zap size={16} />
-                    Generate
-                  </>
-                )}
-              </button>
-            )}
-          </form>
+              />
+            </div>
+          </div>
           
           {/* Custom topic hint */}
           {showCustomOption && (
-            <div className="mt-3 flex items-center justify-center gap-2 text-slate-400 text-sm">
+            <div className="mt-3 flex items-center justify-center gap-2 text-[#666] text-[13px]">
               <ArrowRight size={14} />
-              <span>Press <kbd className="px-2 py-0.5 bg-white/10 rounded text-xs">Enter</kbd> or click Generate to create a custom roadmap for "<span className="text-blue-400">{searchQuery}</span>"</span>
+              <span>Press <kbd className="px-2 py-0.5 bg-[#1a1a1a] border border-[#2a2a2a] text-[11px] font-mono">Enter</kbd> to create roadmap for "<span className="text-[#FF6B35]">{searchQuery}</span>"</span>
             </div>
           )}
         </div>
 
         {/* Detail Level Selector */}
-        <div className="mb-12 max-w-2xl mx-auto">
+        <div className="max-w-[700px] mx-auto mb-12">
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white mx-auto mb-3 transition-colors"
+            className="flex items-center gap-2 text-[13px] text-[#666] hover:text-white mx-auto mb-3 transition-colors"
           >
-            <Settings2 size={16} />
-            Detail Level: <span className="text-blue-400 font-medium capitalize">{detailLevel}</span>
+            <Settings2 size={14} />
+            Detail Level: <span className="text-[#FF6B35] font-semibold uppercase">{detailLevel}</span>
+            <ChevronDown size={14} className={`transition-transform ${showSettings ? 'rotate-180' : ''}`} />
           </button>
           
           {showSettings && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 text-center">Select Detail Level</p>
+            <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-4 mt-3">
+              <p className="text-[10px] text-[#555] uppercase tracking-[0.2em] mb-3 text-center font-mono">SELECT DETAIL LEVEL</p>
               <div className="grid grid-cols-3 gap-3">
                 {detailLevels.map(level => (
                   <button
                     key={level.id}
-                    onClick={() => setDetailLevel(level.id)}
-                    className={`p-3 rounded-xl border transition-all text-center ${
+                    onClick={() => { setDetailLevel(level.id); setShowSettings(false); }}
+                    className={`p-4 border text-left transition-all ${
                       detailLevel === level.id
-                        ? "bg-blue-500/20 border-blue-500/50 text-white"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:border-white/30"
+                        ? 'border-[#FF6B35] bg-[#FF6B35]/10'
+                        : 'border-[#2a2a2a] hover:border-[#444]'
                     }`}
                   >
-                    <p className="font-bold text-sm">{level.label}</p>
-                    <p className="text-xs opacity-70">{level.stages} stages</p>
-                    <p className="text-xs opacity-50 mt-1">{level.desc}</p>
+                    <div className="text-[14px] font-semibold text-white">{level.label}</div>
+                    <div className="text-[12px] text-[#555]">{level.stages} stages</div>
+                    <div className="text-[11px] text-[#444] mt-1">{level.desc}</div>
                   </button>
                 ))}
               </div>
@@ -214,142 +191,114 @@ function AiRoadmap() {
           )}
         </div>
 
-        {/* Your Custom Roadmaps */}
-        {customRoadmaps.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-6 flex items-center gap-2">
-              <Sparkles size={14} />
-              YOUR CUSTOM ROADMAPS
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {customRoadmaps.map((roadmap) => (
-                <button
+        {/* Role Roadmaps */}
+        <div className="mb-10">
+          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ ROLE_ROADMAPS</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            {roleRoadmaps.map((role, i) => (
+              <button
+                key={i}
+                onClick={() => handleRoadmapClick(role)}
+                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
+              >
+                <Route size={18} className="text-[#FF6B35] mb-2" />
+                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
+                  {role}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Skill Roadmaps */}
+        <div className="mb-10">
+          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ SKILL_ROADMAPS</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            {skillRoadmaps.map((skill, i) => (
+              <button
+                key={i}
+                onClick={() => handleRoadmapClick(skill)}
+                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
+              >
+                <Sparkles size={18} className="text-[#FF6B35] mb-2" />
+                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
+                  {skill}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Topic Roadmaps */}
+        <div className="mb-10">
+          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ TOPIC_ROADMAPS</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {topicRoadmaps.map((topic, i) => (
+              <button
+                key={i}
+                onClick={() => handleRoadmapClick(topic)}
+                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
+              >
+                <Star size={18} className="text-[#FF6B35] mb-2" />
+                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
+                  {topic}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* User Generated Roadmaps */}
+        {generatedRoadmaps.length > 0 && (
+          <div>
+            <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ YOUR_GENERATED_ROADMAPS</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {generatedRoadmaps.map((roadmap) => (
+                <div
                   key={roadmap.id}
-                  onClick={() => navigate(`/roadmap?role=${encodeURIComponent(roadmap.role)}`)}
-                  className="group relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5 hover:border-blue-500/50 hover:shadow-lg transition-all duration-200 text-left"
+                  onClick={() => handleRoadmapClick(roadmap.role || roadmap.title, roadmap.detail_level)}
+                  className="relative p-5 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#333] cursor-pointer transition-all group"
                 >
-                  <button
-                    onClick={(e) => handleDeleteRoadmap(e, roadmap.id)}
-                    className="absolute top-3 right-3 p-1.5 bg-red-500/10 hover:bg-red-500/30 rounded-lg text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete roadmap"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors capitalize pr-8">
-                    {roadmap.role}
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Generated {new Date(roadmap.created_at).toLocaleDateString()}
-                  </p>
-                </button>
+                  <div className="absolute left-0 top-4 bottom-4 w-[3px] bg-[#FF6B35]"></div>
+                  <div className="flex items-start justify-between pl-3">
+                    <div>
+                      <h3 className="font-bold text-white text-[15px] mb-1 group-hover:text-[#FF6B35] transition-colors">
+                        {roadmap.title || roadmap.role}
+                      </h3>
+                      <div className="flex items-center gap-3 text-[11px] text-[#555]">
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} />
+                          {new Date(roadmap.created_at).toLocaleDateString()}
+                        </span>
+                        <span className="px-2 py-0.5 bg-[#1a1a1a] text-[#FF6B35] uppercase font-mono">
+                          {roadmap.detail_level || 'standard'}
+                        </span>
+                      </div>
+                      {roadmap.stages_count && (
+                        <div className="text-[11px] text-[#444] mt-2">
+                          {roadmap.stages_count} stages • {roadmap.completed_count || 0} completed
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteRoadmap(e, roadmap.id)}
+                      className="p-2 text-[#555] hover:text-red-400 hover:bg-red-500/10 transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* Previously Generated Preset Roadmaps */}
-        {presetRoadmaps.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6 flex items-center gap-2">
-              <Clock size={14} />
-              YOUR SAVED ROADMAPS
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {presetRoadmaps.slice(0, 6).map((roadmap) => (
-                <button
-                  key={roadmap.id}
-                  onClick={() => navigate(`/roadmap?role=${encodeURIComponent(roadmap.role)}`)}
-                  className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:border-blue-500/50 hover:bg-white/10 hover:shadow-lg transition-all duration-200 text-left"
-                >
-                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors capitalize">
-                    {roadmap.role}
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Generated {new Date(roadmap.created_at).toLocaleDateString()}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Loading History Skeleton */}
-        {loadingHistory && (
-          <section className="mb-12">
-            <div className="h-4 w-48 bg-white/5 rounded mb-6 animate-pulse" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Role-Based Roadmaps */}
-        {(!searchQuery || filteredRoleRoadmaps.length > 0) && (
-          <section className="mb-16">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">
-              ROLE-BASED ROADMAPS
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {filteredRoleRoadmaps.map((role) => (
-                <button
-                  key={role}
-                  onClick={() => handleRoadmapClick(role)}
-                  className="group bg-white/5 border border-white/10 rounded-full p-5 hover:border-blue-500/50 hover:bg-white/10 hover:shadow-lg transition-all duration-200 text-left"
-                >
-                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors">
-                    {role}
-                  </h3>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Skill-Based Roadmaps */}
-        {(!searchQuery || filteredSkillRoadmaps.length > 0) && (
-          <section>
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">
-              SKILL-BASED ROADMAPS
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {filteredSkillRoadmaps.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => handleRoadmapClick(skill)}
-                  className="group bg-white/5 border border-white/10 rounded-full p-5 hover:border-blue-500/50 hover:bg-white/10 hover:shadow-lg transition-all duration-200 text-left"
-                >
-                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-blue-400 transition-colors">
-                    {skill}
-                  </h3>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* No Results - Show Generate Option */}
-        {searchQuery && filteredRoleRoadmaps.length === 0 && filteredSkillRoadmaps.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-2xl text-slate-400 mb-4">No preset roadmaps for "{searchQuery}"</p>
-            <button
-              onClick={handleCustomGenerate}
-              disabled={isGenerating}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white rounded-xl font-medium flex items-center gap-2 mx-auto transition-colors"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  Generating Custom Roadmap...
-                </>
-              ) : (
-                <>
-                  <Sparkles size={18} />
-                  Generate Custom Roadmap for "{searchQuery}"
-                </>
-              )}
-            </button>
+        {/* Empty State for User Roadmaps */}
+        {generatedRoadmaps.length === 0 && (
+          <div className="text-center py-12 bg-[#0f0f0f] border border-[#1f1f1f]">
+            <Route size={40} className="text-[#333] mx-auto mb-4" />
+            <p className="text-[#555] text-[14px] mb-2">No generated roadmaps yet</p>
+            <p className="text-[#444] text-[12px]">Your personalized roadmaps will appear here</p>
           </div>
         )}
       </div>

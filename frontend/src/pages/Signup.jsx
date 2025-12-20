@@ -3,21 +3,30 @@ import SignupForm from '../components/auth/SignupForm.jsx';
 
 function Signup () {
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="text-center space-y-2">
-        <p className="text-sm uppercase tracking-wide text-blue-400">Join EduVerse</p>
-        <h1 className="text-3xl font-semibold text-white">Teach and learn together</h1>
-        <p className="text-slate-400">
-          Publish educational shorts, get AI summaries, and grow study communities.
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center py-12 px-6">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
+            <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
+            [ JOIN EDUVERSE ]
+          </div>
+          <h1 className="text-[32px] font-bold text-white mb-2">Create an account</h1>
+          <p className="text-[#666] text-[14px]">Start your learning journey today</p>
+        </div>
+        
+        {/* Form Container */}
+        <div className="bg-[#111] border border-[#2a2a2a] p-6">
+          <SignupForm />
+        </div>
+        
+        <p className="text-center text-[13px] text-[#666] mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-[#FF6B35] font-semibold hover:underline">
+            Login
+          </Link>
         </p>
       </div>
-      <SignupForm />
-      <p className="text-center text-sm text-slate-400">
-        Already have an account?{' '}
-        <Link to="/login" className="text-blue-400 font-semibold hover:text-blue-300 transition-colors">
-          Login
-        </Link>
-      </p>
     </div>
   );
 }

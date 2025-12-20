@@ -5,7 +5,7 @@ import { PlayCircle, ArrowRight } from "lucide-react";
 export function FeatureShowcase() {
   return (
     <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-24 relative">
-      <div className="rounded-3xl border-gradient p-6 sm:p-8 backdrop-blur" style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
+      <div className=" border-gradient p-6 sm:p-8 " style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
         {/* Header */}
         <div className="flex gap-6 pr-1 pl-1 items-center animate-on-scroll animate">
           <span className="text-4xl text-white tracking-tighter">Features</span>
@@ -50,10 +50,10 @@ export function FeatureShowcase() {
             </div>
 
             <div className="flex gap-6 mt-8 items-center flex-wrap">
-              <Link to="/ai-roadmap" className="group inline-flex items-center gap-2 hover:opacity-90 transition-opacity border-gradient text-sm font-medium text-black bg-gradient-to-r from-blue-400 via-blue-400 to-blue-300 rounded-full pt-2.5 pr-5 pb-2.5 pl-5 shadow-[0_8px_30px_rgba(59,130,246,0.25)]">
+              <Link to="/ai-roadmap" className="group inline-flex items-center gap-2 hover:opacity-90 transition-opacity border-gradient text-sm font-medium text-black bg-gradient-to-r from-[#FF6B35] via-[#FF6B35] to-[#FF6B35] rounded-full pt-2.5 pr-5 pb-2.5 pl-5 shadow-[0_8px_30px_rgba(59,130,246,0.25)]">
                 Start Learning <ArrowRight size={16} />
               </Link>
-              <Link to="/videos" className="inline-flex border-gradient hover:text-white transition-all hover:-translate-y-0.5 text-sm font-medium text-white/80 bg-white/5 rounded-full pt-3 pr-5 pb-3 pl-5 backdrop-blur-xl gap-x-2 gap-y-2 items-center">
+              <Link to="/videos" className="inline-flex border-gradient hover:text-white transition-all hover:-translate-y-0.5 text-sm font-medium text-white/80 bg-white/5 rounded-full pt-3 pr-5 pb-3 pl-5  gap-x-2 gap-y-2 items-center">
                 <PlayCircle size={16} />
                 Watch demo
               </Link>
@@ -81,7 +81,7 @@ export function FeatureShowcase() {
                         "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=320&h=200&fit=crop",
                         "https://images.unsplash.com/photo-1550439062-609e1531270e?w=320&h=200&fit=crop"
                       ].map((src, i) => (
-                        <div key={i} className={`relative overflow-hidden rounded-xl border border-white/10 bg-neutral-900 hover:scale-105 transition-transform duration-300 ${i === 2 ? 'md:row-span-2' : ''}`}>
+                        <div key={i} className={`relative overflow-hidden  border border-white/10 bg-neutral-900 hover:scale-105 transition-transform duration-300 ${i === 2 ? 'md:row-span-2' : ''}`}>
                           <img src={src} alt="Project" className="w-full h-full object-cover opacity-90" />
                           <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black/50"></div>
                         </div>

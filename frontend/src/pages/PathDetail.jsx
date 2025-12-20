@@ -31,7 +31,7 @@ function PathDetail() {
 
   return (
     <div className="space-y-6">
-      <section className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-2">
+      <section className="bg-white/5 border border-white/10  p-6 shadow-sm  space-y-2">
         <p className="text-xs uppercase tracking-wide text-slate-400">Roadmap</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-white">
           {path.title}
@@ -49,7 +49,7 @@ function PathDetail() {
       </section>
 
       <section className="grid md:grid-cols-[minmax(0,1.1fr),minmax(0,1.3fr)] gap-6 items-start">
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-4 shadow-sm backdrop-blur-sm">
+        <div className="bg-white/5 border border-white/10  p-4 shadow-sm ">
           <p className="text-xs uppercase tracking-wide text-slate-400 mb-3">
             Steps
           </p>
@@ -61,8 +61,8 @@ function PathDetail() {
                 onClick={() => setSelectedIndex(index)}
                 className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-full border text-sm transition ${
                   index === selectedIndex
-                    ? "border-blue-500 bg-blue-500/10 text-blue-400"
-                    : "border-white/10 bg-white/5 text-slate-300 hover:border-blue-500/40 hover:bg-white/10"
+                    ? "border-[#FF6B35] bg-[#FF6B35]/10 text-[#FF6B35]"
+                    : "border-white/10 bg-white/5 text-slate-300 hover:border-[#FF6B35]/40 hover:bg-white/10"
                 }`}
               >
                 <span className="text-[11px] uppercase text-slate-500">
@@ -79,7 +79,7 @@ function PathDetail() {
           </div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-5 shadow-sm backdrop-blur-sm space-y-4 min-h-[220px]">
+        <div className="bg-white/5 border border-white/10  p-5 shadow-sm  space-y-4 min-h-[220px]">
           {activeLesson ? (
             <>
               <div className="flex items-center justify-between gap-3">
@@ -98,7 +98,7 @@ function PathDetail() {
                 </div>
                 <Link
                   to={`/posts/${activeLesson.id}`}
-                  className="text-xs px-3 py-1.5 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                  className="text-xs px-3 py-1.5 rounded-full bg-[#FF6B35] text-white font-semibold hover:bg-[#ff7a4a] transition"
                 >
                   Open video
                 </Link>

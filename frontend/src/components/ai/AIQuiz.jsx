@@ -1,28 +1,22 @@
-import { useEffect, useState } from "react";
-import api from "../../utils/api.js";
-
-const SourcePill = ({ source }) =>
-  source && (
-    <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 text-slate-400">
-      {source === "transcript" ? "Transcript" : "Description"}
-    </span>
-  );
+import { useState, useEffect } from 'react';
+import api from '../../utils/api.js';
+import { HelpCircle, Loader2, Check, X } from 'lucide-react';
 
 function AIQuiz({ postId }) {
-  const [quiz, setQuiz] = useState([]);
-  const [answers, setAnswers] = useState({});
+  const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [source, setSource] = useState(null);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     const loadQuiz = async () => {
       setLoading(true);
       try {
         const { data } = await api.get(`/posts/${postId}/ai-quiz`);
-        setQuiz(data.quiz || []);
-        setSource(data.source);
+        setQuestions(data.questions || []);
       } catch {
-        setQuiz([]);
+        setQuestions([]);
       } finally {
         setLoading(false);
       }
@@ -32,59 +26,68 @@ function AIQuiz({ postId }) {
 
   if (loading) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-400 backdrop-blur-sm">
-        Generating quiz...
+      <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 text-[13px] text-[#666]">
+        <div className="flex items-center gap-2">
+          <Loader2 size={14} className="text-[#FF6B35] animate-spin" />
+          Loading quiz...
+        </div>
       </div>
     );
   }
 
-  if (!quiz.length) {
+  if (!questions.length) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-400 backdrop-blur-sm">
-        AI quiz is not available for this video yet.
+      <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 text-[12px] text-[#555]">
+        Quiz not available for this video.
       </div>
     );
   }
+
+  const q = questions[currentQ];
+  const handleAnswer = (idx) => {
+    setSelectedAnswer(idx);
+    setShowResult(true);
+  };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4 backdrop-blur-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-blue-400">🧠 Quick Quiz</h3>
-        <SourcePill source={source} />
+    <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 space-y-4">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+        <HelpCircle size={16} />
+        QUICK QUIZ
       </div>
-      <div className="space-y-3">
-        {quiz.map((question, index) => (
-          <div key={index} className="space-y-2">
-            <p className="text-sm text-white">{question.question}</p>
-            <div className="grid gap-2">
-              {question.options.map((option, optionIndex) => {
-                const selected = answers[index] === optionIndex;
-                const isCorrect = question.correct === optionIndex;
-                return (
-                  <button
-                    key={optionIndex}
-                    className={`text-left text-xs px-3 py-2 rounded border transition ${
-                      selected
-                        ? isCorrect
-                          ? "bg-green-500/10 text-green-400 border-green-500/50"
-                          : "bg-red-500/10 text-red-400 border-red-500/50"
-                        : "text-slate-400 border-white/10 hover:border-blue-500/50 hover:text-white"
-                    }`}
-                    onClick={() =>
-                      setAnswers((prev) => ({
-                        ...prev,
-                        [index]: optionIndex,
-                      }))
-                    }
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      <p className="text-[14px] text-white">{q.question}</p>
+      <div className="space-y-2">
+        {q.options?.map((opt, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleAnswer(idx)}
+            disabled={showResult}
+            className={`w-full text-left px-4 py-2.5 border text-[13px] transition-all ${
+              showResult
+                ? idx === q.correctIndex
+                  ? 'border-green-500 bg-green-500/10 text-green-400'
+                  : selectedAnswer === idx
+                  ? 'border-red-500 bg-red-500/10 text-red-400'
+                  : 'border-[#2a2a2a] text-[#666]'
+                : 'border-[#2a2a2a] text-[#999] hover:border-[#FF6B35] hover:text-white'
+            }`}
+          >
+            {opt}
+          </button>
         ))}
       </div>
+      {showResult && (
+        <button
+          onClick={() => {
+            setCurrentQ((currentQ + 1) % questions.length);
+            setShowResult(false);
+            setSelectedAnswer(null);
+          }}
+          className="text-[#FF6B35] text-[12px] font-semibold hover:underline"
+        >
+          Next Question →
+        </button>
+      )}
     </div>
   );
 }

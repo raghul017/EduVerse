@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
@@ -14,14 +15,30 @@ import {
   Code,
   Sparkles,
   Loader2,
-  AlertTriangle,
   Send,
   User,
+  ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
+import PlaceholdersAndVanishInput from "../components/ui/PlaceholdersAndVanishInput";
 import { aiGenerate } from "../utils/api.js";
 import api from "../utils/api.js";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import MultiStepLoader from "../components/ui/MultiStepLoader.jsx";
+
+// Loading states for generating NEW roadmaps
+const generatingStates = [
+  { text: "Analyzing topic requirements..." },
+  { text: "Building learning modules..." },
+  { text: "Curating resources..." },
+  { text: "Finalizing roadmap..." },
+];
+
+// Loading states for CACHED/retrieved roadmaps
+const retrievingStates = [
+  { text: "Retrieving from database..." },
+];
 
 // Memoized Node Card component to prevent unnecessary re-renders
 const NodeCard = memo(function NodeCard({ 
@@ -35,12 +52,12 @@ const NodeCard = memo(function NodeCard({
   return (
     <div
       onClick={() => onNodeClick(node)}
-      className={`w-full bg-white/5 p-5 rounded-[24px] border cursor-pointer transition-all duration-200 relative overflow-hidden group backdrop-blur-sm ${
+      className={`w-full bg-[#0f0f0f] p-5 border cursor-pointer transition-all duration-300 relative overflow-hidden group ${
         isSelected
-          ? "border-blue-500 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+          ? "border-[#FF6B35] shadow-[0_0_30px_-10px_rgba(255,107,53,0.3)] bg-[#FF6B35]/5"
           : isCompleted
-          ? "border-green-500/50 shadow-sm bg-green-500/5"
-          : "border-white/10 hover:border-white/30 shadow-sm hover:shadow-xl hover:bg-white/10"
+          ? "border-green-500/50 bg-green-500/5"
+          : "border-[#2a2a2a] hover:border-[#FF6B35] hover:bg-[#161616]"
       }`}
       style={{ animationDelay: `${nodeIndex * 50}ms` }}
     >
@@ -54,7 +71,7 @@ const NodeCard = memo(function NodeCard({
             e.stopPropagation();
             onToggleComplete(node.id);
           }}
-          className={`p-1.5 rounded-full transition-all duration-200 cursor-pointer relative z-50 ${
+          className={`p-1.5 rounded-none transition-all duration-200 cursor-pointer relative z-50 ${
             isCompleted
               ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 scale-110"
               : "bg-white/10 text-slate-500 hover:bg-white/20 hover:scale-110"
@@ -86,11 +103,9 @@ const LoadingStep = memo(function LoadingStep({ label, delay }) {
   }, [delay]);
   
   return (
-    <div className={`flex items-center gap-3 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-30'}`}>
-      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${visible ? 'border-blue-500 bg-blue-500/20' : 'border-white/20'}`}>
-        {visible && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-      </div>
-      <span className="text-slate-300 text-sm">{label}</span>
+    <div className={`flex items-center gap-4 transition-all duration-500 ${visible ? 'opacity-100 translate-x-0' : 'opacity-40 -translate-x-2'}`}>
+      <div className={`w-2 h-2 rounded-full ${visible ? 'bg-[#FF6B35] shadow-[0_0_10px_#FF6B35]' : 'bg-[#333]'}`} />
+      <span className={`text-[13px] font-mono tracking-wide ${visible ? 'text-white' : 'text-[#666]'}`}>{label}</span>
     </div>
   );
 });
@@ -101,6 +116,7 @@ function RoadmapGenerator() {
   const [topic, setTopic] = useState("");
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isFromCache, setIsFromCache] = useState(false);
   const [error, setError] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [activeTab, setActiveTab] = useState("resources");
@@ -127,22 +143,21 @@ function RoadmapGenerator() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (chatMessages.length > 0) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatMessages]);
+
 
   useEffect(() => {
     if (activeTab === "chat" && chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [chatMessages, activeTab]);
+  }, [chatMessages.length, activeTab]);
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim() || isChatLoading || !selectedNode) return;
+  const handleSendMessage = async (text) => {
+    // If text is event object (from keypress) or undefined, use chatInput
+    const messageContent = (typeof text === 'string' ? text : chatInput);
+    
+    if (!messageContent?.trim() || isChatLoading || !selectedNode) return;
 
-    const userMessage = { role: "user", content: chatInput };
+    const userMessage = { role: "user", content: messageContent };
     setChatMessages((prev) => [...prev, userMessage]);
     setChatInput("");
     setIsChatLoading(true);
@@ -181,9 +196,13 @@ function RoadmapGenerator() {
       hasGeneratedRef.current = false;
     }
     setLoading(true);
+    setIsFromCache(false);
     setError(null);
     setRoadmap(null);
     setCompletedNodes({});
+    
+    const startTime = Date.now();
+    
     try {
       const data = await aiGenerate("roadmap", {
         topic: topicToGenerate,
@@ -193,27 +212,37 @@ function RoadmapGenerator() {
       });
 
       console.log("[Frontend API] AI roadmap response:", data);
-      console.log("Generated roadmap:", data);
+      
+      // Check if response was from cache (fast response = cached)
+      const elapsed = Date.now() - startTime;
+      const isCached = data?.fromCache || elapsed < 500;
+      setIsFromCache(isCached);
+      
+      if (isCached) {
+        // Brief delay for cached to show "Retrieving" message
+        await new Promise(resolve => setTimeout(resolve, 800));
+      } else {
+        // For new generation, show animation for at least 4 seconds
+        const minLoadingTime = 4000;
+        if (elapsed < minLoadingTime) {
+          await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsed));
+        }
+      }
 
       if (data && data.stages) {
         setRoadmap(data);
         if (data.roadmapId) {
           setRoadmapId(data.roadmapId);
-          // Always load progress when we have a roadmapId
           await loadProgress(data.roadmapId);
         } else {
           console.warn("No roadmapId returned from backend. Database might be offline.");
         }
       } else {
-        throw new Error(
-          "Invalid roadmap data received. Please try again."
-        );
+        throw new Error("Invalid roadmap data received. Please try again.");
       }
     } catch (error) {
       console.error("Error generating roadmap:", error);
-      setError(
-        error.message || "Failed to generate roadmap. Please try again."
-      );
+      setError(error.message || "Failed to generate roadmap. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -360,46 +389,12 @@ function RoadmapGenerator() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
-        <div className="bg-white/5 p-12 rounded-[32px] shadow-2xl border border-white/10 text-center w-full max-w-2xl backdrop-blur-sm relative overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-gradient-x"></div>
-          
-          <div className="relative w-32 h-32 mx-auto mb-8">
-            {/* Outer Ring */}
-            <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
-            
-            {/* Spinning Rings */}
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 border-4 border-blue-500/30 border-t-blue-500 rounded-full"
-            ></motion.div>
-            <motion.div 
-              animate={{ rotate: -360 }}
-              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-2 border-4 border-purple-500/30 border-b-purple-500 rounded-full"
-            ></motion.div>
-            
-            {/* Center Icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Sparkles className="text-white animate-pulse" size={40} />
-            </div>
-          </div>
-
-          <h2 className="text-3xl font-bold text-white mb-6 font-serif">
-            {roadmap?.fromCache ? "Retrieving Roadmap" : "Constructing Your Path"}
-          </h2>
-
-          {/* Progress Steps */}
-          <div className="space-y-4 max-w-sm mx-auto text-left">
-            <LoadingStep label="Analyzing topic requirements..." delay={0} />
-            <LoadingStep label="Structuring learning modules..." delay={1.5} />
-            <LoadingStep label="Curating expert resources..." delay={3} />
-            <LoadingStep label="Finalizing your personalized roadmap..." delay={4.5} />
-          </div>
-        </div>
-      </div>
+      <MultiStepLoader 
+        loadingStates={isFromCache ? retrievingStates : generatingStates} 
+        loading={loading} 
+        duration={isFromCache ? 500 : 1000}
+        loop={false}
+      />
     );
   }
 
@@ -408,8 +403,8 @@ function RoadmapGenerator() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-        <div className="bg-white/5 p-8 rounded-[24px] shadow-xl text-center max-w-md w-full border-l-4 border-red-500 backdrop-blur-sm border-y border-r border-white/10">
-          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white/5 p-8  shadow-xl text-center max-w-md w-full border-l-4 border-red-500  border-y border-r border-white/10">
+          <div className="w-16 h-16 bg-red-500/10 rounded-none flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="text-red-500" size={32} />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Generation Failed</h2>
@@ -417,13 +412,13 @@ function RoadmapGenerator() {
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => navigate("/ai-roadmap")}
-              className="px-4 py-2 text-slate-300 bg-white/5 hover:bg-white/10 rounded-full transition-colors btn-beam border border-white/10"
+              className="px-4 py-2 text-slate-300 bg-white/5 hover:bg-white/10 rounded-none transition-colors btn-beam border border-white/10"
             >
               Go Back
             </button>
             <button
               onClick={() => generateRoadmap(topic)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2 btn-beam"
+              className="px-4 py-2 bg-[#FF6B35] text-white rounded-none hover:bg-[#ff7a4a] transition-colors flex items-center gap-2 btn-beam"
             >
               <RefreshCw size={16} />
               Try Again
@@ -440,7 +435,7 @@ function RoadmapGenerator() {
 
   return (
       /* Main Content Area */
-      <div className="w-full flex overflow-hidden relative bg-[#0a0a0a] min-h-[calc(100vh-70px)]">
+      <div className="w-full flex overflow-hidden relative bg-[#0a0a0a] min-h-[calc(100vh-70px)] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
         
         {/* Resources Sidebar - Slides in from right when node is selected */}
         <AnimatePresence>
@@ -450,15 +445,15 @@ function RoadmapGenerator() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-[70px] bottom-0 w-full md:w-[28rem] bg-[#0a0a0a] border-l border-white/10 shadow-2xl z-40 overflow-hidden"
+              className="fixed right-0 top-[70px] bottom-0 w-full md:w-[28rem] bg-[#0a0a0a]/95 backdrop-blur-xl border-l border-[#FF6B35]/20 shadow-[-20px_0_50px_0px_rgba(0,0,0,0.5)] z-40 overflow-hidden"
             >
               {/* Sidebar Header */}
-              <div className="p-6 border-b border-white/10 bg-white/5">
+              <div className="p-6 border-b border-[#2a2a2a] bg-[#111]">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white">{selectedNode.label}</h3>
+                  <h3 className="text-[16px] font-bold text-white font-mono uppercase tracking-tight">{selectedNode.label}</h3>
                   <button
                     onClick={() => setSelectedNode(null)}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-2 text-[#555] hover:text-[#FF6B35] hover:bg-[#1a1a1a] transition-colors"
                   >
                     ✕
                   </button>
@@ -468,20 +463,20 @@ function RoadmapGenerator() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveTab("resources")}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                    className={`px-4 py-2 font-mono text-[12px] uppercase tracking-wider transition-all border ${
                       activeTab === "resources"
-                        ? "bg-blue-600 text-white"
-                        : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        ? "bg-[#FF6B35] text-black border-[#FF6B35] font-bold"
+                        : "bg-transparent text-[#555] border-[#2a2a2a] hover:border-[#444] hover:text-white"
                     }`}
                   >
                     Resources
                   </button>
                   <button
                     onClick={() => setActiveTab("chat")}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                    className={`px-4 py-2 font-mono text-[12px] uppercase tracking-wider transition-all border ${
                       activeTab === "chat"
-                        ? "bg-blue-600 text-white"
-                        : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        ? "bg-[#FF6B35] text-black border-[#FF6B35] font-bold"
+                        : "bg-transparent text-[#555] border-[#2a2a2a] hover:border-[#444] hover:text-white"
                     }`}
                   >
                     AI Chat
@@ -490,20 +485,20 @@ function RoadmapGenerator() {
               </div>
 
               {/* Sidebar Content */}
-              <div className="h-[calc(100%-180px)] overflow-y-auto">
+              <div className="h-[calc(100%-180px)] overflow-y-auto bg-[#0a0a0a]">
                 {activeTab === "resources" && (
                   <div className="p-6 space-y-6">
                     {loadingResources ? (
                       <div className="flex flex-col items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-                        <p className="text-slate-400 text-sm">Loading resources...</p>
+                        <Loader2 className="w-8 h-8 text-[#FF6B35] animate-spin mb-4" />
+                        <p className="text-[#555] text-[13px] font-mono">LOADING_RESOURCES...</p>
                       </div>
                     ) : nodeResources[selectedNode.id] ? (
                       <>
                         {/* Description */}
                         {nodeResources[selectedNode.id].description && (
-                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                            <p className="text-sm text-slate-300 leading-relaxed">
+                          <div className="bg-[#111] border border-[#2a2a2a] p-4">
+                            <p className="text-[13px] text-[#999] leading-relaxed font-mono">
                               {nodeResources[selectedNode.id].description}
                             </p>
                           </div>
@@ -512,8 +507,8 @@ function RoadmapGenerator() {
                         {/* Free Resources */}
                         {nodeResources[selectedNode.id].freeResources?.length > 0 && (
                           <div>
-                            <h4 className="font-bold text-white mb-3 flex items-center gap-2">
-                              <BookOpen size={18} className="text-blue-400" />
+                            <h4 className="font-bold text-[#FF6B35] mb-3 flex items-center gap-2 text-[12px] font-mono uppercase tracking-wide">
+                              <BookOpen size={14} />
                               Free Resources
                             </h4>
                             <div className="space-y-3">
@@ -523,21 +518,21 @@ function RoadmapGenerator() {
                                   href={resource.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="block p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all group"
+                                  className="block p-4 bg-[#111] border border-[#2a2a2a] hover:border-[#FF6B35] transition-all group"
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-1">
-                                        {resource.type === "video" && <Video size={16} className="text-purple-400" />}
-                                        {resource.type === "article" && <FileText size={16} className="text-green-400" />}
-                                        {resource.type === "course" && <Code size={16} className="text-blue-400" />}
-                                        <h5 className="font-medium text-white text-sm group-hover:text-blue-400 transition-colors">
+                                        {resource.type === "video" && <Video size={14} className="text-[#FF6B35]" />}
+                                        {resource.type === "article" && <FileText size={14} className="text-[#FF6B35]" />}
+                                        {resource.type === "course" && <Code size={14} className="text-[#FF6B35]" />}
+                                        <h5 className="font-medium text-white text-[13px] group-hover:text-[#FF6B35] transition-colors">
                                           {resource.title}
                                         </h5>
                                       </div>
-                                      <p className="text-xs text-slate-400">{resource.platform}</p>
+                                      <p className="text-[11px] text-[#555] font-mono uppercase">{resource.platform}</p>
                                     </div>
-                                    <ExternalLink size={16} className="text-slate-500 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                                    <ExternalLink size={14} className="text-[#444] group-hover:text-[#FF6B35] transition-colors flex-shrink-0" />
                                   </div>
                                 </a>
                               ))}
@@ -548,8 +543,8 @@ function RoadmapGenerator() {
                         {/* Premium Resources */}
                         {nodeResources[selectedNode.id].premiumResources?.length > 0 && (
                           <div>
-                            <h4 className="font-bold text-white mb-3 flex items-center gap-2">
-                              <Sparkles size={18} className="text-yellow-400" />
+                            <h4 className="font-bold text-[#FF6B35] mb-3 flex items-center gap-2 text-[12px] font-mono uppercase tracking-wide">
+                              <Sparkles size={14} />
                               Premium Resources
                             </h4>
                             <div className="space-y-3">
@@ -559,21 +554,21 @@ function RoadmapGenerator() {
                                   href={resource.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="block p-4 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border border-yellow-500/20 rounded-lg transition-all group"
+                                  className="block p-4 bg-[#111] border border-[#2a2a2a] hover:border-[#FF6B35] transition-all group"
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-1">
-                                        {resource.type === "video" && <Video size={16} className="text-purple-400" />}
-                                        {resource.type === "article" && <FileText size={16} className="text-green-400" />}
-                                        {resource.type === "course" && <Code size={16} className="text-blue-400" />}
-                                        <h5 className="font-medium text-white text-sm group-hover:text-yellow-400 transition-colors">
+                                        {resource.type === "video" && <Video size={14} className="text-[#FF6B35]" />}
+                                        {resource.type === "article" && <FileText size={14} className="text-[#FF6B35]" />}
+                                        {resource.type === "course" && <Code size={14} className="text-[#FF6B35]" />}
+                                        <h5 className="font-medium text-white text-[13px] group-hover:text-[#FF6B35] transition-colors">
                                           {resource.title}
                                         </h5>
                                       </div>
-                                      <p className="text-xs text-slate-400">{resource.platform}</p>
+                                      <p className="text-[11px] text-[#555] font-mono uppercase">{resource.platform}</p>
                                     </div>
-                                    <ExternalLink size={16} className="text-slate-500 group-hover:text-yellow-400 transition-colors flex-shrink-0" />
+                                    <ExternalLink size={14} className="text-[#444] group-hover:text-[#FF6B35] transition-colors flex-shrink-0" />
                                   </div>
                                 </a>
                               ))}
@@ -583,23 +578,23 @@ function RoadmapGenerator() {
                       </>
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <BookOpen className="w-12 h-12 text-slate-600 mb-4" />
-                        <p className="text-slate-400 text-sm">No resources available yet</p>
+                        <BookOpen className="w-12 h-12 text-[#333] mb-4" />
+                        <p className="text-[#555] text-[13px] font-mono">NO_RESOURCES_FOUND</p>
                       </div>
                     )}
                   </div>
                 )}
 
                 {activeTab === "chat" && (
-                  <div className="flex flex-col h-full">
-                    {/* Chat Messages */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  <div className="relative h-full bg-[#0a0a0a] overflow-hidden">
+                    {/* Chat Messages - Absolute positioning for perfect scroll area */}
+                    <div className="absolute top-0 left-0 right-0 bottom-[72px] overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-[#2a2a2a] scrollbar-track-transparent">
                       {chatMessages.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center">
-                          <Sparkles className="w-12 h-12 text-blue-500 mb-4" />
-                          <p className="text-slate-400 text-sm mb-2">AI Tutor Ready</p>
-                          <p className="text-slate-500 text-xs max-w-xs">
-                            Ask me anything about {selectedNode.label}
+                        <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                          <Sparkles className="w-12 h-12 text-[#FF6B35] mb-4 opacity-50" />
+                          <p className="text-[#666] text-[13px] mb-2 font-mono uppercase tracking-widest">AI Tutor Ready</p>
+                          <p className="text-[#444] text-[12px] max-w-xs font-mono">
+                            Target: {selectedNode.label}
                           </p>
                         </div>
                       ) : (
@@ -607,44 +602,47 @@ function RoadmapGenerator() {
                           {chatMessages.map((msg, idx) => (
                             <div
                               key={idx}
-                              className={`flex gap-3 ${
+                              className={`flex gap-3 text-[13px] ${
                                 msg.role === "user" ? "justify-end" : "justify-start"
                               }`}
                             >
                               {msg.role === "assistant" && (
-                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                  <Sparkles size={16} className="text-blue-400" />
+                                <div className="w-6 h-6 rounded-none border border-[#FF6B35]/30 flex items-center justify-center flex-shrink-0 mt-1 bg-[#FF6B35]/5 text-[#FF6B35] font-mono text-[10px]">
+                                  AI
                                 </div>
                               )}
                               <div
-                                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                                className={`max-w-[85%] rounded-md px-4 py-3 leading-relaxed font-mono border ${
                                   msg.role === "user"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white/5 text-slate-300 border border-white/10"
+                                    ? "bg-[#FF6B35]/10 text-[#FF6B35] border-[#FF6B35]/20 ml-12"
+                                    : "bg-[#111] text-[#ccc] border-[#2a2a2a] mr-8 shadow-sm"
                                 }`}
                               >
                                 {msg.role === "assistant" ? (
-                                  <ReactMarkdown className="text-sm prose prose-invert prose-sm max-w-none">
-                                    {msg.content}
-                                  </ReactMarkdown>
+                                  <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-[#000] prose-pre:border prose-pre:border-[#333] prose-p:my-1 prose-pre:my-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4">
+                                    <ReactMarkdown components={{
+                                      code: ({node, inline, className, children, ...props}) => (
+                                        <code className={`${className} ${inline ? 'bg-[#222] px-1 py-0.5 rounded text-[#FF6B35]' : 'block bg-[#000] p-3 rounded border border-[#333] overflow-x-auto text-xs'}`} {...props}>
+                                          {children}
+                                        </code>
+                                      )
+                                    }}>
+                                      {msg.content || ''}
+                                    </ReactMarkdown>
+                                  </div>
                                 ) : (
-                                  <p className="text-sm">{msg.content}</p>
+                                  <p className="whitespace-pre-wrap font-mono">{msg.content}</p>
                                 )}
                               </div>
-                              {msg.role === "user" && (
-                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                                  <User size={16} className="text-white" />
-                                </div>
-                              )}
                             </div>
                           ))}
                           {isChatLoading && (
-                            <div className="flex gap-3 justify-start">
-                              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                <Loader2 size={16} className="text-blue-400 animate-spin" />
+                            <div className="flex gap-3 justify-start animate-pulse">
+                              <div className="w-6 h-6 rounded-none border border-[#FF6B35]/30 flex items-center justify-center flex-shrink-0 mt-1">
+                                <Loader2 size={12} className="text-[#FF6B35] animate-spin" />
                               </div>
-                              <div className="bg-white/5 text-slate-400 border border-white/10 rounded-2xl px-4 py-3">
-                                <p className="text-sm">Thinking...</p>
+                              <div className="bg-[#111] text-[#555] border border-[#2a2a2a] rounded-md px-4 py-2">
+                                <p className="text-[12px] font-mono">PROCESSING_QUERY...</p>
                               </div>
                             </div>
                           )}
@@ -653,25 +651,15 @@ function RoadmapGenerator() {
                       )}
                     </div>
 
-                    {/* Chat Input */}
-                    <div className="p-4 border-t border-white/10 bg-white/5">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={chatInput}
+                    {/* Chat Input - Pinned to bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[72px] border-t border-[#2a2a2a] bg-[#111] flex flex-col justify-end">
+                      <div className="px-3 pb-3">
+                        <PlaceholdersAndVanishInput 
+                          placeholders={["Ask specific questions...", "Explain this topic...", "Give me examples..."]}
                           onChange={(e) => setChatInput(e.target.value)}
-                          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                          placeholder="Ask about this topic..."
-                          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                          onSubmit={(e, val) => handleSendMessage(val)}
                           disabled={isChatLoading}
                         />
-                        <button
-                          onClick={handleSendMessage}
-                          disabled={!chatInput.trim() || isChatLoading}
-                          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-white/10 disabled:text-slate-600 text-white rounded-lg transition-colors flex items-center justify-center"
-                        >
-                          <Send size={18} />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -702,7 +690,7 @@ function RoadmapGenerator() {
             )}
 
             {/* Header Card */}
-            <div className="bg-white/5 rounded-[32px] shadow-lg border border-white/10 p-8 mb-12 backdrop-blur-sm">
+            <div className="bg-white/5 rounded-[32px] shadow-lg border border-white/10 p-8 mb-12 ">
               {/* Top Row: Back Button & Action Buttons */}
               <div className="flex items-center justify-between mb-6">
                 <button
@@ -716,14 +704,14 @@ function RoadmapGenerator() {
                 <div className="flex gap-2">
                   <button
                     onClick={handleDownload}
-                    className="px-4 py-2 bg-blue-600 border border-blue-500 rounded-full font-bold text-sm text-white hover:bg-blue-700 transition-all flex items-center gap-2 btn-beam"
+                    className="px-4 py-2 bg-[#FF6B35] border border-[#FF6B35] rounded-none font-bold text-sm text-white hover:bg-[#ff7a4a] transition-all flex items-center gap-2 btn-beam"
                   >
                     <Download size={16} />
                     Download
                   </button>
                   <button
                     onClick={handleRegenerate}
-                    className="px-4 py-2 bg-blue-600 border border-blue-500 rounded-full font-bold text-sm text-white hover:bg-blue-700 transition-all flex items-center gap-2 btn-beam"
+                    className="px-4 py-2 bg-[#FF6B35] border border-[#FF6B35] rounded-none font-bold text-sm text-white hover:bg-[#ff7a4a] transition-all flex items-center gap-2 btn-beam"
                   >
                     <RefreshCw size={16} />
                     Regenerate
@@ -733,7 +721,7 @@ function RoadmapGenerator() {
                       navigator.clipboard.writeText(window.location.href);
                       alert("Link copied to clipboard!");
                     }}
-                    className="px-4 py-2 bg-blue-600 border border-blue-500 rounded-full font-bold text-sm text-white hover:bg-blue-700 transition-all flex items-center gap-2 btn-beam"
+                    className="px-4 py-2 bg-[#FF6B35] border border-[#FF6B35] rounded-none font-bold text-sm text-white hover:bg-[#ff7a4a] transition-all flex items-center gap-2 btn-beam"
                   >
                     <Share2 size={16} />
                     Share
@@ -753,8 +741,8 @@ function RoadmapGenerator() {
               <div className="mt-6 pt-6 border-t border-white/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                      <span className="text-sm font-bold text-blue-400">
+                    <div className="px-3 py-1 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-none">
+                      <span className="text-sm font-bold text-[#FF6B35]">
                         {Math.round((Object.values(completedNodes).filter(Boolean).length / (roadmap?.stages?.reduce((acc, stage) => acc + (stage.nodes?.length || 0), 0) || 1)) * 100)}% DONE
                       </span>
                     </div>
@@ -781,11 +769,11 @@ function RoadmapGenerator() {
             {stages.map((stage, stageIndex) => (
               <div key={stage.id} className="mb-20 relative">
                 {/* Stage Marker on Spine */}
-                <div className="absolute left-1/2 top-0 w-4 h-4 bg-blue-500 rounded-full border-4 border-[#0a0a0a] shadow-sm transform -translate-x-1/2 z-20"></div>
+                <div className="absolute left-1/2 top-0 w-4 h-4 bg-[#FF6B35] rounded-none border-4 border-[#0a0a0a] shadow-sm transform -translate-x-1/2 z-20"></div>
 
                 {/* Stage Title (Root of the Tree) */}
                 <div className="flex justify-center mb-12 relative z-20">
-                  <div className="bg-[#0a0a0a] border border-white/20 px-8 py-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] relative group cursor-default hover:-translate-y-1 transition-transform duration-200">
+                  <div className="bg-[#0a0a0a] border border-white/20 px-8 py-4 rounded-none shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] relative group cursor-default hover:-translate-y-1 transition-transform duration-200">
                     <h2 className="text-xl font-bold text-white text-center uppercase tracking-wide">
                       {stage.label}
                     </h2>
@@ -797,7 +785,7 @@ function RoadmapGenerator() {
                 {/* Nodes Tree Layout */}
                 <div className="relative z-10">
                   {/* Horizontal Bar connecting branches */}
-                  <div className="absolute top-0 left-4 right-4 h-0.5 bg-white/20 rounded-full hidden md:block"></div>
+                  <div className="absolute top-0 left-4 right-4 h-0.5 bg-white/20 rounded-none hidden md:block"></div>
                   
                   <div className="flex flex-wrap justify-center gap-8 md:gap-12 pt-8 relative">
                     {stage.nodes?.map((node, nodeIndex) => {
@@ -817,9 +805,9 @@ function RoadmapGenerator() {
                             whileHover={{ scale: 1.03, translateY: -5 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleNodeClick(node)}
-                            className={`w-full bg-white/5 p-5 rounded-[24px] border cursor-pointer transition-all duration-300 relative overflow-hidden group backdrop-blur-sm ${
+                            className={`w-full bg-white/5 p-5  border cursor-pointer transition-all duration-300 relative overflow-hidden group  ${
                               isSelected
-                                ? "border-blue-500 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+                                ? "border-[#FF6B35] shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
                                 : isCompleted
                                 ? "border-green-500/50 shadow-sm bg-green-500/5"
                                 : "border-white/10 hover:border-white/30 shadow-sm hover:shadow-xl hover:bg-white/10"
@@ -835,7 +823,7 @@ function RoadmapGenerator() {
                                   e.stopPropagation();
                                   toggleNodeCompletion(node.id);
                                 }}
-                                className={`p-1.5 rounded-full transition-all duration-300 cursor-pointer relative z-50 ${
+                                className={`p-1.5 rounded-none transition-all duration-300 cursor-pointer relative z-50 ${
                                   isCompleted
                                     ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 scale-110"
                                     : "bg-white/10 text-slate-500 hover:bg-white/20 hover:scale-110"
@@ -864,7 +852,7 @@ function RoadmapGenerator() {
 
             {/* End Marker */}
             <div className="flex justify-center pt-8 pb-16 relative z-20">
-              <div className="bg-green-500/10 text-green-400 px-6 py-2 rounded-full font-bold text-sm border border-green-500/20 shadow-sm backdrop-blur-sm">
+              <div className="bg-green-500/10 text-green-400 px-6 py-2 rounded-none font-bold text-sm border border-green-500/20 shadow-sm ">
                 Goal Reached! 🚀
               </div>
             </div>

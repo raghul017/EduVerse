@@ -61,7 +61,7 @@ const LearningOrbit = ({ className = '' }) => {
               <div className="w-1 h-1 rounded-full bg-cyan-400" />
               Session Orbit
             </div>
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 backdrop-blur-sm">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 ">
               <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
               <span className="text-[10px] text-cyan-300 font-medium">Live trends</span>
             </div>
@@ -70,7 +70,7 @@ const LearningOrbit = ({ className = '' }) => {
           {/* Central Orbit Visualization */}
           <div className="relative mx-auto h-64 w-full max-w-md">
             {/* Enhanced Central Glow */}
-            <div className="absolute inset-x-10 top-6 bottom-6 rounded-[180px] bg-gradient-to-b from-cyan-500/15 via-blue-600/10 to-transparent blur-[60px]" />
+            <div className="absolute inset-x-10 top-6 bottom-6 rounded-[180px] bg-gradient-to-b from-cyan-500/15 via-[#ff7a4a]/10 to-transparent blur-[60px]" />
 
             <div className="flex flex-col h-full relative items-center justify-center">
               {/* Central Circle */}
@@ -78,7 +78,7 @@ const LearningOrbit = ({ className = '' }) => {
                 {/* Main Circle */}
                 <div className="relative h-44 w-44 rounded-full flex items-center justify-center">
                   {/* Outer Glow Ring */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/30 via-blue-500/20 to-purple-500/10 blur-xl" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/30 via-[#ff7a4a]/20 to-purple-500/10 blur-xl" />
                   
                   {/* Rotating Border Animation */}
                   <div className="absolute inset-0 rounded-full animate-[spin_15s_linear_infinite]">
@@ -118,7 +118,7 @@ const LearningOrbit = ({ className = '' }) => {
                           className="absolute"
                           style={position}
                         >
-                          <div className="group flex gap-2.5 text-xs font-semibold text-slate-100 bg-gradient-to-br from-slate-900/95 to-slate-950/95 rounded-full px-4 py-2 shadow-[0_0_25px_rgba(6,182,212,0.35)] transition-all hover:scale-110 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] cursor-pointer items-center border border-cyan-400/30 backdrop-blur-md">
+                          <div className="group flex gap-2.5 text-xs font-semibold text-slate-100 bg-gradient-to-br from-slate-900/95 to-slate-950/95 rounded-full px-4 py-2 shadow-[0_0_25px_rgba(6,182,212,0.35)] transition-all hover:scale-110 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] cursor-pointer items-center border border-cyan-400/30 ">
                             <skill.icon className="w-4 h-4 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
                             <span className="hidden sm:inline">{skill.label}</span>
                           </div>
@@ -138,13 +138,13 @@ const LearningOrbit = ({ className = '' }) => {
 
               {/* Controls */}
               <div className="relative mb-3 flex w-full items-center justify-center gap-3">
-                <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/60 hover:bg-slate-800/80 hover:border-slate-600/60 transition-all backdrop-blur-sm group">
+                <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/60 hover:bg-slate-800/80 hover:border-slate-600/60 transition-all  group">
                   <SkipBack className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200" />
                 </button>
                 
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg hover:scale-105 transition-all active:scale-95 bg-gradient-to-br from-cyan-500 to-blue-600 shadow-cyan-500/60 hover:shadow-cyan-500/80"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg hover:scale-105 transition-all active:scale-95 bg-gradient-to-br from-cyan-500 to-[#ff7a4a] shadow-cyan-500/60 hover:shadow-cyan-500/80"
                 >
                   {isPlaying ? (
                     <Pause className="w-5 h-5" fill="currentColor" />
@@ -153,7 +153,7 @@ const LearningOrbit = ({ className = '' }) => {
                   )}
                 </button>
 
-                <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/60 hover:bg-slate-800/80 hover:border-slate-600/60 transition-all backdrop-blur-sm group">
+                <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/60 hover:bg-slate-800/80 hover:border-slate-600/60 transition-all  group">
                   <SkipForward className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200" />
                 </button>
               </div>
@@ -165,7 +165,7 @@ const LearningOrbit = ({ className = '' }) => {
                   className="h-1 w-full overflow-hidden rounded-full bg-slate-800/60 cursor-pointer hover:h-1.5 transition-all relative group"
                 >
                   <div
-                    className="h-full bg-gradient-to-r transition-all duration-100 ease-linear from-cyan-500 via-cyan-400 to-blue-500 shadow-[0_0_12px_rgba(6,182,212,0.6)]"
+                    className="h-full bg-gradient-to-r transition-all duration-100 ease-linear from-cyan-500 via-cyan-400 to-[#ff7a4a] shadow-[0_0_12px_rgba(6,182,212,0.6)]"
                     style={{ width: `${progress}%` }}
                   />
                   {/* Progress Handle */}

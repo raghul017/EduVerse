@@ -4,7 +4,7 @@ import { FileText, Settings, Play } from "lucide-react";
 export function HowItWorks() {
   return (
     <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-24 relative">
-      <div className="rounded-3xl border-gradient p-6 sm:p-8 relative backdrop-blur" style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
+      <div className=" border-gradient p-6 sm:p-8 relative " style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
         {/* Header */}
         <div className="flex gap-6 pr-1 pl-1 items-center animate-on-scroll animate">
           <h2 className="text-[44px] sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.9] text-white tracking-tighter">How it works.</h2>
@@ -18,9 +18,9 @@ export function HowItWorks() {
           {/* STEP 1 */}
           <div className="lg:col-span-4 border-gradient rounded-[28px] p-6 sm:p-8 relative h-full flex flex-col animate-on-scroll animate delay-100" style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
             <span className="absolute -top-4 left-6 inline-flex items-center px-4 py-1.5 rounded-full border border-white/20 bg-neutral-950 text-xs sm:text-sm text-white tracking-tight">STEP 1</span>
-            <div className="relative h-48 sm:h-56 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
-              <div className="bg-neutral-900/90 border border-white/10 rounded-xl p-4 shadow-2xl">
-                <FileText size={48} className="text-blue-400 mx-auto mb-2" />
+            <div className="relative h-48 sm:h-56  bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
+              <div className="bg-neutral-900/90 border border-white/10  p-4 shadow-2xl">
+                <FileText size={48} className="text-[#FF6B35] mx-auto mb-2" />
                 <div className="h-2 w-24 bg-white/20 rounded mx-auto"></div>
               </div>
             </div>
@@ -31,8 +31,8 @@ export function HowItWorks() {
           {/* STEP 2 */}
           <div className="lg:col-span-4 border-gradient rounded-[28px] p-6 sm:p-8 relative h-full flex flex-col animate-on-scroll animate delay-200" style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
             <span className="absolute -top-4 left-6 inline-flex items-center px-4 py-1.5 rounded-full border border-white/20 bg-neutral-950 text-xs sm:text-sm text-white tracking-tight">STEP 2</span>
-            <div className="relative h-48 sm:h-56 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
-               <div className="bg-neutral-900/90 border border-white/10 rounded-xl p-4 shadow-2xl">
+            <div className="relative h-48 sm:h-56  bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
+               <div className="bg-neutral-900/90 border border-white/10  p-4 shadow-2xl">
                 <Settings size={48} className="text-purple-400 mx-auto mb-2 animate-spin-slow" />
                 <div className="h-2 w-24 bg-white/20 rounded mx-auto"></div>
               </div>
@@ -44,8 +44,8 @@ export function HowItWorks() {
           {/* STEP 3 */}
           <div className="lg:col-span-4 border-gradient rounded-[28px] p-6 sm:p-8 relative h-full flex flex-col animate-on-scroll animate delay-300" style={{ background: 'linear-gradient(225deg,rgba(255,255,255,0.0) 0%,rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.0) 100%)' }}>
             <span className="absolute -top-4 left-6 inline-flex items-center px-4 py-1.5 rounded-full border border-white/20 bg-neutral-950 text-xs sm:text-sm text-white tracking-tight">STEP 3</span>
-            <div className="relative h-48 sm:h-56 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
-               <div className="bg-neutral-900/90 border border-white/10 rounded-xl p-4 shadow-2xl">
+            <div className="relative h-48 sm:h-56  bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
+               <div className="bg-neutral-900/90 border border-white/10  p-4 shadow-2xl">
                 <Play size={48} className="text-green-400 mx-auto mb-2" />
                 <div className="h-2 w-24 bg-white/20 rounded mx-auto"></div>
               </div>

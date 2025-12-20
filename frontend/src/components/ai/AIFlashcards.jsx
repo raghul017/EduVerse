@@ -1,74 +1,87 @@
-import { useEffect, useState } from "react";
-import api from "../../utils/api.js";
+import { useState, useEffect } from 'react';
+import api from '../../utils/api.js';
+import { Layers, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function AIFlashcards({ postId }) {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [source, setSource] = useState(null);
+  const [currentCard, setCurrentCard] = useState(0);
+  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
-      if (!postId) return;
+    const loadCards = async () => {
       setLoading(true);
       try {
         const { data } = await api.get(`/posts/${postId}/ai-flashcards`);
         setCards(data.flashcards || []);
-        setSource(data.source);
       } catch {
         setCards([]);
       } finally {
         setLoading(false);
       }
     };
-    load();
+    if (postId) loadCards();
   }, [postId]);
 
   if (loading) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-400 backdrop-blur-sm">
-        Building flashcards...
+      <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 text-[13px] text-[#666]">
+        <div className="flex items-center gap-2">
+          <Loader2 size={14} className="text-[#FF6B35] animate-spin" />
+          Loading flashcards...
+        </div>
       </div>
     );
   }
 
   if (!cards.length) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-400 backdrop-blur-sm">
-        Flashcards are not available for this video yet.
+      <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 text-[12px] text-[#555]">
+        Flashcards not available for this video.
       </div>
     );
   }
 
+  const card = cards[currentCard];
+
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm">
-      <div className="flex items-center justify-between text-sm">
-        <h3 className="font-semibold text-blue-400">📚 Flashcards</h3>
-        {source && (
-          <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 text-slate-400">
-            {source === "transcript" ? "Transcript" : "Description"}
-          </span>
-        )}
+    <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+          <Layers size={16} />
+          FLASHCARDS
+        </div>
+        <span className="text-[11px] text-[#555] font-mono">{currentCard + 1}/{cards.length}</span>
       </div>
-      <div className="space-y-2">
-        {cards.map((card, index) => (
-          <details
-            key={index}
-            className="group rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm cursor-pointer transition hover:border-blue-500/50 hover:bg-white/10"
-          >
-            <summary className="list-none flex items-center justify-between gap-2">
-              <span className="font-medium text-white">{card.front}</span>
-              <span className="text-[11px] text-slate-400 group-open:hidden">
-                Show answer
-              </span>
-              <span className="text-[11px] text-slate-400 hidden group-open:inline">
-                Hide answer
-              </span>
-            </summary>
-            <div className="mt-2 text-slate-400 whitespace-pre-line">
-              {card.back}
-            </div>
-          </details>
-        ))}
+      
+      <button
+        onClick={() => setFlipped(!flipped)}
+        className="w-full p-4 border border-[#2a2a2a] hover:border-[#FF6B35] text-left transition-all min-h-[80px]"
+      >
+        <p className="text-[10px] text-[#555] uppercase tracking-wide mb-2 font-mono">
+          {flipped ? 'ANSWER' : 'QUESTION'}
+        </p>
+        <p className="text-[13px] text-white">
+          {flipped ? card.answer : card.question}
+        </p>
+      </button>
+      
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => { setCurrentCard(Math.max(0, currentCard - 1)); setFlipped(false); }}
+          disabled={currentCard === 0}
+          className="p-2 text-[#555] hover:text-white disabled:opacity-30 transition-colors"
+        >
+          <ChevronLeft size={18} />
+        </button>
+        <span className="text-[11px] text-[#555]">Tap card to flip</span>
+        <button
+          onClick={() => { setCurrentCard(Math.min(cards.length - 1, currentCard + 1)); setFlipped(false); }}
+          disabled={currentCard === cards.length - 1}
+          className="p-2 text-[#555] hover:text-white disabled:opacity-30 transition-colors"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
     </div>
   );

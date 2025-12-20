@@ -26,8 +26,8 @@ export const PremiumCard = ({
     <div
       onClick={onClick}
       className={`
-        group relative overflow-hidden rounded-3xl p-6 backdrop-blur-md
-        bg-gradient-to-br from-blue-500/0 via-blue-500/10 to-blue-500/0
+        group relative overflow-hidden  p-6 
+        bg-gradient-to-br from-[#FF6B35]/0 via-[#ff7a4a]/10 to-[#ff7a4a]/0
         ${hoverClasses}
         ${className}
       `}

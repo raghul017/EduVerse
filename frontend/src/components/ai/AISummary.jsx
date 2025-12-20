@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import api from '../../utils/api.js';
+import { Sparkles, Loader2 } from 'lucide-react';
 
 const SourceBadge = ({ source }) => {
   if (!source) return null;
   const label = source === 'transcript' ? 'Transcript' : 'Description';
-  const colorClass = source === 'transcript' ? 'text-green-400 bg-green-500/10' : 'text-yellow-400 bg-yellow-500/10';
+  const colorClass = source === 'transcript' ? 'text-green-400' : 'text-yellow-400';
   return (
-    <span className={`text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 border border-white/10 ${colorClass}`}>
-      Using {label}
+    <span className={`text-[10px] uppercase tracking-[0.1em] font-mono ${colorClass}`}>
+      USING {label.toUpperCase()}
     </span>
   );
 };
@@ -34,18 +35,21 @@ function AISummary ({ postId }) {
   }, [postId]);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 backdrop-blur-sm">
-      <div className="flex items-center gap-2 text-sm font-semibold text-blue-400">
-        <span>⚡ AI Summary</span>
-        {loading && <span className="text-xs text-slate-400">thinking...</span>}
+    <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+          <Sparkles size={16} />
+          AI SUMMARY
+        </div>
+        {loading && <Loader2 size={14} className="text-[#FF6B35] animate-spin" />}
         {!loading && <SourceBadge source={source} />}
       </div>
       {source === 'description' && (
-        <p className="text-[11px] text-yellow-400 bg-yellow-500/10 inline-flex px-2 py-1 rounded">
+        <p className="text-[11px] text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 px-2 py-1 mb-3">
           Transcript still processing. Using description for now.
         </p>
       )}
-      <p className="text-sm text-slate-400 whitespace-pre-line">{summary}</p>
+      <p className="text-[13px] text-[#999] whitespace-pre-line leading-relaxed">{summary}</p>
     </div>
   );
 }

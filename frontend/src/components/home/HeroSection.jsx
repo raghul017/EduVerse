@@ -18,7 +18,7 @@ export function HeroSection() {
           style={{ pointerEvents: 'none' }}
         />
         {/* Overlay to ensure text readability and match template aesthetic */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-black/40 -[1px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
       </div>
 
@@ -27,12 +27,12 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
           {/* Pill Badge */}
           <div className="mb-8 animate-on-scroll animate">
-            <div className="inline-flex items-center gap-2 rounded-full border-gradient bg-white/5 px-3 py-1.5 text-xs text-neutral-300 backdrop-blur-md">
-              <span className="inline-flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300 px-2 py-0.5 font-medium">
+            <div className="inline-flex items-center gap-2 rounded-full border-gradient bg-white/5 px-3 py-1.5 text-xs text-neutral-300 ">
+              <span className="inline-flex items-center justify-center rounded-full bg-[#FF6B35]/20 text-[#FF6B35] px-2 py-0.5 font-medium">
                 New
               </span>
               <span className="font-medium">Studio-grade learning in one prompt</span>
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B35]" />
             </div>
           </div>
 
@@ -40,7 +40,7 @@ export function HeroSection() {
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tighter mb-8 leading-[0.95] animate-on-scroll animate delay-100">
             Powering the next wave of
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 animate-pulse">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF6B35] via-purple-400 to-[#FF6B35] animate-pulse">
               AI‑driven learning
             </span>
           </h1>
@@ -63,7 +63,7 @@ export function HeroSection() {
             <div className="inline-block group relative">
               <Link
                 to="/videos"
-                className="inline-flex gap-2 border-gradient hover:text-white transition-all hover:-translate-y-0.5 text-sm font-medium text-white/80 bg-white/5 rounded-full px-6 py-4 backdrop-blur-xl items-center"
+                className="inline-flex gap-2 border-gradient hover:text-white transition-all hover:-translate-y-0.5 text-sm font-medium text-white/80 bg-white/5 rounded-full px-6 py-4  items-center"
               >
                 <PlayCircle className="w-5 h-5 opacity-70" />
                 Watch demo

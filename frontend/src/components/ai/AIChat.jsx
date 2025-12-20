@@ -1,54 +1,66 @@
 import { useState } from 'react';
-import Button from '../common/Button.jsx';
 import api from '../../utils/api.js';
+import { MessageCircle, Loader2, Send } from 'lucide-react';
 
-function AIChat ({ postId }) {
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState(null);
+function AIChat({ postId }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [source, setSource] = useState(null);
 
-  const handleAsk = async (event) => {
-    event.preventDefault();
-    if (!question.trim()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim() || loading) return;
+    
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setLoading(true);
+    
     try {
-      const { data } = await api.post(`/posts/${postId}/ai-explain`, {
-        question
-      });
-      setAnswer(data.answer);
-      setSource(data.source);
-    } catch (error) {
-      setAnswer(error.response?.data?.message || 'AI is unavailable right now.');
+      const { data } = await api.post(`/posts/${postId}/ai-chat`, { message: userMessage });
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'No response' }]);
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, an error occurred.' }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm">
-      <h3 className="text-sm font-semibold text-blue-400">🤖 Ask AI Tutor</h3>
-      <form onSubmit={handleAsk} className="flex gap-2">
-        <input
-          value={question}
-          onChange={(event) => setQuestion(event.target.value)}
-          placeholder="Explain photosynthesis in simple terms..."
-          className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-        />
-        <Button type="submit" size="sm" disabled={loading}>
-          {loading ? 'Thinking...' : 'Ask'}
-        </Button>
-      </form>
-      {answer && (
-        <div className="border border-white/10 rounded p-3 space-y-1 bg-white/5">
-          <div className="text-[10px] uppercase text-slate-400">
-            {source === 'transcript'
-              ? 'Response generated from transcript'
-              : 'Transcript unavailable, using description'}
-          </div>
-          <p className="text-sm text-slate-400 whitespace-pre-line">{answer}</p>
+    <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 space-y-4">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+        <MessageCircle size={16} />
+        ASK AI TUTOR
+      </div>
+      
+      {messages.length > 0 && (
+        <div className="space-y-3 max-h-48 overflow-y-auto">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`text-[12px] ${msg.role === 'user' ? 'text-white' : 'text-[#999]'}`}>
+              <span className="text-[#FF6B35] font-mono text-[10px]">{msg.role === 'user' ? 'YOU' : 'AI'}:</span>
+              <p className="mt-1">{msg.content}</p>
+            </div>
+          ))}
         </div>
       )}
+      
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask about this video..."
+          className="flex-1 bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-2 text-[13px] text-white placeholder:text-[#444] focus:border-[#FF6B35] focus:outline-none"
+          disabled={loading}
+        />
+        <button
+          type="submit"
+          disabled={loading || !input.trim()}
+          className="px-3 py-2 bg-[#FF6B35] text-black disabled:opacity-40"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+        </button>
+      </form>
     </div>
   );
 }

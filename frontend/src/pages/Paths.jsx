@@ -85,7 +85,7 @@ function Paths() {
 
   return (
     <div className="space-y-8">
-      <section className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-sm backdrop-blur-sm space-y-3">
+      <section className="bg-white/5 border border-white/10  p-8 shadow-sm  space-y-3">
         <p className="text-sm uppercase tracking-wide text-slate-400">
           Roadmaps
         </p>
@@ -99,7 +99,7 @@ function Paths() {
       </section>
 
       {paths.length > 0 && (
-        <section className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-4">
+        <section className="bg-white/5 border border-white/10  p-6 shadow-sm  space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm uppercase tracking-wide text-slate-400">
@@ -121,7 +121,7 @@ function Paths() {
       <section className="grid lg:grid-cols-[minmax(0,1.2fr),minmax(0,1.3fr)] gap-6 items-start">
         <form
           onSubmit={handleCreatePath}
-          className="bg-white/5 border border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-sm space-y-4"
+          className="bg-white/5 border border-white/10  p-6 shadow-sm  space-y-4"
         >
           <div>
             <p className="text-sm uppercase tracking-wide text-slate-400">
@@ -135,7 +135,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Title
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
               name="title"
               value={form.title}
               onChange={handleChange}
@@ -145,7 +145,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Subject
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
               name="subject"
               value={form.subject}
               onChange={handleChange}
@@ -155,7 +155,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Level
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
               name="level"
               value={form.level}
               onChange={handleChange}
@@ -165,7 +165,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Description
             <textarea
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition min-h-[120px]"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition min-h-[120px]"
               rows={4}
               name="description"
               value={form.description}
@@ -177,7 +177,7 @@ function Paths() {
           {success && <p className="text-sm text-green-400">{success}</p>}
           <button
             type="submit"
-            className="w-full px-6 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full px-6 py-2 bg-[#FF6B35] text-white rounded-full font-semibold hover:bg-[#ff7a4a] transition disabled:opacity-50"
             disabled={saving}
           >
             {saving ? "Creating..." : "Create path"}
@@ -185,7 +185,7 @@ function Paths() {
         </form>
 
         <div className="space-y-4">
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-4 shadow-sm backdrop-blur-sm">
+          <div className="bg-white/5 border border-white/10  p-4 shadow-sm ">
             <p className="text-sm font-semibold text-white mb-2">
               Available lessons
             </p>
@@ -208,7 +208,7 @@ function Paths() {
                     </div>
                   <button
                     type="button"
-                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-400 hover:border-blue-500 hover:text-white transition"
+                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-400 hover:border-[#FF6B35] hover:text-white transition"
                     onClick={() => handleAddLesson(post.id)}
                   >
                     Add
@@ -223,7 +223,7 @@ function Paths() {
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-4 shadow-sm backdrop-blur-sm">
+          <div className="bg-white/5 border border-white/10  p-4 shadow-sm ">
             <p className="text-sm font-semibold text-white mb-2">
               Path outline
             </p>
@@ -237,7 +237,7 @@ function Paths() {
                   return (
                     <div
                       key={lesson.postId}
-                      className="border border-white/10 rounded-2xl p-3 space-y-2 bg-white/5"
+                      className="border border-white/10  p-3 space-y-2 bg-white/5"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div>
@@ -257,7 +257,7 @@ function Paths() {
                         </button>
                       </div>
                       <textarea
-                        className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition min-h-[64px] text-xs"
+                        className="w-full px-3 py-2 bg-black/20 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition min-h-[64px] text-xs"
                         rows={2}
                         placeholder="Links or notes: e.g. article, docs, exercises for this step."
                         value={lesson.resources}

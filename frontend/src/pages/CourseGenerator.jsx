@@ -47,7 +47,7 @@ function CourseGenerator() {
     >
       {course && (
         <div className="mt-10 space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-2 backdrop-blur-sm">
+          <div className="bg-white/5 border border-white/10  p-6 space-y-2 ">
             <h2 className="text-2xl font-semibold text-white">
               {course.title}
             </h2>
@@ -60,7 +60,7 @@ function CourseGenerator() {
             {modules.map((mod) => (
               <div
                 key={mod.id}
-                className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-sm"
+                className="bg-white/5 border border-white/10  p-4 space-y-3 "
               >
                 <div>
                   <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">
@@ -79,7 +79,7 @@ function CourseGenerator() {
                   {mod.lessons?.map((lesson) => (
                     <div
                       key={lesson.id}
-                      className="border border-white/10 rounded-xl p-3 bg-white/5 space-y-1"
+                      className="border border-white/10  p-3 bg-white/5 space-y-1"
                     >
                       <p className="text-sm font-semibold text-white">
                         {lesson.title}

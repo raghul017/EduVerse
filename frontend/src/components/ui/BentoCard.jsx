@@ -50,11 +50,11 @@ export const BentoCard = ({
       <div
         onClick={onClick}
         className={`
-          group flex flex-col overflow-hidden rounded-3xl p-6 
-          bg-slate-900/40 backdrop-blur-md
+          group flex flex-col overflow-hidden  p-6 
+          bg-slate-900/40 
           transition-all duration-300 
           hover:-translate-y-1 hover:shadow-2xl hover:bg-slate-900/80
-          hover:shadow-blue-500/10 hover:border-blue-500/30
+          hover:shadow-[#ff7a4a]/10 hover:border-[#FF6B35]/30
           animate-enter
           ${colSpanClasses[colSpan]}
           ${className}
@@ -68,7 +68,7 @@ export const BentoCard = ({
       >
         {/* Gradient Border Effect */}
         <div
-          className="absolute inset-0 rounded-3xl p-[1px] pointer-events-none"
+          className="absolute inset-0  p-[1px] pointer-events-none"
           style={{
             background: gradients[gradient],
             WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
