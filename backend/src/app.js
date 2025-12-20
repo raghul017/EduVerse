@@ -18,36 +18,59 @@ const app = express();
 const logger = pino({ level: env.node === "development" ? "debug" : "info" });
 
 const getAllowedOrigins = () => {
+  const origins = [];
+  
+  // Development: allow all localhost ports
   if (env.node === 'development') {
     return [/^http:\/\/localhost:\d+$/];
   }
   
-  const origins = [env.frontendUrl];
+  // Production: explicit URLs
+  // Add exact frontend URL from env
+  if (env.frontendUrl) {
+    origins.push(env.frontendUrl);
+  }
   
-  // Allow additional origins from env if specified (comma-separated)
+  // Explicitly add Vercel production URL
+  origins.push('https://edu-verse-ebon.vercel.app');
+  
+  // Allow additional origins from env if specified
   if (process.env.CORS_ALLOWED_ORIGINS) {
     const additional = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
     origins.push(...additional);
   }
   
-  // For Vercel deployments, allow specific project URLs (more secure than wildcards)
-  // Format: https://project-name-*.vercel.app or exact URLs
-  if (env.frontendUrl?.includes('vercel.app')) {
-    // Extract project name from frontend URL and allow its variations
-    const match = env.frontendUrl.match(/https:\/\/([^-]+)/);
-    if (match) {
-      const projectPrefix = match[1];
-      origins.push(new RegExp(`^https://${projectPrefix}[a-z0-9-]*\\.vercel\\.app$`));
-    }
-  }
+  // Allow Vercel preview deployments (with regex)
+  origins.push(/^https:\/\/edu-verse-[a-z0-9-]+\.vercel\.app$/);
   
+  console.log('[CORS] Allowed origins:', origins);
   return origins;
 };
 
 app.use(
   cors({
-    origin: getAllowedOrigins(),
+    origin: (origin, callback) => {
+      const allowedOrigins = getAllowedOrigins();
+      
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin matches any allowed origin
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed instanceof RegExp) return allowed.test(origin);
+        return allowed === origin;
+      });
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS] Blocked request from origin: ${origin}`);
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 app.use(express.json({ limit: "100mb" })); // Increased for video uploads
