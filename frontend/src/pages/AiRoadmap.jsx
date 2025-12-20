@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ArrowRight, Clock, Trash2, Loader2, Route, Star, Play, ChevronDown, Settings2 } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Trash2, Loader2, Route, Star, ChevronDown, Settings2 } from "lucide-react";
 import api from "../utils/api.js";
 import PlaceholdersAndVanishInput from "../components/ui/PlaceholdersAndVanishInput.jsx";
 

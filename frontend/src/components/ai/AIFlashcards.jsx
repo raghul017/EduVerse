@@ -62,7 +62,7 @@ function AIFlashcards({ postId }) {
           {flipped ? 'ANSWER' : 'QUESTION'}
         </p>
         <p className="text-[13px] text-white">
-          {flipped ? card.answer : card.question}
+          {flipped ? card.back : card.front}
         </p>
       </button>
       

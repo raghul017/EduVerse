@@ -4,17 +4,45 @@ import { Play, Clock, Eye, Upload, Video } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function Videos() {
-  const { posts, fetchFeed } = usePostStore();
+  const { posts, fetchFeed, loading, error } = usePostStore();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
     fetchFeed(true);
   }, []);
 
-  const categories = ["All", ...new Set(posts.map(p => p.subject).filter(Boolean))];
+  if (loading && posts.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[12px] font-mono text-[#666]">LOADING_VIDEOS...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center p-8 border border-red-500/20 bg-red-500/5">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button 
+            onClick={() => fetchFeed(true)}
+            className="px-4 py-2 bg-[#FF6B35] text-black font-bold text-sm hover:bg-[#ff7a4a] transition-colors"
+          >
+            RETRY_CONNECTION
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const categories = ["All", ...new Set(safePosts.map(p => p.subject).filter(Boolean))];
   const filteredPosts = selectedCategory === "All" 
-    ? posts 
-    : posts.filter(p => p.subject === selectedCategory);
+    ? safePosts 
+    : safePosts.filter(p => p.subject === selectedCategory);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">

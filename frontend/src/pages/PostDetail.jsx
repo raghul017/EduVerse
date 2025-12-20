@@ -211,7 +211,6 @@ function PostDetail() {
           {/* AI tutor side panel */}
           <aside className="space-y-4">
             <AISummary postId={post.id} transcriptReady={transcriptReady} />
-            <AIQuiz postId={post.id} transcriptReady={transcriptReady} />
             <AIFlashcards postId={post.id} transcriptReady={transcriptReady} />
             <AIChat postId={post.id} transcriptReady={transcriptReady} />
           </aside>

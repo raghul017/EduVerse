@@ -16,7 +16,6 @@ import {
   Sparkles,
   Loader2,
   Send,
-  User,
   ChevronRight,
   AlertTriangle,
 } from "lucide-react";

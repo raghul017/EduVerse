@@ -435,7 +435,8 @@ class AIService {
     )}`;
 
     try {
-      const summary = await this.callAI(prompt, "fast");
+      const result = await this.callAI(prompt, "fast");
+      const summary = result.content;
       cache.set(cacheKey, summary);
       return summary;
     } catch (error) {
@@ -460,7 +461,8 @@ class AIService {
 Content: ${transcript.substring(0, 2000)}`;
 
     try {
-      const text = await this.callAI(prompt, "fast");
+      const result = await this.callAI(prompt, "fast");
+      const text = result.content;
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const jsonStr = jsonMatch ? jsonMatch[0] : text;
       const quiz = JSON.parse(jsonStr);
@@ -487,7 +489,8 @@ Content: ${transcript.substring(0, 2000)}`;
 Content: ${transcript.substring(0, 2000)}`;
 
     try {
-      const text = await this.callAI(prompt, "fast");
+      const result = await this.callAI(prompt, "fast");
+      const text = result.content;
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const jsonStr = jsonMatch ? jsonMatch[0] : text;
       const flashcards = JSON.parse(jsonStr);
@@ -506,7 +509,8 @@ Content: ${transcript.substring(0, 2000)}`;
     )}`;
 
     try {
-      return await this.callAI(prompt, "fast");
+      const result = await this.callAI(prompt, "fast");
+      return result.content;
     } catch (error) {
       return "AI explanation is currently unavailable.";
     }
@@ -751,35 +755,23 @@ Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
 
   async chatWithTutor(message, context) {
     console.log(`[AI Service] Chat request: "${message}" (Context: ${context?.substring(0, 50)}...)`);
-    try {
-      if (!this.groq) {
-        throw new Error("Groq API key not configured");
-      }
-
-      const prompt = `
-        You are an expert AI Tutor. The user is asking a question about: "${context}".
-        
-        User Question: "${message}"
-        
-        Provide a helpful, concise, and encouraging answer. 
-        Keep it under 150 words. 
-        Use markdown for formatting.
-      `;
-
-      const completion = await this.groq.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "llama-3.1-8b-instant",
-        temperature: 0.7,
-        max_tokens: 300,
-      });
-
-      const response = completion.choices[0]?.message?.content || "I couldn't generate a response.";
-      console.log(`[AI Service] Chat response length: ${response.length}`);
-      this.trackUsage("chat", completion.usage?.total_tokens || 0);
+    
+    const prompt = `
+      You are an expert AI Tutor. The user is asking a question about: "${context}".
       
-      return { response };
+      User Question: "${message}"
+      
+      Provide a helpful, concise, and encouraging answer. 
+      Keep it under 150 words. 
+      Use markdown for formatting.
+    `;
+
+    try {
+      const result = await this.callAIWithRetry(prompt, "fast");
+      this.trackUsage("chat", result.tokensUsed || 0);
+      return { response: result.content };
     } catch (error) {
-      console.error("[AI Service] Chat failed:", error);
+      console.error("[AI Service] Chat failed:", error.message);
       return { error: "Failed to get response from AI Tutor." };
     }
   }

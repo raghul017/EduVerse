@@ -17,8 +17,8 @@ function AIChat({ postId }) {
     setLoading(true);
     
     try {
-      const { data } = await api.post(`/posts/${postId}/ai-chat`, { message: userMessage });
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'No response' }]);
+      const { data } = await api.post(`/posts/${postId}/ai-explain`, { question: userMessage });
+      setMessages(prev => [...prev, { role: 'assistant', content: data.answer || 'No response' }]);
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, an error occurred.' }]);
     } finally {
