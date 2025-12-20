@@ -15,7 +15,7 @@ const Communities = lazy(() => import("./pages/Communities.jsx"));
 const CommunityDetail = lazy(() => import("./pages/CommunityDetail.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
 const PostDetail = lazy(() => import("./pages/PostDetail.jsx"));
-const MyVideos = lazy(() => import("./pages/MyVideos.jsx"));
+
 const AiCourse = lazy(() => import("./pages/AiCourse.jsx"));
 const AiTutor = lazy(() => import("./pages/AiTutor.jsx"));
 const AiRoadmap = lazy(() => import("./pages/AiRoadmap.jsx"));
@@ -92,14 +92,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/roadmap-generator"
-            element={
-              <ProtectedRoute>
-                <RoadmapGenerator />
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/guide-generator"
             element={
@@ -116,14 +109,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/my-videos"
-            element={
-              <ProtectedRoute>
-                <MyVideos />
-              </ProtectedRoute>
-            }
-          />
+          {/* Redirect /my-videos to dashboard */}
+          <Route path="/my-videos" element={<Navigate to="/dashboard" replace />} />
           <Route
             path="/paths"
             element={
