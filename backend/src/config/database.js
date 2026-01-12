@@ -23,9 +23,11 @@ console.log('[Database] Connecting with SSL:', needsSSL ? 'enabled (self-signed 
 export const pool = new Pool({
   connectionString,
   ssl: sslConfig,
-  max: 5,
+  max: 10,                          // Increased from 5 for better concurrency
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,    // Reduced from 10s for faster failure detection
+  keepAlive: true,                  // Prevent connections from dropping during Render hibernation
+  keepAliveInitialDelayMillis: 10000, // Send keep-alive probe after 10s of idle
 });
 
 pool.on('error', (error) => {

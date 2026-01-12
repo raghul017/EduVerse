@@ -101,6 +101,26 @@ app.get("/health/db", async (req, res) => {
   }
 });
 
+// API health endpoint for cron ping (prevents Render cold starts)
+app.get("/api/health", async (req, res) => {
+  try {
+    const start = Date.now();
+    await query("SELECT 1");
+    const dbLatency = Date.now() - start;
+    res.json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      dbLatency: `${dbLatency}ms`,
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "error", 
+      message: error.message 
+    });
+  }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
