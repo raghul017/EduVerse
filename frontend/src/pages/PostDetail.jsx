@@ -6,8 +6,6 @@ import {
 } from 'lucide-react';
 import VideoPlayer from "../components/feed/VideoPlayer.jsx";
 import AISummary from "../components/ai/AISummary.jsx";
-import AIQuiz from "../components/ai/AIQuiz.jsx";
-import AIFlashcards from "../components/ai/AIFlashcards.jsx";
 import AIChat from "../components/ai/AIChat.jsx";
 import api from "../utils/api.js";
 import { usePostStore } from "../store/postStore.js";
@@ -77,7 +75,7 @@ function PostDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <Loader2 size={32} className="text-[#FF6B35] animate-spin" />
+        <Loader2 size={32} className="text-[#A1FF62] animate-spin" />
       </div>
     );
   }
@@ -87,7 +85,7 @@ function PostDetail() {
       <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
         <div className="max-w-[800px] mx-auto text-center">
           <p className="text-red-400 text-[16px] mb-4">{error}</p>
-          <Link to="/videos" className="text-[#FF6B35] text-[13px] hover:underline">
+          <Link to="/videos" className="text-[#A1FF62] text-[13px] hover:underline">
             ← Back to Videos
           </Link>
         </div>
@@ -129,7 +127,7 @@ function PostDetail() {
                 </h1>
                 <div className="flex flex-wrap items-center gap-4 text-[13px] text-[#666]">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-[#FF6B35] flex items-center justify-center text-black font-bold text-[12px]">
+                    <div className="w-8 h-8 bg-[#A1FF62] flex items-center justify-center text-black font-bold text-[12px]">
                       {post.creator_name?.charAt(0) || 'U'}
                     </div>
                     <span className="font-semibold text-white">{post.creator_name || 'Creator'}</span>
@@ -144,7 +142,7 @@ function PostDetail() {
                       {Math.round(post.duration / 60)} min
                     </span>
                   )}
-                  <span className="px-2 py-1 bg-[#1a1a1a] border border-[#2a2a2a] text-[#FF6B35] text-[11px] font-mono uppercase">
+                  <span className="px-2 py-1 bg-[#1a1a1a] border border-[#2a2a2a] text-[#A1FF62] text-[11px] font-mono uppercase">
                     {post.subject}
                   </span>
                 </div>
@@ -156,8 +154,8 @@ function PostDetail() {
                   onClick={handleLike}
                   className={`px-4 py-2 flex items-center gap-2 text-[13px] font-semibold transition-all ${
                     post.liked 
-                      ? 'bg-[#FF6B35] text-black' 
-                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35]'
+                      ? 'bg-[#A1FF62] text-black' 
+                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#A1FF62]'
                   }`}
                 >
                   <Heart size={16} className={post.liked ? 'fill-current' : ''} />
@@ -167,8 +165,8 @@ function PostDetail() {
                   onClick={handleBookmark}
                   className={`px-4 py-2 flex items-center gap-2 text-[13px] font-semibold transition-all ${
                     post.bookmarked 
-                      ? 'bg-[#FF6B35] text-black' 
-                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35]'
+                      ? 'bg-[#A1FF62] text-black' 
+                      : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#A1FF62]'
                   }`}
                 >
                   <Bookmark size={16} className={post.bookmarked ? 'fill-current' : ''} />
@@ -176,7 +174,7 @@ function PostDetail() {
                 </button>
                 <button
                   onClick={handleShare}
-                  className="px-4 py-2 flex items-center gap-2 text-[13px] font-semibold bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#FF6B35] transition-all"
+                  className="px-4 py-2 flex items-center gap-2 text-[13px] font-semibold bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white hover:border-[#A1FF62] transition-all"
                 >
                   <Share2 size={16} />
                   SHARE
@@ -195,7 +193,7 @@ function PostDetail() {
               
               {/* Description */}
               <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-6 space-y-3">
-                <h3 className="text-[14px] font-mono text-[#FF6B35] tracking-wide">&gt;_ ABOUT_THIS_LESSON</h3>
+                <h3 className="text-[14px] font-mono text-[#A1FF62] tracking-wide">&gt;_ ABOUT_THIS_LESSON</h3>
                 <p className="text-[#999] leading-relaxed text-[14px] whitespace-pre-wrap">
                   {post.description}
                 </p>

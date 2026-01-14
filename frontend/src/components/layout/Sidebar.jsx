@@ -26,7 +26,7 @@ const Sidebar = () => {
       {/* Logo Area */}
       <div className="h-16 flex items-center px-6 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#ff7a4a]  flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#A1FF62] to-[#b8ff8a]  flex items-center justify-center">
             <Zap size={16} className="text-white" />
           </div>
           <span className="font-heading font-bold text-lg text-white">EduVerse</span>
@@ -45,7 +45,7 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5  transition-all duration-200 ${
                   isActive
-                    ? "bg-[#FF6B35] text-white shadow-sm"
+                    ? "bg-[#A1FF62] text-white shadow-sm"
                     : "text-slate-400 hover:bg-white/10 hover:text-white"
                 }`
               }
@@ -70,7 +70,7 @@ const Sidebar = () => {
                 to={`/communities/${comm.id}`}
                 className="flex items-center gap-3 px-3 py-2.5  text-slate-400 hover:bg-white/10 hover:text-white transition-all"
               >
-                <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#FF6B35]/20 to-[#ff7a4a]/20 flex items-center justify-center text-xs font-bold text-[#FF6B35]">
+                <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#A1FF62]/20 to-[#b8ff8a]/20 flex items-center justify-center text-xs font-bold text-[#A1FF62]">
                   {comm.name?.[0] || "C"}
                 </div>
                 <span className="text-sm font-medium truncate">{comm.name}</span>
@@ -78,7 +78,7 @@ const Sidebar = () => {
             ))}
             {communities.length > 3 && (
               <div className="px-3 py-2">
-                <Link to="/communities" className="text-xs text-[#FF6B35] hover:underline flex items-center gap-1">
+                <Link to="/communities" className="text-xs text-[#A1FF62] hover:underline flex items-center gap-1">
                   <MessageSquare size={12} /> View all
                 </Link>
               </div>
@@ -94,7 +94,7 @@ const Sidebar = () => {
             to={`/profile/${user.id}`}
             className="flex items-center gap-3 p-3  bg-white/5 hover:bg-white/10 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#ff7a4a] flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#A1FF62] to-[#b8ff8a] flex items-center justify-center text-white font-bold text-sm">
               {user.name?.[0] || "U"}
             </div>
             <div className="flex-1 min-w-0">
@@ -116,7 +116,7 @@ const Sidebar = () => {
         ) : (
           <NavLink
             to="/login"
-            className="flex items-center justify-center gap-2 w-full py-2.5  bg-[#FF6B35] text-white font-semibold hover:bg-[#ff7a4a] transition-all"
+            className="flex items-center justify-center gap-2 w-full py-2.5  bg-[#A1FF62] text-white font-semibold hover:bg-[#b8ff8a] transition-all"
           >
             <User size={18} />
             <span>Sign In</span>

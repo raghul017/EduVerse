@@ -18,64 +18,19 @@ const PostDetail = lazy(() => import("./pages/PostDetail.jsx"));
 
 const AiCourse = lazy(() => import("./pages/AiCourse.jsx"));
 const AiTutor = lazy(() => import("./pages/AiTutor.jsx"));
+// const AiTutor = lazy(() => import("./pages/AiTutorNew.jsx")); // Using rebuilt version
 const AiRoadmap = lazy(() => import("./pages/AiRoadmap.jsx"));
 const RoadmapGenerator = lazy(() => import("./pages/RoadmapGenerator.jsx"));
-const GuideGenerator = lazy(() => import("./pages/GuideGenerator.jsx"));
-const CourseGenerator = lazy(() => import("./pages/CourseGenerator.jsx"));
 const Videos = lazy(() => import("./pages/Videos.jsx"));
 const Paths = lazy(() => import("./pages/Paths.jsx"));
 
+import { ThemeProvider } from "./context/ThemeContext";
+
 function App() {
   return (
-    <Suspense fallback={<Loader />}>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/profile/:id"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/upload"
-            element={
-              <ProtectedRoute>
-                <Upload />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/roadmap"
-            element={
-              <ProtectedRoute>
-                <RoadmapGenerator />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/ai-course"
-            element={
-              <ProtectedRoute>
-                <AiCourse />
-              </ProtectedRoute>
-            }
-          />
+    <ThemeProvider>
+      <Suspense fallback={<Loader />}>
+        <Routes>
           <Route
             path="/ai-tutor"
             element={
@@ -84,62 +39,101 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Roadmap Generator - Full screen without navbar */}
           <Route
-            path="/ai-roadmap"
+            path="/roadmap"
             element={
               <ProtectedRoute>
-                <AiRoadmap />
+                <RoadmapGenerator />
               </ProtectedRoute>
             }
           />
+          
+          {/* AI Course - Full screen without navbar */}
+          <Route
+            path="/ai-course"
+            element={
+              <ProtectedRoute>
+                <AiCourse />
+              </ProtectedRoute>
+            }
+          />
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/profile/:id"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <Upload />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+          
+
 
           <Route
-            path="/guide-generator"
-            element={
-              <ProtectedRoute>
-                <GuideGenerator />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/course-generator"
-            element={
-              <ProtectedRoute>
-                <CourseGenerator />
-              </ProtectedRoute>
-            }
-          />
-          {/* Redirect /my-videos to dashboard */}
-          <Route path="/my-videos" element={<Navigate to="/dashboard" replace />} />
-          <Route
-            path="/paths"
-            element={
-              <ProtectedRoute>
-                <Paths />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/posts/:id" element={<PostDetail />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-          <Route
-            path="/communities"
-            element={
-              <ProtectedRoute>
-                <Communities />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/communities/:id"
-            element={
-              <ProtectedRoute>
-                <CommunityDetail />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
-      </Routes>
-    </Suspense>
+            path="/ai-roadmap"
+              element={
+                <ProtectedRoute>
+                  <AiRoadmap />
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* Redirect /my-videos to dashboard */}
+            <Route path="/my-videos" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/paths"
+              element={
+                <ProtectedRoute>
+                  <Paths />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/posts/:id" element={<PostDetail />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route
+              path="/communities"
+              element={
+                <ProtectedRoute>
+                  <Communities />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:id"
+              element={
+                <ProtectedRoute>
+                  <CommunityDetail />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </Suspense>
+    </ThemeProvider>
   );
 }
 

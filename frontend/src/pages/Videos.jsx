@@ -15,7 +15,7 @@ function Videos() {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-2 border-[#A1FF62] border-t-transparent rounded-full animate-spin"></div>
           <p className="text-[12px] font-mono text-[#666]">LOADING_VIDEOS...</p>
         </div>
       </div>
@@ -29,7 +29,7 @@ function Videos() {
           <p className="text-red-400 mb-4">{error}</p>
           <button 
             onClick={() => fetchFeed(true)}
-            className="px-4 py-2 bg-[#FF6B35] text-black font-bold text-sm hover:bg-[#ff7a4a] transition-colors"
+            className="px-4 py-2 bg-[#A1FF62] text-black font-bold text-sm hover:bg-[#b8ff8a] transition-colors"
           >
             RETRY_CONNECTION
           </button>
@@ -50,8 +50,8 @@ function Videos() {
         
         {/* Header */}
         <div className="mb-10">
-          <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
-            <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
+          <div className="inline-flex items-center gap-2 text-[12px] text-[#A1FF62] mb-4 tracking-[0.15em] font-mono">
+            <span className="w-2 h-2 bg-[#A1FF62] rounded-full"></span>
             [ LEARNING VIDEOS ]
           </div>
           <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
@@ -64,7 +64,7 @@ function Videos() {
 
         {/* Category Filter */}
         <div className="mb-10">
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ CATEGORIES</h2>
+          <h2 className="text-[14px] font-mono text-[#A1FF62] mb-4 tracking-wide">&gt;_ CATEGORIES</h2>
           <div className="flex items-center gap-3 overflow-x-auto pb-2">
             {categories.map((category) => (
               <button
@@ -72,8 +72,8 @@ function Videos() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-all ${
                   selectedCategory === category
-                    ? "bg-[#FF6B35] text-black"
-                    : "bg-[#111] border border-[#2a2a2a] text-[#999] hover:border-[#FF6B35] hover:text-white"
+                    ? "bg-[#A1FF62] text-black"
+                    : "bg-[#111] border border-[#2a2a2a] text-[#999] hover:border-[#A1FF62] hover:text-white"
                 }`}
               >
                 {category}
@@ -84,7 +84,7 @@ function Videos() {
 
         {/* Videos Grid */}
         <div className="mb-10">
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ VIDEO_LIBRARY</h2>
+          <h2 className="text-[14px] font-mono text-[#A1FF62] mb-4 tracking-wide">&gt;_ VIDEO_LIBRARY</h2>
           
           {filteredPosts.length === 0 ? (
             <div className="text-center py-20 bg-[#0f0f0f] border border-[#1f1f1f]">
@@ -108,7 +108,7 @@ function Videos() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                        <div className="w-12 h-12 bg-[#FF6B35] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                        <div className="w-12 h-12 bg-[#A1FF62] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                           <Play size={20} fill="black" className="text-black ml-1" />
                         </div>
                       </div>
@@ -121,7 +121,7 @@ function Videos() {
 
                     {/* Info */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-white text-[14px] line-clamp-2 mb-2 group-hover:text-[#FF6B35] transition-colors">
+                      <h3 className="font-semibold text-white text-[14px] line-clamp-2 mb-2 group-hover:text-[#A1FF62] transition-colors">
                         {post.title}
                       </h3>
                       <p className="text-[12px] text-[#555] mb-3">{post.creator_name || "Unknown Creator"}</p>
@@ -150,7 +150,7 @@ function Videos() {
       {/* Floating Upload Button */}
       <Link
         to="/upload"
-        className="fixed bottom-8 right-8 flex items-center gap-2 px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] text-black font-bold text-[13px] transition-all z-50"
+        className="fixed bottom-8 right-8 flex items-center gap-2 px-5 py-3 bg-[#A1FF62] hover:bg-[#b8ff8a] text-black font-bold text-[13px] transition-all z-50"
       >
         <Upload size={18} />
         UPLOAD VIDEO

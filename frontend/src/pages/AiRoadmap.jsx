@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Sparkles, ArrowRight, Clock, Trash2, Loader2, Route, Star, ChevronDown, Settings2 } from "lucide-react";
-import api from "../utils/api.js";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Route, Sparkles, Star, Search, Command, ArrowRight, Settings2, ChevronDown, ChevronRight, Loader2, Trash2, Clock, Zap, Terminal } from 'lucide-react';
+import api from '../utils/api.js';
+import Loader from '../components/common/Loader';
+import SpotlightCard from '../components/ui/SpotlightCard';
 import PlaceholdersAndVanishInput from "../components/ui/PlaceholdersAndVanishInput.jsx";
 
 // Animated input placeholders
@@ -16,10 +18,14 @@ const placeholders = [
 function AiRoadmap() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [detailLevel, setDetailLevel] = useState("standard");
+  // Professional Design State
+  const [detailLevel, setDetailLevel] = useState('standard');
   const [showSettings, setShowSettings] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [generatedRoadmaps, setGeneratedRoadmaps] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [coldStartDetected, setColdStartDetected] = useState(false);
 
   // Extensive preset roadmaps - Roles
   const roleRoadmaps = [
@@ -68,11 +74,25 @@ function AiRoadmap() {
   }, []);
 
   const loadGeneratedRoadmaps = async () => {
+    const startTime = Date.now();
+    setIsLoading(true);
+    
+    // Show cold start message after 2 seconds
+    const coldStartTimer = setTimeout(() => {
+      setColdStartDetected(true);
+    }, 2000);
+    
     try {
       const { data } = await api.get("/paths/my-roadmaps");
       setGeneratedRoadmaps(data.data || []);
     } catch (err) {
       console.error("Failed to load roadmaps:", err);
+    } finally {
+      clearTimeout(coldStartTimer);
+      const duration = Date.now() - startTime;
+      console.log(`[AiRoadmap] Load completed in ${duration}ms`);
+      setIsLoading(false);
+      setColdStartDetected(false);
     }
   };
 
@@ -108,199 +128,243 @@ function AiRoadmap() {
     { id: "comprehensive", label: "Comprehensive", stages: "15-20", desc: "In-depth path" }
   ];
 
+  const suggestions = ["Frontend Developer", "Data Scientist", "AWS Cloud Engineer"];
+  const loading = isGenerating; // Assuming isGenerating is the correct state for loading
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+    setIsGenerating(true); // Set generating state
+    handleRoadmapClick(searchQuery.trim());
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] py-12 px-6">
-      <div className="max-w-[1400px] mx-auto">
-        
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
-            <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
-            [ AI ROADMAP GENERATOR ]
+    <div className="min-h-screen relative overflow-hidden font-sans" style={{ backgroundColor: 'var(--page-bg-light)' }}>
+      
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 bg-[#201D1D]/95 backdrop-blur-3xl flex items-center justify-center transition-all duration-700">
+          <div className="text-center">
+            <div className="relative w-24 h-24 mx-auto mb-8">
+               <div className="absolute inset-0 border-t-2 border-[#A1FF62] rounded-full animate-spin"></div>
+               <div className="absolute inset-2 border-r-2 border-[#694EFF] rounded-full animate-spin-slow"></div>
+               <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="text-white animate-pulse" size={24} />
+               </div>
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2 tracking-tighter">INITIALIZING_NEURAL_LINK</h2>
+            <p className="text-[#A1FF62] font-mono text-sm tracking-widest animate-pulse">ESTABLISHING CONNECTION...</p>
           </div>
-          <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
-            AI Roadmap Generator
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="relative z-10 py-[var(--section-padding-y)] px-6">
+        
+        {/* Hero Section - Light BG, Dark Text */}
+        <div className="text-center mb-24 max-w-[1200px] mx-auto relative">
+          
+          <div className="inline-flex items-center gap-2 mb-12 px-5 py-2.5 rounded-full bg-[#201D1D] text-white">
+            <span className="w-2 h-2 rounded-full bg-[#A1FF62] animate-pulse shadow-[0_0_10px_#A1FF62]" />
+            <span className="text-[11px] font-mono tracking-[0.2em]">INTELLIGENT_PATHWAY_GENERATOR_V2</span>
+          </div>
+          
+          {/* Hero Text */}
+          <h1 
+            className="font-bold mb-8 leading-[0.95]"
+            style={{ 
+              fontSize: 'var(--hero-font-size)',
+              letterSpacing: 'var(--hero-letter-spacing)',
+              color: '#201D1D'
+            }}
+          >
+            MASTER ANY SKILL<br />
+            WITH <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A1FF62] to-[#694EFF]">AI</span>
           </h1>
-          <p className="text-[#666] text-[16px] max-w-xl mx-auto">
-            Choose a role/skill or <span className="text-[#FF6B35]">enter any topic</span> to generate a personalized learning roadmap
+          
+          <p className="text-[#666666] text-xl max-w-2xl mx-auto leading-relaxed font-light mb-16">
+            Construct personalized, adaptive learning architectures tailored to your specific career trajectory.
           </p>
         </div>
-
-        {/* Animated Search Bar */}
-        <div className="max-w-[700px] mx-auto mb-6">
-          <div className="bg-[#111] border border-[#2a2a2a]">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]">
-              <code className="text-[12px] text-[#555] tracking-wide font-mono">USER@EDUVERSE:~/ROADMAP</code>
-              <div className="flex gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-              </div>
-            </div>
-            <div className="p-4">
-              <PlaceholdersAndVanishInput
-                placeholders={placeholders}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onSubmit={handleVanishSubmit}
-                disabled={isGenerating}
-              />
-            </div>
-          </div>
+        
+        {/* Dark Command Center Pod */}
+        <div 
+          className="max-w-4xl mx-auto mb-24 rounded-[var(--container-radius)] p-8 relative overflow-hidden"
+          style={{ backgroundColor: 'var(--pod-bg-dark)' }}
+        >
+          {/* Subtle glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#A1FF62]/10 blur-[120px] rounded-full pointer-events-none" />
           
-          {/* Custom topic hint */}
-          {showCustomOption && (
-            <div className="mt-3 flex items-center justify-center gap-2 text-[#666] text-[13px]">
-              <ArrowRight size={14} />
-              <span>Press <kbd className="px-2 py-0.5 bg-[#1a1a1a] border border-[#2a2a2a] text-[11px] font-mono">Enter</kbd> to create roadmap for "<span className="text-[#FF6B35]">{searchQuery}</span>"</span>
-            </div>
-          )}
-        </div>
-
-        {/* Detail Level Selector */}
-        <div className="max-w-[700px] mx-auto mb-12">
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center gap-2 text-[13px] text-[#666] hover:text-white mx-auto mb-3 transition-colors"
-          >
-            <Settings2 size={14} />
-            Detail Level: <span className="text-[#FF6B35] font-semibold uppercase">{detailLevel}</span>
-            <ChevronDown size={14} className={`transition-transform ${showSettings ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {showSettings && (
-            <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-4 mt-3">
-              <p className="text-[10px] text-[#555] uppercase tracking-[0.2em] mb-3 text-center font-mono">SELECT DETAIL LEVEL</p>
-              <div className="grid grid-cols-3 gap-3">
-                {detailLevels.map(level => (
-                  <button
-                    key={level.id}
-                    onClick={() => { setDetailLevel(level.id); setShowSettings(false); }}
-                    className={`p-4 border text-left transition-all ${
-                      detailLevel === level.id
-                        ? 'border-[#FF6B35] bg-[#FF6B35]/10'
-                        : 'border-[#2a2a2a] hover:border-[#444]'
-                    }`}
-                  >
-                    <div className="text-[14px] font-semibold text-white">{level.label}</div>
-                    <div className="text-[12px] text-[#555]">{level.stages} stages</div>
-                    <div className="text-[11px] text-[#444] mt-1">{level.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Role Roadmaps */}
-        <div className="mb-10">
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ ROLE_ROADMAPS</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-            {roleRoadmaps.map((role, i) => (
-              <button
-                key={i}
-                onClick={() => handleRoadmapClick(role)}
-                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
-              >
-                <Route size={18} className="text-[#FF6B35] mb-2" />
-                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
-                  {role}
+          <div className="relative z-10">
+            {/* Input Container */}
+            <div className="group relative">
+              <div className={`absolute -inset-0.5 bg-gradient-to-r from-[#A1FF62] via-[#694EFF] to-[#A1FF62] rounded-[32px] opacity-20 blur transition duration-500 group-hover:opacity-40 ${isFocused ? 'opacity-75 blur-md' : ''}`} />
+              <div className="relative bg-[#0A0A0A] rounded-[30px] p-2 flex items-center border border-white/10 shadow-2xl">
+                <div className="pl-6 pr-4 text-white/30">
+                  <Command size={28} />
                 </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Skill Roadmaps */}
-        <div className="mb-10">
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ SKILL_ROADMAPS</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-            {skillRoadmaps.map((skill, i) => (
-              <button
-                key={i}
-                onClick={() => handleRoadmapClick(skill)}
-                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
-              >
-                <Sparkles size={18} className="text-[#FF6B35] mb-2" />
-                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
-                  {skill}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Topic Roadmaps */}
-        <div className="mb-10">
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ TOPIC_ROADMAPS</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {topicRoadmaps.map((topic, i) => (
-              <button
-                key={i}
-                onClick={() => handleRoadmapClick(topic)}
-                className="p-4 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] transition-all text-left group"
-              >
-                <Star size={18} className="text-[#FF6B35] mb-2" />
-                <div className="text-[13px] font-semibold text-white group-hover:text-[#FF6B35] transition-colors">
-                  {topic}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* User Generated Roadmaps */}
-        {generatedRoadmaps.length > 0 && (
-          <div>
-            <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ YOUR_GENERATED_ROADMAPS</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {generatedRoadmaps.map((roadmap) => (
-                <div
-                  key={roadmap.id}
-                  onClick={() => handleRoadmapClick(roadmap.role || roadmap.title, roadmap.detail_level)}
-                  className="relative p-5 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#333] cursor-pointer transition-all group"
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="What do you want to learn? (e.g., 'Senior React Developer')"
+                  className="w-full bg-transparent text-white text-xl py-6 placeholder:text-white/20 focus:outline-none font-medium"
+                />
+                <button 
+                  onClick={handleSearch}
+                  disabled={loading}
+                  className="px-8 py-4 bg-[#A1FF62] text-black rounded-[24px] font-bold hover:scale-105 active:scale-95 transition-all text-sm tracking-wide disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
                 >
-                  <div className="absolute left-0 top-4 bottom-4 w-[3px] bg-[#FF6B35]"></div>
-                  <div className="flex items-start justify-between pl-3">
-                    <div>
-                      <h3 className="font-bold text-white text-[15px] mb-1 group-hover:text-[#FF6B35] transition-colors">
-                        {roadmap.title || roadmap.role}
-                      </h3>
-                      <div className="flex items-center gap-3 text-[11px] text-[#555]">
-                        <span className="flex items-center gap-1">
-                          <Clock size={12} />
-                          {new Date(roadmap.created_at).toLocaleDateString()}
-                        </span>
-                        <span className="px-2 py-0.5 bg-[#1a1a1a] text-[#FF6B35] uppercase font-mono">
-                          {roadmap.detail_level || 'standard'}
-                        </span>
-                      </div>
-                      {roadmap.stages_count && (
-                        <div className="text-[11px] text-[#444] mt-2">
-                          {roadmap.stages_count} stages • {roadmap.completed_count || 0} completed
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={(e) => handleDeleteRoadmap(e, roadmap.id)}
-                      className="p-2 text-[#555] hover:text-red-400 hover:bg-red-500/10 transition-all"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
+                  {loading ? <Loader2 className="animate-spin" /> : "GENERATE"}
+                  {!loading && <span className="hidden md:inline">ROADMAP</span>}
+                </button>
+              </div>
+            </div>
+            
+            {/* Suggestions */}
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <span className="text-[11px] font-mono text-white/30 pt-2 uppercase tracking-wider">Try:</span>
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSearchQuery(s)}
+                  className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#A1FF62]/50 text-white/60 hover:text-white text-xs transition-all hover:bg-white/10"
+                >
+                  {s}
+                </button>
               ))}
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Empty State for User Roadmaps */}
-        {generatedRoadmaps.length === 0 && (
-          <div className="text-center py-12 bg-[#0f0f0f] border border-[#1f1f1f]">
-            <Route size={40} className="text-[#333] mx-auto mb-4" />
-            <p className="text-[#555] text-[14px] mb-2">No generated roadmaps yet</p>
-            <p className="text-[#444] text-[12px]">Your personalized roadmaps will appear here</p>
-          </div>
-        )}
+        {/* Content Sections - Dark Pods in Light Background */}
+        <div className="max-w-[1400px] mx-auto space-y-16">
+          
+          {/* Career Protocols - Dark Pod Container */}
+          <section 
+            className="rounded-[var(--container-radius)] p-10 relative overflow-hidden"
+            style={{ backgroundColor: 'var(--pod-bg-dark)' }}
+          >
+            <div className="flex items-center justify-between mb-10 pb-4 border-b border-white/10">
+              <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+                <Terminal size={24} className="text-[#694EFF]" />
+                Career Protocols
+              </h3>
+              <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">SELECT_PATHWAY</div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--grid-gap)]">
+              {roleRoadmaps.slice(0, 6).map((role, i) => (
+                 <div
+                    key={i}
+                    onClick={() => handleRoadmapClick(role)}
+                    className="group bg-[#0A0A0A] border border-white/10 hover:border-[#694EFF]/50 rounded-[var(--card-radius)] cursor-pointer transition-all hover:-translate-y-1"
+                 >
+                    <div className="p-8 flex flex-col h-full">
+                       <div className="w-14 h-14 rounded-2xl bg-[#694EFF]/10 flex items-center justify-center text-[#694EFF] mb-6 group-hover:scale-110 transition-transform duration-500">
+                          <Route strokeWidth={1.5} size={28} />
+                       </div>
+                       <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#694EFF] transition-colors">{role}</h4>
+                       <p className="text-white/50 text-sm leading-relaxed mb-8 flex-1">
+                         Comprehensive career track designed to take you from novice to mastery.
+                       </p>
+                       <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
+                          <span className="text-[10px] font-mono text-white/40 uppercase">FULL_STACK</span>
+                          <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#A1FF62] group-hover:text-black transition-colors">
+                            <ChevronRight size={14} />
+                          </span>
+                       </div>
+                    </div>
+                 </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Trending Skills - Dark Pod Container */}
+          <section 
+            className="rounded-[var(--container-radius)] p-10 relative overflow-hidden"
+            style={{ backgroundColor: 'var(--pod-bg-dark)' }}
+          >
+            <div className="flex items-center justify-between mb-10 pb-4 border-b border-white/10">
+              <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+                <Sparkles size={24} className="text-[#A1FF62]" />
+                Trending Skills
+              </h3>
+              <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">ACCELERATED_LEARNING</div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {skillRoadmaps.map((skill, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleRoadmapClick(skill)}
+                  className="group relative p-4 bg-[#0A0A0A] border border-white/10 rounded-[var(--card-radius)] hover:border-[#A1FF62]/50 transition-all hover:-translate-y-1 overflow-hidden text-left"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#A1FF62]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative z-10">
+                    <div className="w-8 h-8 rounded-lg bg-[#A1FF62]/10 text-[#A1FF62] flex items-center justify-center mb-3">
+                       <Zap size={16} fill="currentColor" />
+                    </div>
+                    <div className="font-bold text-white text-sm group-hover:text-[#A1FF62] transition-colors">{skill}</div>
+                    <div className="text-[10px] text-white/40 mt-1">Start Path →</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* User Generated Section (If Exists) */}
+          {generatedRoadmaps.length > 0 && (
+             <section className="bg-surface/50 border border-white/5 rounded-[32px] p-8 md:p-12 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-accent-purple/10 blur-[100px] rounded-full pointer-events-none" />
+                <h3 className="text-2xl font-mono text-black mb-8 tracking-tight relative z-10">&gt;_ YOUR_GENERATED_ROADMAPS</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+                  {generatedRoadmaps.map((roadmap) => (
+                    <div
+                      key={roadmap.id}
+                      onClick={() => handleRoadmapClick(roadmap.role || roadmap.title, roadmap.detail_level)}
+                      className="group relative p-6 bg-[#0A0A0A] border border-white/5 hover:border-accent-purple/50 cursor-pointer transition-all rounded-[20px] hover:shadow-2xl hover:shadow-accent-purple/5"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-10 h-10 rounded-full bg-accent-purple/10 flex items-center justify-center text-accent-purple">
+                          <Terminal size={18} />
+                        </div>
+                        <span className="px-2 py-1 bg-white/5 rounded text-[10px] font-mono text-white/50 border border-white/5 uppercase">
+                          {roadmap.detail_level || 'standard'}
+                        </span>
+                      </div>
+                      
+                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-accent-purple transition-colors">{roadmap.title || roadmap.role}</h4>
+                      <p className="text-sm text-textMuted mb-4">Generated on {new Date(roadmap.created_at).toLocaleDateString()}</p>
+                      
+                      <div className="flex items-center gap-2 text-xs font-bold text-white/40 group-hover:text-white transition-colors">
+                        <span>RESUME PROTOCOL</span>
+                        <ChevronRight size={12} />
+                      </div>
+
+                      <button
+                        onClick={(e) => handleDeleteRoadmap(e, roadmap.id)}
+                        className="absolute bottom-6 right-6 p-2 text-white/20 hover:text-red-500 hover:bg-white/5 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+             </section>
+          )}
+
+        </div>
+
       </div>
     </div>
   );

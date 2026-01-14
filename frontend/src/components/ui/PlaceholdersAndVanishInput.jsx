@@ -158,13 +158,13 @@ export function PlaceholdersAndVanishInput({
     <form
       className={cn(
         "w-full relative max-w-xl mx-auto h-12 transition-all duration-300",
-        "bg-[#111] border-l-4 border-l-[#FF6B35] border-y border-r border-y-[#2a2a2a] border-r-[#2a2a2a]",
+        "bg-[#111] border-l-4 border-l-[#A1FF62] border-y border-r border-y-[#2a2a2a] border-r-[#2a2a2a]",
         "hover:bg-[#1a1a1a]",
         value && "bg-[#161616]"
       )}
       onSubmit={handleSubmit}
     >
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FF6B35] font-mono font-bold text-lg pointer-events-none z-50">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1FF62] font-mono font-bold text-lg pointer-events-none z-50">
         &gt;
       </div>
 
@@ -202,7 +202,7 @@ export function PlaceholdersAndVanishInput({
         className={cn(
           "absolute right-4 top-1/2 z-50 -translate-y-1/2 h-10 px-4 flex items-center gap-2 transition-all duration-300 font-mono text-[13px] font-bold uppercase",
           value && !animating 
-            ? "bg-[#FF6B35] text-black hover:bg-[#ff7a4a]" 
+            ? "bg-[#A1FF62] text-black hover:bg-[#b8ff8a]" 
             : "bg-[#2a2a2a] text-[#555] cursor-not-allowed"
         )}
       >

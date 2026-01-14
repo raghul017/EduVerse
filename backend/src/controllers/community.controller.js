@@ -39,13 +39,211 @@ export const listCommunities = async (req, res, next) => {
 
 export const getCommunityPosts = async (req, res, next) => {
   try {
+    const userId = req.user?.id;
     const posts = await query(
-      "SELECT * FROM posts WHERE subject = (SELECT subject FROM communities WHERE id=$1)",
+      `SELECT cp.*, 
+              u.name as user_name,
+              (SELECT COUNT(*) FROM community_post_likes WHERE post_id = cp.id AND is_like = true) as upvotes,
+              (SELECT COUNT(*) FROM community_post_likes WHERE post_id = cp.id AND is_like = false) as downvotes,
+              (SELECT COUNT(*) FROM community_post_comments WHERE post_id = cp.id) as comments_count,
+              ${userId ? `(SELECT is_like FROM community_post_likes WHERE post_id = cp.id AND user_id = '${userId}') as user_vote` : 'NULL as user_vote'}
+       FROM community_posts cp 
+       JOIN users u ON u.id = cp.user_id 
+       WHERE cp.community_id = $1 
+       ORDER BY cp.created_at DESC`,
       [req.params.id]
     ).then((result) => result.rows);
     res.json({ data: posts });
   } catch (error) {
     next(error);
+  }
+};
+
+export const createCommunityPost = async (req, res, next) => {
+  try {
+    const communityId = req.params.id;
+    const userId = req.user.id;
+    const { title, description } = req.body;
+
+    // Validate inputs
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: "Title is required." });
+    }
+    if (!description || !description.trim()) {
+      return res.status(400).json({ message: "Content is required." });
+    }
+
+    // Check if user is a member of the community
+    const membership = await query(
+      "SELECT 1 FROM community_members WHERE community_id=$1 AND user_id=$2",
+      [communityId, userId]
+    );
+    if (membership.rowCount === 0) {
+      return res.status(403).json({ message: "Join the community to post." });
+    }
+
+    // Create text post in community_posts table
+    const inserted = await query(
+      `INSERT INTO community_posts (community_id, user_id, title, content)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *, (SELECT name FROM users WHERE id = $2) as user_name`,
+      [communityId, userId, title.trim(), description.trim()]
+    ).then((result) => result.rows[0]);
+
+    res.status(201).json({
+      message: "Post created successfully",
+      data: inserted
+    });
+  } catch (error) {
+    console.error("Create community post error:", error);
+    res.status(500).json({ 
+      message: "Failed to create post",
+      error: error.message 
+    });
+  }
+};
+
+export const updateCommunityPost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+    const { title, content } = req.body;
+
+    // Check if post belongs to user
+    const post = await query(
+      "SELECT * FROM community_posts WHERE id = $1",
+      [postId]
+    ).then(r => r.rows[0]);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+    if (post.user_id !== userId) {
+      return res.status(403).json({ message: "You can only edit your own posts." });
+    }
+
+    const updated = await query(
+      `UPDATE community_posts 
+       SET title = $1, content = $2, updated_at = NOW() 
+       WHERE id = $3 
+       RETURNING *`,
+      [title.trim(), content.trim(), postId]
+    ).then(r => r.rows[0]);
+
+    res.json({ message: "Post updated", data: updated });
+  } catch (error) {
+    console.error("Update post error:", error);
+    res.status(500).json({ message: "Failed to update post" });
+  }
+};
+
+export const deleteCommunityPost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    // Check if post belongs to user
+    const post = await query(
+      "SELECT user_id FROM community_posts WHERE id = $1",
+      [postId]
+    ).then(r => r.rows[0]);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+    if (post.user_id !== userId) {
+      return res.status(403).json({ message: "You can only delete your own posts." });
+    }
+
+    await query("DELETE FROM community_posts WHERE id = $1", [postId]);
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Delete post error:", error);
+    res.status(500).json({ message: "Failed to delete post" });
+  }
+};
+
+export const togglePostLike = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+    const { isLike } = req.body; // true = like, false = dislike
+
+    // Check if already reacted
+    const existing = await query(
+      "SELECT * FROM community_post_likes WHERE post_id = $1 AND user_id = $2",
+      [postId, userId]
+    ).then(r => r.rows[0]);
+
+    if (existing) {
+      if (existing.is_like === isLike) {
+        // Remove reaction (toggle off)
+        await query(
+          "DELETE FROM community_post_likes WHERE post_id = $1 AND user_id = $2",
+          [postId, userId]
+        );
+        res.json({ message: "Reaction removed", action: "removed" });
+      } else {
+        // Switch reaction
+        await query(
+          "UPDATE community_post_likes SET is_like = $1 WHERE post_id = $2 AND user_id = $3",
+          [isLike, postId, userId]
+        );
+        res.json({ message: "Reaction updated", action: "updated", isLike });
+      }
+    } else {
+      // Add new reaction
+      await query(
+        "INSERT INTO community_post_likes (post_id, user_id, is_like) VALUES ($1, $2, $3)",
+        [postId, userId, isLike]
+      );
+      res.json({ message: "Reaction added", action: "added", isLike });
+    }
+  } catch (error) {
+    console.error("Toggle like error:", error);
+    res.status(500).json({ message: "Failed to toggle reaction" });
+  }
+};
+
+export const getPostComments = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const comments = await query(
+      `SELECT c.*, u.name as user_name 
+       FROM community_post_comments c 
+       JOIN users u ON u.id = c.user_id 
+       WHERE c.post_id = $1 
+       ORDER BY c.created_at ASC`,
+      [postId]
+    ).then(r => r.rows);
+    res.json({ data: comments });
+  } catch (error) {
+    console.error("Get comments error:", error);
+    res.status(500).json({ message: "Failed to load comments" });
+  }
+};
+
+export const createPostComment = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+    const { content } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: "Comment cannot be empty." });
+    }
+
+    const inserted = await query(
+      `INSERT INTO community_post_comments (post_id, user_id, content)
+       VALUES ($1, $2, $3)
+       RETURNING *, (SELECT name FROM users WHERE id = $2) as user_name`,
+      [postId, userId, content.trim()]
+    ).then(r => r.rows[0]);
+
+    res.status(201).json({ message: "Comment added", data: inserted });
+  } catch (error) {
+    console.error("Create comment error:", error);
+    res.status(500).json({ message: "Failed to add comment" });
   }
 };
 

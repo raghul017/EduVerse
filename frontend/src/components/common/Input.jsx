@@ -6,7 +6,7 @@ function Input ({ label, error, className, ...props }) {
       {label && <span className="text-[11px] uppercase tracking-[0.15em] text-[#555] font-mono">{label}</span>}
       <input
         className={classNames(
-          'bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35] transition',
+          'bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62] transition',
           error && 'border-red-500',
           className
         )}

@@ -54,7 +54,7 @@ function SignupForm () {
             value={form.name}
             onChange={handleChange}
             placeholder="Your name"
-            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
           />
         </div>
         <div>
@@ -65,7 +65,7 @@ function SignupForm () {
             value={form.email}
             onChange={handleChange}
             placeholder="you@example.com"
-            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ function SignupForm () {
           value={form.password}
           onChange={handleChange}
           placeholder="At least 8 characters"
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
         />
       </div>
       
@@ -90,7 +90,7 @@ function SignupForm () {
           value={form.bio}
           onChange={handleChange}
           placeholder="Tell us about yourself"
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
         />
       </div>
       
@@ -102,7 +102,7 @@ function SignupForm () {
           value={form.interests}
           onChange={handleChange}
           placeholder="React, Python, AI..."
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
         />
       </div>
       
@@ -113,7 +113,7 @@ function SignupForm () {
       <button 
         type="submit" 
         disabled={loading}
-        className="w-full px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all mt-6"
+        className="w-full px-5 py-3 bg-[#A1FF62] hover:bg-[#b8ff8a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all mt-6"
       >
         {loading ? <><Loader2 size={16} className="animate-spin" /> CREATING...</> : 'CREATE ACCOUNT'}
       </button>

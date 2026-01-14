@@ -702,7 +702,7 @@ Requirements:
     const cacheKey = `course_${key}`;
     if (cache.get(cacheKey)) return cache.get(cacheKey);
 
-    const prompt = `Create a detailed course outline for: ${topic}
+    const prompt = `Create a comprehensive, article-style course outline for: ${topic}
 
 Return ONLY valid JSON (no markdown) with this structure:
 {
@@ -712,20 +712,29 @@ Return ONLY valid JSON (no markdown) with this structure:
     {
       "id": "module-id",
       "title": "Module Title",
-      "description": "What this module covers",
       "lessons": [
         {
           "id": "lesson-id",
           "title": "Lesson Title",
-          "description": "Lesson content",
-          "duration": "30 min"
+          "duration": "20 min",
+          "theory": "## Introduction\\n[Engaging introduction to the topic]\\n\\n## Key Concepts\\n### [Concept 1]\\n[Detailed explanation]\\n\\n### [Concept 2]\\n[Detailed explanation]\\n\\n## Real-world Example\\n[Practical application or code snippet]\\n\\n## Summary\\n[Key takeaways]\\n\\n(Total approx 400 words)",
+          "articles": [
+            { "title": "Deep Dive Article", "url": "https://example.com/article", "type": "article" }
+          ],
+          "links": [
+            { "title": "Reference Doc", "url": "https://example.com/resource" }
+          ]
         }
       ]
     }
   ]
 }
 
-Make it comprehensive with 5-8 modules, each with 4-6 lessons.`;
+Requirements:
+1. Create 3 modules, each with 3 lessons (Total ~9 lessons).
+2. 'theory' MUST be a high-quality, structured markdown article (approx 400 words).
+3. Use headers (##, ###), bullet points, and code blocks where relevant.
+4. Ensure 'articles' and 'links' are relevant and realistic.`;
 
     try {
       const aiResponse = await this.callAIWithRetry(prompt, "balanced");

@@ -27,7 +27,7 @@ function AIFlashcards({ postId }) {
     return (
       <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 text-[13px] text-[#666]">
         <div className="flex items-center gap-2">
-          <Loader2 size={14} className="text-[#FF6B35] animate-spin" />
+          <Loader2 size={14} className="text-[#A1FF62] animate-spin" />
           Loading flashcards...
         </div>
       </div>
@@ -47,7 +47,7 @@ function AIFlashcards({ postId }) {
   return (
     <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#A1FF62]">
           <Layers size={16} />
           FLASHCARDS
         </div>
@@ -56,7 +56,7 @@ function AIFlashcards({ postId }) {
       
       <button
         onClick={() => setFlipped(!flipped)}
-        className="w-full p-4 border border-[#2a2a2a] hover:border-[#FF6B35] text-left transition-all min-h-[80px]"
+        className="w-full p-4 border border-[#2a2a2a] hover:border-[#A1FF62] text-left transition-all min-h-[80px]"
       >
         <p className="text-[10px] text-[#555] uppercase tracking-wide mb-2 font-mono">
           {flipped ? 'ANSWER' : 'QUESTION'}

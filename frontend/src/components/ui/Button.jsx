@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import Magnetic from './Magnetic';
 
 const Button = ({ 
   children, 
@@ -10,14 +11,14 @@ const Button = ({
   type = 'button',
   ...props 
 }) => {
-  const base = `inline-flex items-center justify-center font-bold transition-all duration-200 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed`;
+  const base = `inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed rounded-full`; // Enforce Pill Shape
   
   const variants = {
-    primary: 'bg-[#FF6B35] text-black hover:bg-[#ff7a4a]',
-    secondary: 'bg-[#1a1a1a] border border-[#2a2a2a] text-white hover:border-[#FF6B35]',
-    ghost: 'bg-transparent text-[#999] hover:text-white hover:bg-[#1a1a1a]',
+    primary: 'bg-[#BDFF6B] text-black hover:bg-[#a6e65c] shadow-[0_4px_12px_rgba(189,255,107,0.2)]', // Acid Lime
+    secondary: 'bg-[#161616] border border-[#333] text-white hover:bg-[#222] hover:border-[#444]', // Surface
+    ghost: 'bg-transparent text-[#999] hover:text-white hover:bg-[#161616]',
     danger: 'bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30',
-    outline: 'border border-[#FF6B35] text-[#FF6B35] bg-transparent hover:bg-[#FF6B35] hover:text-black'
+    outline: 'border border-[#BDFF6B] text-[#BDFF6B] bg-transparent hover:bg-[#BDFF6B] hover:text-black'
   };
   
   const sizes = {
@@ -27,7 +28,7 @@ const Button = ({
     icon: 'p-2'
   };
 
-  return (
+  const buttonElement = (
     <button
       type={type}
       className={classNames(base, variants[variant], sizes[size], className)}
@@ -38,6 +39,13 @@ const Button = ({
       {children}
     </button>
   );
+
+  // Apply Magnetic effect only to primary buttons for that "heavy" feel
+  if (variant === 'primary' && !disabled) {
+    return <Magnetic strength={40}>{buttonElement}</Magnetic>;
+  }
+
+  return buttonElement;
 };
 
 export default Button;

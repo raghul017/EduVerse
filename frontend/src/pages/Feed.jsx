@@ -72,7 +72,7 @@ function Feed() {
                     onClick={() => setSelectedSubject(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedSubject === null
-                        ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                        ? "bg-[#A1FF62]/10 text-[#A1FF62]"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -88,7 +88,7 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         selectedSubject === subject
-                          ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                          ? "bg-[#A1FF62]/10 text-[#A1FF62]"
                           : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
@@ -108,7 +108,7 @@ function Feed() {
                     onClick={() => setSelectedCreator(null)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                       selectedCreator === null
-                        ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                        ? "bg-[#A1FF62]/10 text-[#A1FF62]"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -126,7 +126,7 @@ function Feed() {
                         }
                         className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                           selectedCreator === creatorId
-                            ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                            ? "bg-[#A1FF62]/10 text-[#A1FF62]"
                             : "text-slate-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
@@ -151,7 +151,7 @@ function Feed() {
                       }
                       className={`w-full text-left px-3 py-2 text-sm rounded-md transition ${
                         difficulty === level
-                          ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                          ? "bg-[#A1FF62]/10 text-[#A1FF62]"
                           : "text-slate-400 hover:text-white hover:bg-white/5"
                       }`}
                     >

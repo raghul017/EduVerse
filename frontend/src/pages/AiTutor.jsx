@@ -1,251 +1,246 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, MessageCircle, Loader2, Send, Bot, User } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, User, Bot, ThumbsUp, Copy, RefreshCw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import api from "../utils/api.js";
 
 function AiTutor() {
-  const [topic, setTopic] = useState("");
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [inputMessage, setInputMessage] = useState("");
-  const messagesEndRef = useRef(null);
+  const scrollRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Auto-scroll to bottom
   useEffect(() => {
-    scrollToBottom();
+    if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [messages, loading]);
 
-  const handleStartSession = async (e) => {
-    e.preventDefault();
-    if (!topic.trim()) return;
-    
+  const handleSend = async (e) => {
+    e?.preventDefault();
+    if (!input.trim() || loading) return;
+
+    const userMsg = input;
+    setInput("");
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
+
     try {
-      // Initialize with a welcome message
-      setMessages([
-        { 
-          role: "assistant", 
-          content: `Hello! I'm your AI tutor for **${topic}**. Ask me anything about this topic, and I'll help you learn!` 
-        }
-      ]);
+        const history = messages.slice(-6).map(m => `${m.role}: ${m.content}`).join('\n');
+        const { data } = await api.post("/paths/ai-chat", {
+            message: userMsg,
+            context: history
+        });
+        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
     } catch (err) {
-      console.error(err);
+        setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now." }]);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || loading) return;
-    
-    const userMessage = inputMessage.trim();
-    setInputMessage("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
-    setLoading(true);
-    
-    try {
-      // Create context from topic and recent history (last 3 interaction pairs)
-      const recentHistory = messages.slice(-6).map(m => `${m.role}: ${m.content}`).join('\n');
-      const contextStr = `Topic: ${topic}. \nPrevious conversation:\n${recentHistory}`;
-
-      const { data } = await api.post("/paths/ai-chat", { 
-        message: userMessage,
-        context: contextStr
-      });
-      
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: data.response || "I'm not sure about that. Could you rephrase your question?" 
-      }]);
-    } catch (err) {
-      console.error("AI Tutor error:", err);
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: "Sorry, I encountered an error. Please try again." 
-      }]);
-    } finally {
-      setLoading(false);
-    }
+  const startSession = (topic) => {
+      setLoading(true);
+      setTimeout(() => {
+          setMessages([{ role: 'assistant', content: `Hello! I'm ready to help you learn **${topic}**. What would you like to know?` }]);
+          setLoading(false);
+      }, 500);
   };
 
-  const suggestedTopics = [
-    "React Hooks", "Python Basics", "Machine Learning", 
-    "Data Structures", "System Design", "JavaScript ES6"
-  ];
+  const [copiedIndex, setCopiedIndex] = useState(null);
+
+  const copyToClipboard = (text, index) => {
+      navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+  };
 
   return (
-    <div className="h-[calc(100vh-64px)] bg-[#0a0a0a] overflow-hidden flex flex-col">
-      <div className="max-w-[900px] mx-auto w-full h-full flex flex-col p-6">
+    // ROOT LAYOUT: Preserving the "Holy Grail" scroll fix
+    <div className="fixed inset-0 z-[100] h-[100dvh] w-screen bg-[#F5F5F7] text-[#1a1a1a] font-sans flex flex-col selection:bg-[#A1FF62] selection:text-black overflow-hidden overscroll-none">
+      
+      {/* Background decoration */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#A1FF62]/10 blur-[120px] rounded-full mix-blend-multiply" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-400/10 blur-[100px] rounded-full mix-blend-multiply" />
+      </div>
+
+      {/* HEADER - Compact h-14 with Glass */}
+      <header className="flex-none h-14 border-b border-black/5 bg-white/70 backdrop-blur-xl flex items-center px-4 justify-between z-20 sticky top-0">
+        <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/')} className="p-1.5 hover:bg-black/5 rounded-full transition-colors group">
+                <ArrowLeft size={18} className="text-black/60 group-hover:text-black transition-colors" />
+            </button>
+            <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-[#A1FF62] rounded-lg flex items-center justify-center font-bold text-[10px] shadow-sm shadow-[#A1FF62]/20 border border-white/20">AI</div>
+                <div>
+                   <div className="font-heading font-bold text-base leading-none">EduVerse <span className="text-black/40">Tutor</span></div>
+                   <span className="text-[9px] font-mono uppercase tracking-widest text-[#A1FF62] brightness-75">Online</span>
+                </div>
+            </div>
+        </div>
+        {messages.length > 0 && (
+            <button 
+                onClick={() => setMessages([])} 
+                className="text-[10px] font-bold text-black/40 hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-md uppercase tracking-widest transition-all"
+            >
+                End Session
+            </button>
+        )}
+      </header>
+
+      {/* MAIN SCROLL AREA */}
+      <main className="flex-1 min-h-0 relative flex flex-col">
         
         {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
-                <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
-                [ AI TUTOR ]
-              </div>
-              <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
-                AI Tutor
-              </h1>
-              <p className="text-[#666] text-[16px] max-w-xl mx-auto">
-                Get personalized help on any topic. Start a session to begin learning.
-              </p>
-            </div>
-
-            {/* Topic Input */}
-            <div className="max-w-[600px] w-full mx-auto mb-12">
-              <div className="bg-[#111] border border-[#2a2a2a]">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]">
-                  <code className="text-[12px] text-[#555] tracking-wide font-mono">USER@EDUVERSE:~/TUTOR</code>
-                  <div className="flex gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#555]"></div>
-                  </div>
+            /* EMPTY STATE - Compact */
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 flex flex-col items-center justify-center text-center animate-fade-in">
+                <div className="relative mb-6 group cursor-default">
+                    <div className="absolute inset-0 bg-[#A1FF62] blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 rounded-full" />
+                    <div className="relative w-16 h-16 bg-white rounded-2xl shadow-lg shadow-black/5 flex items-center justify-center border border-white/50 transform rotate-3 transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110">
+                        <Sparkles size={28} className="text-[#A1FF62] fill-current" />
+                    </div>
                 </div>
-                <form onSubmit={handleStartSession} className="p-6">
-                  <input
-                    type="text"
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    placeholder="What would you like to learn about?"
-                    className="w-full bg-transparent text-white text-[18px] placeholder:text-[#444] focus:outline-none mb-6 font-mono"
-                  />
-                  
-                  <button 
-                    type="submit"
-                    disabled={!topic.trim() || loading}
-                    className="w-full px-6 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all"
-                  >
-                    {loading ? (
-                      <><Loader2 size={16} className="animate-spin" /> STARTING...</>
-                    ) : (
-                      <><Play size={14} fill="currentColor" /> START SESSION</>
-                    )}
-                  </button>
+
+                <h1 className="font-heading text-3xl md:text-4xl font-black mb-4 tracking-tight text-[#1a1a1a] leading-tight">
+                    What do you want<br />to <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#1a1a1a] to-[#1a1a1a]/60">master</span> today?
+                </h1>
+                
+                <p className="text-black/60 text-sm md:text-base mb-8 max-w-sm font-medium leading-relaxed">
+                    I'm here to help you debug code, understand complex topics, or generate personalized roadmaps.
+                </p>
+
+                <form onSubmit={(e) => { e.preventDefault(); startSession(input || "General Learning"); }} className="w-full max-w-md relative mb-8 group">
+                    <div className="absolute inset-0 bg-black/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-2" />
+                    <input 
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="e.g. Explain React Hooks..."
+                        className="relative w-full h-12 pl-6 pr-12 bg-white rounded-full border border-black/5 shadow-xl shadow-black/5 focus:outline-none focus:ring-2 focus:ring-[#A1FF62]/50 text-base placeholder:text-black/30 transition-all font-medium"
+                        autoFocus
+                    />
+                    <button type="submit" className="absolute right-2 top-2 bottom-2 aspect-square bg-[#1a1a1a] rounded-full text-[#A1FF62] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md">
+                        <ArrowLeft size={18} className="rotate-180" />
+                    </button>
                 </form>
-              </div>
-            </div>
 
-            {/* Suggested Topics */}
-            <div>
-              <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide text-center">&gt;_ SUGGESTED_TOPICS</h2>
-              <div className="flex flex-wrap justify-center gap-3">
-                {suggestedTopics.map((t, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setTopic(t)}
-                    className="px-4 py-2 bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#FF6B35] text-[#999] hover:text-white text-[13px] transition-all"
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+                <div className="flex flex-wrap gap-2 justify-center max-w-md px-4">
+                    {["Python Basics", "System Design", "Calculus I", "React Hooks", "Docker"].map(topic => (
+                        <button 
+                            key={topic} 
+                            onClick={() => startSession(topic)} 
+                            className="px-4 py-2 bg-white border border-black/5 rounded-full text-xs font-bold text-black/60 hover:text-black hover:border-black/20 hover:shadow-md transition-all transform hover:-translate-y-0.5"
+                        >
+                            {topic}
+                        </button>
+                    ))}
+                </div>
             </div>
-          </div>
         ) : (
-          /* Chat Interface */
-          <div className="flex flex-col h-full">
-            {/* Chat Header */}
-            <div className="flex items-center justify-between mb-6 flex-shrink-0">
-              <div>
-                <div className="text-[12px] text-[#FF6B35] font-mono mb-1">ACTIVE SESSION</div>
-                <h2 className="text-[24px] font-bold text-white">{topic}</h2>
-              </div>
-              <button
-                onClick={() => { setMessages([]); setTopic(""); }}
-                className="px-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] hover:text-white text-[13px] transition-all"
-              >
-                END SESSION
-              </button>
-            </div>
+            /* CHAT LIST - Compact */
+            <div 
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6 scroll-smooth pb-32" // Added padding-bottom to clear floating input
+            >
+                {messages.map((m, i) => (
+                    <div key={i} className={`flex gap-3 md:gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards`}>
+                        
+                        {/* Avatar */}
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-none shadow-sm ${m.role === 'assistant' ? 'bg-white border border-black/5 text-black' : 'bg-[#1a1a1a] text-white shadow-md'}`}>
+                            {m.role === 'assistant' ? (
+                                <div className="font-bold text-[10px]">AI</div>
+                            ) : (
+                                <User size={14} />
+                            )}
+                        </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto space-y-6 mb-6 pr-4 min-h-0">
-              {messages.map((msg, idx) => (
-                <div 
-                  key={idx} 
-                  className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : ''}`}
-                >
-                  {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded bg-[#1f1f1f] border border-[#333] flex items-center justify-center flex-shrink-0">
-                      <Bot size={16} className="text-[#FF6B35]" />
+                        {/* Content Bubble */}
+                        <div className={`max-w-[88%] md:max-w-[75%] space-y-1 group`}>
+                            {m.role === 'assistant' && (
+                                <div className="flex items-center gap-2 mb-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="text-[9px] font-bold text-black/40 uppercase tracking-wider">EduVerse AI</span>
+                                </div>
+                            )}
+                            
+                            <div className={`p-4 rounded-2xl shadow-sm text-sm md:text-[15px] leading-relaxed ${m.role === 'user' ? 'bg-[#1a1a1a] text-white rounded-tr-sm shadow-md' : 'bg-white border border-black/5 text-[#333] rounded-tl-sm shadow-sm'}`}>
+                                {m.role === 'user' ? (
+                                    <p className="font-medium">{m.content}</p>
+                                ) : (
+                                    <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-[#FAFAFA] prose-pre:border prose-pre:border-black/5 prose-pre:text-[#1a1a1a] prose-pre:my-2 prose-code:text-[#D90429] prose-code:bg-black/5 prose-code:px-1 prose-code:rounded prose-strong:text-black">
+                                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Assistant Actions */}
+                            {m.role === 'assistant' && (
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pl-1 pt-1">
+                                    <button 
+                                        onClick={() => copyToClipboard(m.content, i)}
+                                        className="p-1.5 hover:bg-black/5 rounded-md text-black/40 hover:text-black transition-colors flex items-center gap-1.5" 
+                                        title="Copy"
+                                    >
+                                        {copiedIndex === i ? (
+                                            <>
+                                                <ThumbsUp size={12} className="text-green-600" />
+                                                <span className="text-[9px] font-bold text-green-600">Copied</span>
+                                            </>
+                                        ) : (
+                                            <Copy size={12} />
+                                        )}
+                                    </button>
+                                    <button className="p-1.5 hover:bg-black/5 rounded-md text-black/40 hover:text-black transition-colors" title="Regenerate">
+                                        <RefreshCw size={12} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                  )}
-                  
-                  <div className={`max-w-[85%] p-5 rounded-lg border ${
-                    msg.role === 'user' 
-                      ? 'bg-[#1a1a1a] border-[#2a2a2a]' 
-                      : 'bg-[#0f0f0f] border-[#1f1f1f]'
-                  }`}>
-                    {msg.role === 'assistant' ? (
-                      <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-[#050505] prose-pre:border prose-pre:border-[#222] prose-p:my-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4">
-                        <ReactMarkdown components={{
-                          code: ({node, inline, className, children, ...props}) => (
-                            <code className={`${className} ${inline ? 'bg-[#222] px-1 py-0.5 rounded text-[#ABF182]' : 'block bg-[#050505] p-3 rounded border border-[#222] overflow-x-auto text-xs'}`} {...props}>
-                              {children}
-                            </code>
-                          )
-                        }}>
-                          {msg.content}
-                        </ReactMarkdown>
-                      </div>
-                    ) : (
-                      <p className="text-white text-[14px] leading-relaxed whitespace-pre-wrap font-mono">
-                        {msg.content}
-                      </p>
-                    )}
-                  </div>
-
-                  {msg.role === 'user' && (
-                    <div className="w-8 h-8 rounded bg-[#333] border border-[#444] flex items-center justify-center flex-shrink-0">
-                      <User size={16} className="text-white" />
+                ))}
+                
+                {loading && (
+                    <div className="flex gap-3 animate-pulse">
+                         <div className="w-8 h-8 bg-white border border-black/5 rounded-lg flex items-center justify-center"><div className="w-1.5 h-1.5 bg-black/10 rounded-full"/></div>
+                         <div className="bg-white border border-black/5 rounded-2xl rounded-tl-sm p-4 flex gap-1 items-center shadow-sm">
+                            <div className="w-1.5 h-1.5 bg-[#1a1a1a] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                            <div className="w-1.5 h-1.5 bg-[#1a1a1a] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                            <div className="w-1.5 h-1.5 bg-[#1a1a1a] rounded-full animate-bounce" />
+                         </div>
                     </div>
-                  )}
-                </div>
-              ))}
-              
-              {loading && (
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded bg-[#1f1f1f] border border-[#333] flex items-center justify-center flex-shrink-0">
-                    <Bot size={16} className="text-[#FF6B35]" />
-                  </div>
-                  <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-4 rounded-lg flex items-center gap-3">
-                    <Loader2 size={16} className="text-[#FF6B35] animate-spin" />
-                    <span className="text-xs text-[#555] font-mono tracking-wide">THINKING...</span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+                )}
             </div>
-
-            {/* Input */}
-            <form onSubmit={handleSendMessage} className="flex gap-3 relative flex-shrink-0">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask a question about this topic..."
-                className="flex-1 bg-[#111] border border-[#2a2a2a] px-4 py-4 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35] font-mono rounded-lg transition-all"
-                disabled={loading}
-              />
-              <button
-                type="submit"
-                disabled={!inputMessage.trim() || loading}
-                className="px-6 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black rounded-lg transition-all flex items-center justify-center"
-              >
-                <Send size={20} />
-              </button>
-            </form>
-          </div>
         )}
-      </div>
+
+      </main>
+
+      {/* FLOATING FOOTER INPUT */}
+      {messages.length > 0 && (
+          <footer className="fixed bottom-6 left-0 right-0 px-4 md:px-0 z-30 pointer-events-none">
+            <div className="max-w-3xl mx-auto w-full relative group pointer-events-auto">
+                <div className="absolute inset-0 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-lg translate-y-2" />
+                <form onSubmit={handleSend} className="relative flex items-center bg-white/90 backdrop-blur-md rounded-full border border-black/10 shadow-2xl shadow-black/10 p-2 transition-all focus-within:ring-4 focus-within:ring-[#A1FF62]/20 focus-within:border-[#A1FF62] focus-within:scale-[1.01]">
+                    <div className="pl-3 pr-2 text-xl animate-pulse">✨</div>
+                    <input 
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Ask a follow-up question..."
+                        className="flex-1 h-10 bg-transparent border-none focus:ring-0 text-[#1a1a1a] placeholder:text-black/30 text-sm font-medium px-2"
+                        autoFocus
+                    />
+                    <button 
+                        type="submit" 
+                        disabled={!input.trim() || loading} 
+                        className="p-2.5 bg-[#1a1a1a] text-[#A1FF62] rounded-full hover:bg-black disabled:opacity-50 disabled:hover:bg-[#1a1a1a] transition-all hover:scale-105 active:scale-95 shadow-md"
+                    >
+                        {loading ? <div className="w-4 h-4 border-2 border-[#A1FF62] border-t-transparent rounded-full animate-spin" /> : <Send size={16} />}
+                    </button>
+                </form>
+            </div>
+          </footer>
+      )}
+
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Send, Trash2 } from "lucide-react";
+import { Send, Trash2, Loader2 } from "lucide-react";
 import api from "../../utils/api.js";
 import { useAuthStore } from "../../store/authStore.js";
 
@@ -31,7 +31,7 @@ function CommunityChat({ communityId }) {
     };
     load();
     
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(load, 15000);
     return () => clearInterval(interval);
   }, [communityId]);
 
@@ -74,22 +74,30 @@ function CommunityChat({ communityId }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-[600px]">
       {/* Chat Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface/20">
-        <span className="text-sm font-semibold text-textPrimary">💬 Live Chat</span>
-        {loading && <span className="text-xs text-textSecondary animate-pulse">Loading...</span>}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-surface/30 backdrop-blur-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+          <span className="text-sm font-bold text-white uppercase tracking-wider">Live Chat</span>
+        </div>
+        {loading && (
+          <div className="flex items-center gap-2">
+            <Loader2 size={14} className="text-accent animate-spin" />
+            <span className="text-xs text-textMuted font-mono">Loading...</span>
+          </div>
+        )}
       </div>
       
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
         {messages.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-surface/50 flex items-center justify-center mb-4">
-              <Send size={24} className="text-textSecondary" />
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 rounded-2xl bg-surface/50 border border-border/30 flex items-center justify-center mb-4 backdrop-blur-md">
+              <Send size={32} className="text-textMuted opacity-40" />
             </div>
-            <p className="text-textSecondary text-sm">No messages yet</p>
-            <p className="text-textSecondary/60 text-xs mt-1">Start the conversation!</p>
+            <p className="text-textSecondary text-[15px] font-semibold mb-1">No messages yet</p>
+            <p className="text-textMuted text-[13px]">Be the first to start the conversation!</p>
           </div>
         )}
         
@@ -98,41 +106,52 @@ function CommunityChat({ communityId }) {
           return (
             <div
               key={msg.id}
-              className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
+              className={`flex ${isOwn ? "justify-end" : "justify-start"} group animate-in slide-in-from-bottom-2 fade-in duration-300`}
             >
-              <div
-                className={`relative max-w-[75%]  px-4 py-2.5 shadow-sm ${
-                  isOwn 
-                    ? "bg-accent text-white" 
-                    : "bg-surface/50 text-textPrimary border border-border"
-                }`}
-              >
+              <div className="flex gap-3 max-w-[80%]">
                 {!isOwn && (
-                  <div className="text-[10px] font-semibold text-accent mb-1">
-                    {msg.user_name}
+                  <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-sm flex-shrink-0 shadow-lg shadow-accent/5">
+                    {msg.user_name?.charAt(0) || 'U'}
                   </div>
                 )}
-                <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                  {msg.content}
-                </div>
-                <div className={`text-[10px] mt-1.5 ${isOwn ? "text-white/70" : "text-textSecondary"}`}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
                 
-                {isOwn && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("Delete this message?")) {
-                        handleDelete(msg.id);
-                      }
-                    }}
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-background text-textSecondary border border-border hover:text-error hover:border-error/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
-                    title="Delete message"
+                <div className={`flex-1 ${isOwn ? 'flex flex-col items-end' : ''}`}>
+                  {!isOwn && (
+                    <div className="text-[11px] font-bold text-accent mb-1.5 tracking-wide">
+                      {msg.user_name}
+                    </div>
+                  )}
+                  
+                  <div
+                    className={`relative px-5 py-3 rounded-2xl shadow-md transition-all group-hover:shadow-lg ${
+                      isOwn 
+                        ? "bg-accent text-black rounded-tr-sm shadow-accent/20" 
+                        : "bg-surface/60 text-white border border-border/30 rounded-tl-sm backdrop-blur-md"
+                    }`}
                   >
-                    <Trash2 size={12} />
-                  </button>
-                )}
+                    <div className="text-[14px] whitespace-pre-wrap break-words leading-relaxed">
+                      {msg.content}
+                    </div>
+                    <div className={`text-[10px] font-mono mt-2 ${isOwn ? "text-black/50" : "text-textMuted"}`}>
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    
+                    {isOwn && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("Delete this message?")) {
+                            handleDelete(msg.id);
+                          }
+                        }}
+                        className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[#0a0a0a] text-textMuted border border-border hover:text-red-400 hover:border-red-400/50 hover:bg-red-500/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-lg"
+                        title="Delete message"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -141,30 +160,44 @@ function CommunityChat({ communityId }) {
       </div>
       
       {/* Input Area */}
-      <form onSubmit={handleSend} className="p-4 border-t border-border bg-surface/20">
+      <div className="p-4 border-t border-border/50 bg-surface/20 backdrop-blur-md">
         {!user ? (
-          <p className="text-center text-textSecondary text-sm">
-            Please <a href="/login" className="text-accent hover:underline font-medium">log in</a> to send messages
-          </p>
+          <div className="text-center py-3 bg-surface/50 rounded-2xl border border-border/30 backdrop-blur-md">
+            <p className="text-textSecondary text-sm">
+              Please <a href="/login" className="text-accent hover:underline font-bold">log in</a> to send messages
+            </p>
+          </div>
         ) : (
-          <div className="flex gap-3">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 bg-background border border-border  px-4 py-2.5 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
-            />
+          <form onSubmit={handleSend} className="flex gap-3">
+            <div className="flex-1 relative group">
+              <div className="absolute inset-0 bg-accent/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type a message..."
+                className="relative w-full bg-surface/50 backdrop-blur-md border border-border rounded-full px-5 py-3 text-[14px] text-white placeholder:text-textMuted focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
+              />
+            </div>
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="px-5 py-2.5  bg-accent hover:bg-accent/90 disabled:bg-accent/50 disabled:cursor-not-allowed text-white text-sm font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+              className="px-6 py-3 rounded-full bg-accent hover:bg-accent-hover disabled:bg-accent/30 disabled:cursor-not-allowed text-black text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:scale-105 active:scale-95 uppercase tracking-wider"
             >
-              <Send size={16} />
-              {sending ? "..." : "Send"}
+              {sending ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Sending
+                </>
+              ) : (
+                <>
+                  <Send size={16} />
+                  Send
+                </>
+              )}
             </button>
-          </div>
+          </form>
         )}
-      </form>
+      </div>
     </div>
   );
 }

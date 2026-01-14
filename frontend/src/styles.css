@@ -1,4 +1,5 @@
 @import './styles/design-system.css';
+@import './styles/animations.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +10,8 @@
   }
   
   body {
-    @apply bg-background text-textPrimary font-sans antialiased;
+    @apply bg-background text-textPrimary antialiased;
+    font-family: 'Haffer XH', Arial, sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -100,6 +102,15 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
   }
 }
 

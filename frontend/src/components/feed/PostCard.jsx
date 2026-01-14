@@ -15,7 +15,7 @@ function PostCard({ post, index = 0 }) {
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-          <div className="w-12 h-12 bg-[#FF6B35] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+          <div className="w-12 h-12 bg-[#A1FF62] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
             <Play size={20} fill="black" className="text-black ml-1" />
           </div>
         </div>
@@ -34,7 +34,7 @@ function PostCard({ post, index = 0 }) {
       {/* Info */}
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="w-9 h-9 bg-[#FF6B35] flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
+        <div className="w-9 h-9 bg-[#A1FF62] flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
           {post.creator?.avatar ? (
             <img src={post.creator.avatar} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -44,7 +44,7 @@ function PostCard({ post, index = 0 }) {
 
         <div className="flex-1 min-w-0">
           <Link to={`/posts/${post.id}`}>
-            <h3 className="text-[14px] font-semibold text-white leading-tight line-clamp-2 group-hover:text-[#FF6B35] transition-colors">
+            <h3 className="text-[14px] font-semibold text-white leading-tight line-clamp-2 group-hover:text-[#A1FF62] transition-colors">
               {post.title}
             </h3>
           </Link>

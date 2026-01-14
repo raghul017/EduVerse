@@ -135,7 +135,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Title
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#A1FF62] transition"
               name="title"
               value={form.title}
               onChange={handleChange}
@@ -145,7 +145,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Subject
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#A1FF62] transition"
               name="subject"
               value={form.subject}
               onChange={handleChange}
@@ -155,7 +155,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Level
             <input
-              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#A1FF62] transition"
               name="level"
               value={form.level}
               onChange={handleChange}
@@ -165,7 +165,7 @@ function Paths() {
           <label className="text-sm text-slate-400 space-y-1 block">
             Description
             <textarea
-              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition min-h-[120px]"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#A1FF62] transition min-h-[120px]"
               rows={4}
               name="description"
               value={form.description}
@@ -177,7 +177,7 @@ function Paths() {
           {success && <p className="text-sm text-green-400">{success}</p>}
           <button
             type="submit"
-            className="w-full px-6 py-2 bg-[#FF6B35] text-white rounded-full font-semibold hover:bg-[#ff7a4a] transition disabled:opacity-50"
+            className="w-full px-6 py-2 bg-[#A1FF62] text-white rounded-full font-semibold hover:bg-[#b8ff8a] transition disabled:opacity-50"
             disabled={saving}
           >
             {saving ? "Creating..." : "Create path"}
@@ -208,7 +208,7 @@ function Paths() {
                     </div>
                   <button
                     type="button"
-                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-400 hover:border-[#FF6B35] hover:text-white transition"
+                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-400 hover:border-[#A1FF62] hover:text-white transition"
                     onClick={() => handleAddLesson(post.id)}
                   >
                     Add
@@ -257,7 +257,7 @@ function Paths() {
                         </button>
                       </div>
                       <textarea
-                        className="w-full px-3 py-2 bg-black/20 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B35] transition min-h-[64px] text-xs"
+                        className="w-full px-3 py-2 bg-black/20 border border-white/10  text-white placeholder-slate-500 focus:outline-none focus:border-[#A1FF62] transition min-h-[64px] text-xs"
                         rows={2}
                         placeholder="Links or notes: e.g. article, docs, exercises for this step."
                         value={lesson.resources}

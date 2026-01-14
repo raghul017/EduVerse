@@ -42,7 +42,7 @@ function EditProfile ({ profile, onUpdated }) {
           name="name"
           value={form.name}
           onChange={handleChange}
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
         />
       </div>
       
@@ -53,7 +53,7 @@ function EditProfile ({ profile, onUpdated }) {
           value={form.bio}
           onChange={handleChange}
           rows={3}
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35] resize-none"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62] resize-none"
         />
       </div>
       
@@ -65,7 +65,7 @@ function EditProfile ({ profile, onUpdated }) {
           value={form.interests}
           onChange={handleChange}
           placeholder="React, Python, AI..."
-          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#A1FF62]"
         />
       </div>
       
@@ -79,7 +79,7 @@ function EditProfile ({ profile, onUpdated }) {
       <button 
         type="submit"
         disabled={saving}
-        className="px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center gap-2 transition-all"
+        className="px-5 py-3 bg-[#A1FF62] hover:bg-[#b8ff8a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center gap-2 transition-all"
       >
         {saving ? <><Loader2 size={16} className="animate-spin" /> SAVING...</> : 'SAVE CHANGES'}
       </button>

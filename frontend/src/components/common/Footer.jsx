@@ -1,173 +1,127 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Github, Linkedin, Twitter, Mail, Rocket, BookOpen, Users, MessageSquare } from "lucide-react";
+import { Github, Linkedin, Twitter, Mail, Heart, Sparkles, Route, BookOpen, MessageCircle } from "lucide-react";
 
-function Footer() {
+const Footer = () => {
   const currentYear = new Date().getFullYear();
-
+  
   return (
-    <footer className="border-t border-[#1a1a1a] py-16 px-6 bg-[#050505]">
-      <div className="max-w-[1400px] mx-auto">
-        {/* Main Footer Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+    <footer className="relative overflow-hidden z-10" style={{ backgroundColor: '#F4F4F4' }}>
+      
+      {/* Main Footer Content */}
+      <div className="max-w-[1200px] mx-auto px-6 pt-20 pb-12">
+        
+        {/* Top Section */}
+        <div className="flex flex-col lg:flex-row justify-between gap-16 mb-16">
           
           {/* Brand & Description */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#FF6B35] flex items-center justify-center">
-                <Rocket size={16} className="text-black" />
-              </div>
-              <span className="text-white font-bold text-[16px] tracking-wide">EDUVERSE</span>
-            </div>
-            <p className="text-[13px] text-[#555] leading-relaxed mb-4">
-              AI-powered learning platform that generates personalized roadmaps, courses, and provides intelligent tutoring.
+          <div className="max-w-md">
+            <Link to="/" className="inline-flex items-center gap-2 mb-6">
+              <Sparkles size={24} className="text-[#A1FF62]" />
+              <span className="text-2xl font-black text-[#201D1D]">EduVerse</span>
+            </Link>
+            <p className="text-[#666] leading-relaxed mb-8">
+              AI-powered learning platform that creates personalized roadmaps, adaptive tutoring, and smart quizzes to accelerate your learning journey.
             </p>
-            {/* Social Icons */}
-            <div className="flex items-center gap-3">
+            
+            {/* Social Links */}
+            <div className="flex gap-3">
               <a 
-                href="https://github.com/raghul017/EduVerse" 
+                href="https://github.com/raghul017" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 bg-[#111] border border-[#222] flex items-center justify-center hover:border-[#FF6B35] hover:bg-[#FF6B35]/10 transition-all group"
+                className="w-11 h-11 rounded-full bg-white border border-[#e5e5e5] flex items-center justify-center hover:border-[#A1FF62] hover:bg-[#A1FF62] hover:text-black transition-all group"
               >
-                <Github size={16} className="text-[#666] group-hover:text-[#FF6B35]" />
+                <Github size={18} className="text-[#666] group-hover:text-black" />
               </a>
               <a 
                 href="https://www.linkedin.com/in/raghul-ar05/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 bg-[#111] border border-[#222] flex items-center justify-center hover:border-[#FF6B35] hover:bg-[#FF6B35]/10 transition-all group"
+                className="w-11 h-11 rounded-full bg-white border border-[#e5e5e5] flex items-center justify-center hover:border-[#0077B5] hover:bg-[#0077B5] hover:text-white transition-all group"
               >
-                <Linkedin size={16} className="text-[#666] group-hover:text-[#FF6B35]" />
+                <Linkedin size={18} className="text-[#666] group-hover:text-white" />
               </a>
               <a 
                 href="https://x.com/RaghulAR7" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 bg-[#111] border border-[#222] flex items-center justify-center hover:border-[#FF6B35] hover:bg-[#FF6B35]/10 transition-all group"
+                className="w-11 h-11 rounded-full bg-white border border-[#e5e5e5] flex items-center justify-center hover:border-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all group"
               >
-                <Twitter size={16} className="text-[#666] group-hover:text-[#FF6B35]" />
+                <Twitter size={18} className="text-[#666] group-hover:text-white" />
+              </a>
+              <a 
+                href="mailto:arraghul6@gmail.com"
+                className="w-11 h-11 rounded-full bg-white border border-[#e5e5e5] flex items-center justify-center hover:border-[#EA4335] hover:bg-[#EA4335] hover:text-white transition-all group"
+              >
+                <Mail size={18} className="text-[#666] group-hover:text-white" />
               </a>
             </div>
           </div>
 
-          {/* Platform Links */}
-          <div>
-            <h4 className="text-[11px] text-[#FF6B35] tracking-[0.15em] mb-4 font-mono">PLATFORM</h4>
-            <div className="space-y-3 text-[12px]">
-              <Link to="/" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <Rocket size={12} /> Home
+          {/* Quick Links */}
+          <div className="flex gap-16 md:gap-24">
+            
+            {/* Features */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-sm font-bold text-[#201D1D] uppercase tracking-wider mb-2">Features</h4>
+              <Link to="/ai-roadmap" className="text-[#666] hover:text-[#A1FF62] transition-colors flex items-center gap-2 text-sm">
+                <Route size={14} />
+                AI Roadmaps
               </Link>
-              <Link to="/ai-roadmap" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <BookOpen size={12} /> AI Roadmap
+              <Link to="/ai-tutor" className="text-[#666] hover:text-[#A1FF62] transition-colors flex items-center gap-2 text-sm">
+                <MessageCircle size={14} />
+                AI Tutor
               </Link>
-              <Link to="/ai-course" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <BookOpen size={12} /> AI Course
-              </Link>
-              <Link to="/ai-tutor" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <MessageSquare size={12} /> AI Tutor
+              <Link to="/ai-course" className="text-[#666] hover:text-[#A1FF62] transition-colors flex items-center gap-2 text-sm">
+                <BookOpen size={14} />
+                Courses
               </Link>
             </div>
-          </div>
 
-          {/* Community Links */}
-          <div>
-            <h4 className="text-[11px] text-[#FF6B35] tracking-[0.15em] mb-4 font-mono">COMMUNITY</h4>
-            <div className="space-y-3 text-[12px]">
-              <Link to="/communities" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <Users size={12} /> Communities
-              </Link>
-              <Link to="/feed" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <BookOpen size={12} /> Learning Feed
-              </Link>
-              <Link to="/videos" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <BookOpen size={12} /> Videos
-              </Link>
-              <Link to="/dashboard" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
-                <Rocket size={12} /> Dashboard
-              </Link>
+            {/* Resources */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-sm font-bold text-[#201D1D] uppercase tracking-wider mb-2">Account</h4>
+              <Link to="/dashboard" className="text-[#666] hover:text-[#A1FF62] transition-colors text-sm">Dashboard</Link>
+              <Link to="/profile" className="text-[#666] hover:text-[#A1FF62] transition-colors text-sm">Profile</Link>
+              <Link to="/login" className="text-[#666] hover:text-[#A1FF62] transition-colors text-sm">Login</Link>
+              <Link to="/signup" className="text-[#666] hover:text-[#A1FF62] transition-colors text-sm">Sign Up</Link>
             </div>
-          </div>
 
-          {/* Developer Links */}
-          <div>
-            <h4 className="text-[11px] text-[#FF6B35] tracking-[0.15em] mb-4 font-mono">DEVELOPER</h4>
-            <div className="space-y-3 text-[12px]">
-              <a 
-                href="https://github.com/raghul017/EduVerse" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[#666] hover:text-white transition-colors"
-              >
-                <Github size={12} /> Source Code
-              </a>
-              <a 
-                href="https://github.com/raghul017/EduVerse#readme" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[#666] hover:text-white transition-colors"
-              >
-                <BookOpen size={12} /> Documentation
-              </a>
-              <a 
-                href="https://github.com/raghul017/EduVerse/issues" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[#666] hover:text-white transition-colors"
-              >
-                <MessageSquare size={12} /> Report Issue
-              </a>
-              <a 
-                href="mailto:raghular017@gmail.com" 
-                className="flex items-center gap-2 text-[#666] hover:text-white transition-colors"
-              >
-                <Mail size={12} /> Contact
-              </a>
-            </div>
           </div>
         </div>
 
-        {/* Tech Stack Banner */}
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-4 mb-8">
-          <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] text-[#444] font-mono tracking-widest">
-            <span>REACT 18</span>
-            <span className="text-[#333]">•</span>
-            <span>NODE.JS</span>
-            <span className="text-[#333]">•</span>
-            <span>POSTGRESQL</span>
-            <span className="text-[#333]">•</span>
-            <span>GROQ AI</span>
-            <span className="text-[#333]">•</span>
-            <span>TAILWIND CSS</span>
-            <span className="text-[#333]">•</span>
-            <span>SUPABASE</span>
-          </div>
-        </div>
-        
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-[#1a1a1a]">
-          <p className="text-[11px] text-[#444] font-mono">
-            © {currentYear} EDUVERSE. ALL RIGHTS RESERVED.
-          </p>
-          <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <div className="flex items-center gap-2 text-[11px] text-[#444] font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#27ca40] animate-pulse"></span>
-              SYSTEM OPERATIONAL
-            </div>
-            <div className="h-4 w-[1px] bg-[#222]"></div>
+        {/* Divider */}
+        <div className="h-px bg-[#e5e5e5] mb-8"></div>
+
+        {/* Bottom Section */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-[#999]">
+            © {currentYear} EduVerse. Built with <Heart size={12} className="inline text-red-500 mx-1" /> by{" "}
             <a 
-              href="https://www.linkedin.com/in/raghul-ar05/" 
+              href="https://github.com/raghul017" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[11px] text-[#666] hover:text-[#FF6B35] transition-colors font-mono"
+              className="text-[#201D1D] font-medium hover:text-[#A1FF62] transition-colors"
             >
-              BUILT BY RAGHUL A R
+              Raghul A R
             </a>
+          </p>
+          
+          <div className="flex items-center gap-6 text-sm text-[#999]">
+            <span>Made in India 🇮🇳</span>
           </div>
         </div>
       </div>
+
+      {/* Massive Background Text */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none select-none z-0 flex justify-center overflow-hidden opacity-[0.04]">
+        <h1 className="text-[28vw] font-black leading-[0.8] tracking-tighter text-[#201D1D] whitespace-nowrap">
+          EDUVERSE
+        </h1>
+      </div>
     </footer>
   );
-}
+};
 
 export default Footer;

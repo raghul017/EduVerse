@@ -28,7 +28,7 @@ function AIChat({ postId }) {
 
   return (
     <div className="bg-[#0f0f0f] border border-[#1f1f1f] p-5 space-y-4">
-      <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FF6B35]">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-[#A1FF62]">
         <MessageCircle size={16} />
         ASK AI TUTOR
       </div>
@@ -37,7 +37,7 @@ function AIChat({ postId }) {
         <div className="space-y-3 max-h-48 overflow-y-auto">
           {messages.map((msg, idx) => (
             <div key={idx} className={`text-[12px] ${msg.role === 'user' ? 'text-white' : 'text-[#999]'}`}>
-              <span className="text-[#FF6B35] font-mono text-[10px]">{msg.role === 'user' ? 'YOU' : 'AI'}:</span>
+              <span className="text-[#A1FF62] font-mono text-[10px]">{msg.role === 'user' ? 'YOU' : 'AI'}:</span>
               <p className="mt-1">{msg.content}</p>
             </div>
           ))}
@@ -50,13 +50,13 @@ function AIChat({ postId }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about this video..."
-          className="flex-1 bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-2 text-[13px] text-white placeholder:text-[#444] focus:border-[#FF6B35] focus:outline-none"
+          className="flex-1 bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-2 text-[13px] text-white placeholder:text-[#444] focus:border-[#A1FF62] focus:outline-none"
           disabled={loading}
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="px-3 py-2 bg-[#FF6B35] text-black disabled:opacity-40"
+          className="px-3 py-2 bg-[#A1FF62] text-black disabled:opacity-40"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </button>

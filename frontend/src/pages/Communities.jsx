@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Users, Plus, Loader2, X, MessageSquare, Hash } from "lucide-react";
+import { Search, Users, Plus, Loader2, X, MessageSquare, TrendingUp, Activity } from "lucide-react";
 import { useCommunityStore } from "../store/communityStore.js";
 import { useAuthStore } from "../store/authStore.js";
+import SpotlightCard from "../components/ui/SpotlightCard.jsx";
+import ScrollReveal from "../components/ui/ScrollReveal.jsx";
 
 function Communities() {
   const navigate = useNavigate();
@@ -64,113 +66,131 @@ function Communities() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] py-12 px-6">
-      <div className="max-w-[1200px] mx-auto">
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans pb-24">
+      
+      {/* Ambient Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="bg-noise opacity-[0.03] absolute inset-0"></div>
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-accent/5 rounded-full blur-[120px] mix-blend-screen animate-float-slow"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] mix-blend-screen animate-float-slow" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-8 pt-16">
         
         {/* Header */}
-        <div className="flex items-start justify-between mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[12px] text-[#FF6B35] mb-4 tracking-[0.15em] font-mono">
-              <span className="w-2 h-2 bg-[#FF6B35] rounded-full"></span>
-              [ LEARNING COMMUNITIES ]
+        <ScrollReveal>
+          <div className="flex flex-col lg:flex-row items-start justify-between mb-12 gap-6">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border mb-6 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-textSecondary">Learning Communities</span>
+              </div>
+              <h1 className="text-fluid-hero text-white mb-4 leading-none tracking-tighter">
+                COMMUNITIES
+              </h1>
+              <p className="text-textSecondary text-xl max-w-xl text-balance">
+                Join communities to learn, discuss, and connect with others who share your interests.
+              </p>
             </div>
-            <h1 className="text-[48px] font-bold text-white mb-4 leading-tight">
-              Communities
-            </h1>
-            <p className="text-[#666] text-[16px] max-w-xl">
-              Join communities to learn and discuss with others
-            </p>
+            
+            {user && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="ev-button ev-button--primary text-xs uppercase tracking-wider py-3 px-6 flex items-center gap-2 font-bold"
+              >
+                <Plus size={16} /> Create Community
+              </button>
+            )}
           </div>
-          
-          {user && (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] text-black font-bold text-[13px] transition-all"
-            >
-              <Plus size={16} /> CREATE COMMUNITY
-            </button>
-          )}
-        </div>
+        </ScrollReveal>
 
         {/* Search */}
-        <div className="mb-10">
-          <div className="max-w-md bg-[#111] border border-[#2a2a2a] flex items-center gap-3 px-4">
-            <Search size={18} className="text-[#555]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search communities..."
-              className="flex-1 bg-transparent py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none font-mono"
-            />
+        <ScrollReveal delay={0.1}>
+          <div className="mb-12 max-w-2xl">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-accent/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div className="relative flex items-center gap-3 px-6 py-4 bg-surface/50 backdrop-blur-md border border-border rounded-full shadow-lg focus-within:border-accent/50 transition-all">
+                <Search size={20} className="text-textMuted flex-shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search communities..."
+                  className="flex-1 bg-transparent text-white text-[15px] placeholder:text-textDisabled focus:outline-none font-medium"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Communities Grid */}
         <div>
-          <h2 className="text-[14px] font-mono text-[#FF6B35] mb-4 tracking-wide">&gt;_ ALL_COMMUNITIES</h2>
+          <ScrollReveal delay={0.2}>
+            <h2 className="text-sm font-mono text-textMuted mb-8 tracking-wide flex items-center gap-2">
+              <TrendingUp size={14} /> ALL COMMUNITIES
+            </h2>
+          </ScrollReveal>
           
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 size={32} className="text-[#FF6B35] animate-spin" />
+              <Loader2 size={32} className="text-accent animate-spin" />
             </div>
           ) : filteredCommunities.length === 0 ? (
-            <div className="text-center py-20 bg-[#0f0f0f] border border-[#1f1f1f]">
-              <Users size={48} className="text-[#333] mx-auto mb-4" />
-              <p className="text-[#555] text-[14px]">No communities found</p>
-            </div>
+            <ScrollReveal delay={0.3}>
+              <div className="text-center py-20 bg-surface/30 border border-border rounded-3xl backdrop-blur-md">
+                <Users size={48} className="text-textDisabled mx-auto mb-4 opacity-40" />
+                <p className="text-textMuted text-[15px]">No communities found</p>
+              </div>
+            </ScrollReveal>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredCommunities.map((community) => (
-                <Link
-                  key={community.id}
-                  to={`/communities/${community.id}`}
-                  className="group block"
-                >
-                  <div className="relative bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#333] p-5 transition-all">
-                    <div className="absolute left-0 top-4 bottom-4 w-[3px] bg-[#FF6B35]"></div>
-                    
-                    <div className="pl-4">
-                      <div className="flex items-start justify-between mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCommunities.map((community, idx) => (
+                <ScrollReveal key={community.id} delay={0.3 + idx * 0.05}>
+                  <Link to={`/communities/${community.id}`} className="group block">
+                    <SpotlightCard className="p-6 hover:scale-[1.02] transition-all duration-300 h-full flex flex-col">
+                      <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <span className="text-2xl">{getSubjectEmoji(community.subject)}</span>
+                          <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center text-2xl border border-accent/20 shadow-lg shadow-accent/5">
+                            {getSubjectEmoji(community.subject)}
+                          </div>
                           <div>
-                            <h3 className="font-bold text-white text-[16px] group-hover:text-[#FF6B35] transition-colors">
+                            <h3 className="font-bold text-white text-[17px] group-hover:text-accent transition-colors leading-tight">
                               {community.name}
                             </h3>
-                            <span className="text-[11px] text-[#555] font-mono uppercase">{community.subject}</span>
+                            <span className="text-[11px] text-textMuted font-mono uppercase tracking-wider">{community.subject}</span>
                           </div>
                         </div>
                       </div>
                       
-                      <p className="text-[#666] text-[13px] mb-4 line-clamp-2">
+                      <p className="text-textSecondary text-[14px] mb-6 line-clamp-2 flex-1 leading-relaxed">
                         {community.description || "A community for learning and discussion"}
                       </p>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-[11px] text-[#555]">
-                          <span className="flex items-center gap-1">
-                            <Users size={12} /> {community.member_count || 0}
+                      <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                        <div className="flex items-center gap-4 text-[12px] text-textMuted">
+                          <span className="flex items-center gap-1.5">
+                            <Users size={13} /> {community.member_count || 0}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <MessageSquare size={12} /> {community.post_count || 0}
+                          <span className="flex items-center gap-1.5">
+                            <MessageSquare size={13} /> {community.post_count || 0}
                           </span>
                         </div>
                         
                         <button
                           onClick={(e) => handleJoinLeave(e, community)}
-                          className={`px-3 py-1.5 text-[11px] font-semibold transition-all ${
+                          className={`px-4 py-2 text-[11px] font-bold transition-all rounded-full ${
                             community.joined
-                              ? 'bg-[#1a1a1a] text-[#FF6B35] border border-[#FF6B35]'
-                              : 'bg-[#FF6B35] text-black'
+                              ? 'bg-surface text-accent border border-accent/30 hover:bg-accent/10'
+                              : 'bg-accent text-black hover:bg-accent-hover shadow-md shadow-accent/20'
                           }`}
                         >
                           {community.joined ? 'JOINED' : 'JOIN'}
                         </button>
                       </div>
-                    </div>
-                  </div>
-                </Link>
+                    </SpotlightCard>
+                  </Link>
+                </ScrollReveal>
               ))}
             </div>
           )}
@@ -179,58 +199,58 @@ function Communities() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-[#111] border border-[#2a2a2a] w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]">
-              <h2 className="text-white font-bold text-[16px]">Create Community</h2>
-              <button onClick={() => setShowCreateModal(false)} className="text-[#555] hover:text-white">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
+          <div className="bg-surface/90 backdrop-blur-xl border border-border w-full max-w-md rounded-3xl shadow-2xl shadow-black/50 animate-in slide-in-from-bottom-4 duration-300">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
+              <h2 className="text-white font-bold text-[18px] tracking-tight">Create Community</h2>
+              <button onClick={() => setShowCreateModal(false)} className="text-textMuted hover:text-white transition-colors p-2 hover:bg-surface-hover rounded-full">
                 <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleCreateCommunity} className="p-5 space-y-4">
+            <form onSubmit={handleCreateCommunity} className="p-6 space-y-5">
               <div>
-                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">NAME</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-textMuted mb-2 font-mono">Community Name</label>
                 <input
                   type="text"
                   value={newCommunity.name}
                   onChange={(e) => setNewCommunity({ ...newCommunity, name: e.target.value })}
-                  placeholder="Community name"
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+                  placeholder="React Developers"
+                  className="w-full bg-background/50 border border-border px-4 py-3 rounded-2xl text-white text-[15px] placeholder:text-textDisabled focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">SUBJECT</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-textMuted mb-2 font-mono">Subject</label>
                 <input
                   type="text"
                   value={newCommunity.subject}
                   onChange={(e) => setNewCommunity({ ...newCommunity, subject: e.target.value })}
                   placeholder="e.g. React, Python, Machine Learning"
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35]"
+                  className="w-full bg-background/50 border border-border px-4 py-3 rounded-2xl text-white text-[15px] placeholder:text-textDisabled focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-[11px] uppercase tracking-[0.15em] text-[#555] mb-2 font-mono">DESCRIPTION</label>
+                <label className="block text-[11px] uppercase tracking-[0.15em] text-textMuted mb-2 font-mono">Description</label>
                 <textarea
                   value={newCommunity.description}
                   onChange={(e) => setNewCommunity({ ...newCommunity, description: e.target.value })}
                   placeholder="Brief description..."
-                  rows={3}
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-3 text-white text-[14px] placeholder:text-[#444] focus:outline-none focus:border-[#FF6B35] resize-none"
+                  rows={4}
+                  className="w-full bg-background/50 border border-border px-4 py-3 rounded-2xl text-white text-[15px] placeholder:text-textDisabled focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 resize-none transition-all"
                 />
               </div>
               
               <button
                 type="submit"
                 disabled={creating || !newCommunity.name.trim() || !newCommunity.subject.trim()}
-                className="w-full px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] disabled:opacity-40 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all"
+                className="w-full px-5 py-3 bg-accent hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all rounded-full shadow-lg shadow-accent/20 uppercase tracking-wider"
               >
                 {creating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                CREATE COMMUNITY
+                Create Community
               </button>
             </form>
           </div>
