@@ -144,7 +144,7 @@ const Home = () => {
 
       {/* HERO SECTION */}
       <section className="relative z-10 pt-20 pb-10 flex flex-col items-center px-6">
-        <div className="max-w-[1200px] mx-auto text-center bg-[#F5F5F5]/80 backdrop-blur-sm p-4 rounded-3xl">
+        <div className="max-w-[1200px] mx-auto text-center bg-[#F5F5F5]/80 backdrop-blur-sm p-3 sm:p-4 rounded-3xl">
           
           {/* DISCLAIMER BANNER - TOP */}
           <div className="mb-6">
@@ -154,19 +154,19 @@ const Home = () => {
           </div>
 
           {/* Single Line Large Headline with Dynamic Word */}
-          <h1 className="leading-none flex flex-wrap justify-center items-center gap-2 md:gap-4 mb-8"
+          <h1 className="leading-none flex flex-wrap justify-center items-center gap-2 md:gap-4 mb-6 sm:mb-8"
             style={{ 
               fontFamily: 'Haffer XH, Arial, sans-serif',
               fontWeight: 400,
               letterSpacing: '-.06em',
               lineHeight: 1,
-              fontSize: 'clamp(3rem, 8vw, 6rem)',
+              fontSize: 'clamp(2rem, 8vw, 6rem)',
               color: '#1a1a1a' 
             }}>
             <span>Master</span>
             <span 
               ref={wordRef}
-              className="text-[#A1FF62] bg-[#1a1a1a] px-4 md:px-6 py-1 md:py-2 rounded-xl inline-block min-w-[180px] md:min-w-[280px] text-center"
+              className="text-[#A1FF62] bg-[#1a1a1a] px-3 sm:px-4 md:px-6 py-1 md:py-2 rounded-xl inline-block min-w-[120px] sm:min-w-[180px] md:min-w-[280px] text-center"
               style={{ 
                 fontWeight: 500,
                 letterSpacing: '-.02em'
@@ -181,56 +181,58 @@ const Home = () => {
           </h1>
 
           {/* Subtext with pills */}
-          <p className="text-[#666] text-base md:text-xl mb-10 flex flex-wrap justify-center gap-3 items-center max-w-[900px] mx-auto">
+          <p className="text-[#666] text-sm sm:text-base md:text-xl mb-8 sm:mb-10 flex flex-wrap justify-center gap-2 sm:gap-3 items-center max-w-[900px] mx-auto px-2">
             Ultra-fast roadmaps via
-            <span className="px-3 py-1.5 bg-[#1a1a1a] text-white text-sm rounded-lg font-medium shadow-lg">Groq Llama 3.3</span>
-            •
-            <span className="px-3 py-1.5 bg-[#1a1a1a] text-white text-sm rounded-lg font-medium shadow-lg">AI Tutor Chat</span>
-            •
-            <span className="px-3 py-1.5 bg-[#1a1a1a] text-white text-sm rounded-lg font-medium shadow-lg">Video Whisper</span>
-            •
-            <span className="px-3 py-1.5 bg-[#1a1a1a] text-white text-sm rounded-lg font-medium shadow-lg">Auto Quizzes</span>
-            and
-            <span className="px-3 py-1.5 bg-[#1a1a1a] text-white text-sm rounded-lg font-medium shadow-lg">Communities</span>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] text-white text-xs sm:text-sm rounded-lg font-medium shadow-lg">Groq Llama 3.3</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] text-white text-xs sm:text-sm rounded-lg font-medium shadow-lg">AI Tutor Chat</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] text-white text-xs sm:text-sm rounded-lg font-medium shadow-lg">Video Whisper</span>
+            <span className="hidden md:inline">•</span>
+            <span className="hidden md:inline px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] text-white text-xs sm:text-sm rounded-lg font-medium shadow-lg">Auto Quizzes</span>
+            <span className="hidden md:inline">and</span>
+            <span className="hidden md:inline px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] text-white text-xs sm:text-sm rounded-lg font-medium shadow-lg">Communities</span>
           </p>
 
           {/* SEARCH BOX */}
-          <div className="bg-[#1a1a1a] rounded-full p-2 pl-6 flex items-center max-w-2xl mx-auto shadow-2xl relative z-20">
-            <Command size={24} className="text-white/40 mr-4 shrink-0" />
+          <div className="bg-[#1a1a1a] rounded-full p-1.5 sm:p-2 pl-4 sm:pl-6 flex items-center max-w-2xl mx-auto shadow-2xl relative z-20">
+            <Command size={20} className="text-white/40 mr-2 sm:mr-4 shrink-0 hidden sm:block" />
             <input
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-              placeholder="Frontend Developer, Data Science, DevOps..."
-              className="flex-1 bg-transparent border-none text-white placeholder:text-white/40 focus:ring-0 p-0 h-14 text-lg focus:outline-none"
+              placeholder="Frontend, Data Science..."
+              aria-label="Enter a topic to generate a learning roadmap"
+              className="flex-1 bg-transparent border-none text-white placeholder:text-white/40 focus:ring-0 p-0 h-10 sm:h-14 text-sm sm:text-lg focus:outline-none"
             />
             <button 
               onClick={handleGenerate}
-              className="bg-[#A1FF62] hover:bg-[#b8ff8a] text-black font-bold h-12 px-8 rounded-full text-base transition-all flex items-center gap-2"
+              aria-label="Generate learning roadmap"
+              className="bg-[#A1FF62] hover:bg-[#b8ff8a] text-black font-bold h-9 sm:h-12 px-4 sm:px-8 rounded-full text-sm sm:text-base transition-all flex items-center gap-1 sm:gap-2"
             >
-              Generate <ArrowRight size={20} />
+              <span className="hidden sm:inline">Generate</span> <ArrowRight size={18} aria-hidden="true" />
             </button>
           </div>
           
           {/* Meta info */}
-          <div className="flex gap-8 justify-center mt-8 text-sm text-[#999] font-medium">
+          <div className="flex flex-wrap gap-4 sm:gap-8 justify-center mt-6 sm:mt-8 text-xs sm:text-sm text-[#999] font-medium">
             <span className="flex items-center gap-2">
-              <Zap size={14} className="text-[#A1FF62]" /> Groq Ultra-Fast (45ms)
+              <Zap size={14} className="text-[#A1FF62]" /> Groq Ultra-Fast
             </span>
-            <span>Llama 3.3 70B</span>
-            <span>Gemini Fallback</span>
+            <span className="hidden sm:inline">Llama 3.3 70B</span>
+            <span className="hidden md:inline">Gemini Fallback</span>
           </div>
         </div>
 
         {/* BENTO GRID GALLERY */}
-        <div ref={bentoRef} className="relative w-full max-w-[1200px] mx-auto mt-16 px-4">
+        <div ref={bentoRef} className="relative w-full max-w-[1200px] mx-auto mt-10 sm:mt-16 px-3 sm:px-4">
           
           {/* Bento Grid Container */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[180px] md:auto-rows-[200px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 auto-rows-[160px] sm:auto-rows-[180px] md:auto-rows-[200px]">
             
             {/* Card 1 - Roadmaps (2 rows) */}
-            <div className="bento-item row-span-2 bg-[#1a1a1a] rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(161,255,98,0.15)] group relative">
+            <div className="bento-item sm:row-span-2 bg-[#1a1a1a] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(161,255,98,0.15)] group relative">
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
               <div className="p-6 h-full flex flex-col justify-between relative z-10">
                 <div className="flex gap-2">
@@ -252,7 +254,7 @@ const Home = () => {
             </div>
 
             {/* Card 2 - AI Courses (Featured - 2 cols, 2 rows) */}
-            <div className="bento-item col-span-2 row-span-2 bg-[#000] rounded-[2rem] shadow-[0_20px_50px_rgba(161,255,98,0.2)] overflow-hidden border border-[#A1FF62]/20 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_25px_60px_rgba(161,255,98,0.3)] group relative">
+            <div className="bento-item col-span-1 sm:col-span-2 sm:row-span-2 bg-[#000] rounded-2xl sm:rounded-[2rem] shadow-[0_20px_50px_rgba(161,255,98,0.2)] overflow-hidden border border-[#A1FF62]/20 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_25px_60px_rgba(161,255,98,0.3)] group relative">
               <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
               <div className="p-8 h-full flex flex-col relative z-10">
                 <div className="flex justify-between items-center mb-6">
@@ -284,7 +286,7 @@ const Home = () => {
             </div>
 
             {/* Card 3 - Whisper (2 rows) */}
-            <div className="bento-item row-span-2 bg-[#E8E4D8] rounded-3xl shadow-2xl overflow-hidden border border-black/5 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl group relative">
+            <div className="bento-item hidden sm:flex sm:row-span-2 bg-[#E8E4D8] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-black/5 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl group relative flex-col">
               <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
               <div className="p-6 h-full flex flex-col justify-between relative z-10">
                 <span className="text-[10px] text-[#000]/40 uppercase tracking-[0.2em] font-bold border border-black/10 px-2 py-1 rounded-full self-start">VOICE AI</span>
@@ -304,7 +306,7 @@ const Home = () => {
             </div>
 
             {/* Card 4 - AI Tutor (1 row, full width on mobile) */}
-            <div className="bento-item col-span-2 bg-[#1a1a1a] rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-lg group relative">
+            <div className="bento-item col-span-1 sm:col-span-2 bg-[#1a1a1a] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-lg group relative">
               <div className="absolute top-0 right-0 w-40 h-40 bg-[#A1FF62] blur-[80px] opacity-10 pointer-events-none"></div>
               <div className="p-6 h-full flex items-center gap-6 relative z-10">
                 <div className="p-3 bg-[#A1FF62]/10 rounded-xl group-hover:bg-[#A1FF62]/20 transition-colors">
@@ -322,7 +324,7 @@ const Home = () => {
             </div>
 
             {/* Card 5 - Community */}
-            <div className="bento-item col-span-2 bg-[#F5F0E6] rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-lg group relative">
+            <div className="bento-item col-span-1 sm:col-span-2 bg-[#F5F0E6] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-lg group relative">
               <div className="p-6 h-full flex items-center justify-between relative">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white rounded-xl shadow-sm">
@@ -358,8 +360,8 @@ const Home = () => {
       </section>
 
       {/* TOOLKIT SECTION */}
-      <section className="py-20 px-6 relative z-10">
-        <div className="max-w-[800px] mx-auto text-center mb-12 bg-[#F5F5F5]/90 backdrop-blur rounded-xl p-4">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 relative z-10">
+        <div className="max-w-[800px] mx-auto text-center mb-8 sm:mb-12 bg-[#F5F5F5]/90 backdrop-blur rounded-xl p-3 sm:p-4">
           <span className="text-[10px] font-mono uppercase tracking-widest text-[#999]">Powered by Groq + Gemini</span>
           <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-black text-[#1a1a1a] leading-tight mt-3 mb-4">
             Your complete AI learning<br />ecosystem
@@ -377,7 +379,7 @@ const Home = () => {
         </div>
 
         {/* TILTED CARDS */}
-        <div ref={toolkitRef} className="relative flex justify-center items-center gap-4 md:gap-8 py-8 max-w-[1000px] mx-auto">
+        <div ref={toolkitRef} className="relative flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8 py-8 max-w-[1000px] mx-auto">
           
           {/* Purple Card - Community */}
           <div className="hidden md:block hover:scale-105 transition-all duration-500 z-10">
@@ -460,11 +462,11 @@ const Home = () => {
       </section>
 
       {/* GLOBE + TESTIMONIAL (Trusted By Removed) */}
-      <section className="py-16 px-6 relative z-10">
-        <div className="max-w-[1000px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 relative z-10">
+        <div className="max-w-[1000px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 items-center">
           
           {/* Globe */}
-          <div className="relative w-[300px] md:w-[380px] h-[380px] md:h-[480px] mx-auto">
+          <div className="relative w-[250px] sm:w-[300px] md:w-[380px] h-[320px] sm:h-[380px] md:h-[480px] mx-auto">
             <div className="absolute inset-0 bg-[#0a0a0a] rounded-[50%/40%] flex items-center justify-center overflow-hidden shadow-2xl">
               
               {/* Top Label */}
@@ -539,10 +541,10 @@ const Home = () => {
       </section>
 
       {/* WHY EDUVERSE */}
-      <section className="py-16 px-6 relative z-10">
-        <div className="max-w-[700px] mx-auto bg-[#F5F5F5]/90 backdrop-blur rounded-xl p-4">
-          <span className="text-[#FF6B6B] text-lg italic">Why EduVerse?</span>
-          <h2 className="text-[clamp(1.5rem,3.5vw,2.5rem)] font-black text-[#1a1a1a] leading-[1.2] mt-3">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 relative z-10">
+        <div className="max-w-[700px] mx-auto bg-[#F5F5F5]/90 backdrop-blur rounded-xl p-3 sm:p-4">
+          <span className="text-[#FF6B6B] text-base sm:text-lg italic">Why EduVerse?</span>
+          <h2 className="text-[clamp(1.25rem,3.5vw,2.5rem)] font-black text-[#1a1a1a] leading-[1.2] mt-3">
             Learn faster with AI that generates roadmaps in seconds, transcribes videos instantly, and tutors you in real-time. Join 1,700+ learners building their future.
           </h2>
         </div>

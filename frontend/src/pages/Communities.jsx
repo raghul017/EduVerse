@@ -75,20 +75,20 @@ function Communities() {
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] mix-blend-screen animate-float-slow" style={{ animationDelay: '2s' }}></div>
       </div>
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-8 pt-16">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8 pt-8 sm:pt-16">
         
         {/* Header */}
         <ScrollReveal>
-          <div className="flex flex-col lg:flex-row items-start justify-between mb-12 gap-6">
+          <div className="flex flex-col lg:flex-row items-start justify-between mb-8 sm:mb-12 gap-4 sm:gap-6">
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border mb-6 backdrop-blur-md">
                 <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-textSecondary">Learning Communities</span>
               </div>
-              <h1 className="text-fluid-hero text-white mb-4 leading-none tracking-tighter">
+              <h1 className="text-4xl sm:text-fluid-hero text-white mb-4 leading-none tracking-tighter">
                 COMMUNITIES
               </h1>
-              <p className="text-textSecondary text-xl max-w-xl text-balance">
+              <p className="text-textSecondary text-base sm:text-xl max-w-xl text-balance">
                 Join communities to learn, discuss, and connect with others who share your interests.
               </p>
             </div>
@@ -106,17 +106,17 @@ function Communities() {
 
         {/* Search */}
         <ScrollReveal delay={0.1}>
-          <div className="mb-12 max-w-2xl">
+          <div className="mb-8 sm:mb-12 max-w-2xl">
             <div className="relative group">
               <div className="absolute inset-0 bg-accent/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-              <div className="relative flex items-center gap-3 px-6 py-4 bg-surface/50 backdrop-blur-md border border-border rounded-full shadow-lg focus-within:border-accent/50 transition-all">
-                <Search size={20} className="text-textMuted flex-shrink-0" />
+              <div className="relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-surface/50 backdrop-blur-md border border-border rounded-full shadow-lg focus-within:border-accent/50 transition-all">
+                <Search size={18} className="text-textMuted flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search communities..."
-                  className="flex-1 bg-transparent text-white text-[15px] placeholder:text-textDisabled focus:outline-none font-medium"
+                  className="flex-1 bg-transparent text-white text-sm sm:text-[15px] placeholder:text-textDisabled focus:outline-none font-medium"
                   autoComplete="off"
                 />
               </div>
@@ -199,8 +199,8 @@ function Communities() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
-          <div className="bg-surface/90 backdrop-blur-xl border border-border w-full max-w-md rounded-3xl shadow-2xl shadow-black/50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6 animate-in fade-in duration-200">
+          <div className="bg-surface/90 backdrop-blur-xl border border-border w-full max-w-md rounded-2xl sm:rounded-3xl shadow-2xl shadow-black/50 animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
               <h2 className="text-white font-bold text-[18px] tracking-tight">Create Community</h2>
               <button onClick={() => setShowCreateModal(false)} className="text-textMuted hover:text-white transition-colors p-2 hover:bg-surface-hover rounded-full">
@@ -208,7 +208,7 @@ function Communities() {
               </button>
             </div>
             
-            <form onSubmit={handleCreateCommunity} className="p-6 space-y-5">
+            <form onSubmit={handleCreateCommunity} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div>
                 <label className="block text-[11px] uppercase tracking-[0.15em] text-textMuted mb-2 font-mono">Community Name</label>
                 <input
@@ -216,7 +216,7 @@ function Communities() {
                   value={newCommunity.name}
                   onChange={(e) => setNewCommunity({ ...newCommunity, name: e.target.value })}
                   placeholder="React Developers"
-                  className="w-full bg-background/50 border border-border px-4 py-3 rounded-2xl text-white text-[15px] placeholder:text-textDisabled focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
+                  className="w-full bg-background/50 border border-border px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-white text-sm sm:text-[15px] placeholder:text-textDisabled focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
                   required
                 />
               </div>

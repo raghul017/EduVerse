@@ -486,9 +486,9 @@ function RoadmapGenerator() {
               className="fixed right-0 top-0 bottom-0 w-full md:w-[28rem] bg-[#111] border-l border-white/10 shadow-2xl z-40 overflow-hidden"
             >
               {/* Sidebar Header - Dark Theme */}
-              <div className="p-6 border-b border-white/10 bg-[#0a0a0a]">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[16px] font-bold text-white font-mono uppercase tracking-tight">{selectedNode.label}</h3>
+              <div className="p-4 sm:p-6 border-b border-white/10 bg-[#0a0a0a]">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-[14px] sm:text-[16px] font-bold text-white font-mono uppercase tracking-tight line-clamp-1">{selectedNode.label}</h3>
                   <button
                     onClick={() => setSelectedNode(null)}
                     className="p-2 text-gray-500 hover:text-white hover:bg-white/10 transition-colors rounded-full"
@@ -719,7 +719,7 @@ function RoadmapGenerator() {
 
         {/* Main Content Area - Full width */}
         <div className={`relative w-full overflow-y-auto transition-all duration-300 ${selectedNode ? 'md:pr-[28rem]' : ''}`}>
-          <div className="w-full px-6 py-8">
+          <div className="w-full px-3 sm:px-6 py-4 sm:py-8">
             
             {/* Offline Warning Banner */}
             {roadmap?.isOffline && (
@@ -738,60 +738,61 @@ function RoadmapGenerator() {
             )}
 
             {/* Header Card - Dark Theme */}
-            <div className="bg-[#111] rounded-[32px] shadow-2xl border border-white/10 p-8 mb-12 relative overflow-hidden">
+            <div className="bg-[#111] rounded-[20px] sm:rounded-[32px] shadow-2xl border border-white/10 p-4 sm:p-8 mb-8 sm:mb-12 relative overflow-hidden">
               {/* Background glow */}
               <div className="absolute top-0 right-0 w-80 h-80 bg-[#A1FF62]/10 blur-[100px] pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-60 h-60 bg-[#A1FF62]/5 blur-[80px] pointer-events-none" />
               
               {/* Top Row: Back Button & Action Buttons */}
-              <div className="flex items-center justify-between mb-6 relative z-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6 relative z-10">
                 <button
                   onClick={() => navigate("/ai-roadmap")}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white font-medium transition-colors"
+                  className="flex items-center gap-2 text-gray-400 hover:text-white font-medium transition-colors text-sm"
                 >
-                  <ArrowLeft size={20} />
-                  <span>All Roadmaps</span>
+                  <ArrowLeft size={18} />
+                  <span className="hidden sm:inline">All Roadmaps</span>
+                  <span className="sm:hidden">Back</span>
                 </button>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={handleDownload}
-                    className="px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-2"
+                    className="px-3 sm:px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-xs sm:text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-1 sm:gap-2"
                   >
-                    <Download size={16} />
-                    Download
+                    <Download size={14} />
+                    <span className="hidden sm:inline">Download</span>
                   </button>
                   <button
                     onClick={handleRegenerate}
-                    className="px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-2"
+                    className="px-3 sm:px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-xs sm:text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-1 sm:gap-2"
                   >
-                    <RefreshCw size={16} />
-                    Regenerate
+                    <RefreshCw size={14} />
+                    <span className="hidden sm:inline">Regenerate</span>
                   </button>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                       alert("Link copied to clipboard!");
                     }}
-                    className="px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-2"
+                    className="px-3 sm:px-4 py-2 bg-[#A1FF62] border border-[#A1FF62] rounded-full font-bold text-xs sm:text-sm text-black hover:bg-[#b8ff8a] transition-all flex items-center gap-1 sm:gap-2"
                   >
-                    <Share2 size={16} />
-                    Share
+                    <Share2 size={14} />
+                    <span className="hidden sm:inline">Share</span>
                   </button>
                 </div>
               </div>
 
               {/* Title & Description */}
-              <h1 className="text-4xl font-bold text-white mb-3 font-serif relative z-10">
+              <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-3 font-serif relative z-10">
                 {roadmap?.title || `${topic} Learning Roadmap`}
               </h1>
-              <p className="text-lg text-gray-400 leading-relaxed relative z-10">
+              <p className="text-sm sm:text-lg text-gray-400 leading-relaxed relative z-10">
                 {roadmap?.description || `Step by step guide to becoming a proficient ${topic} developer.`}
               </p>
 
               {/* Progress Indicator */}
-              <div className="mt-6 pt-6 border-t border-white/10 relative z-10">
-                <div className="flex items-center justify-between">
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10 relative z-10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                   <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-[#A1FF62]/20 border border-[#A1FF62]/30 rounded-full">
                       <span className="text-sm font-bold text-[#A1FF62]">

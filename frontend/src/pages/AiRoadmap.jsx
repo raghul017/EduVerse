@@ -167,11 +167,11 @@ function AiRoadmap() {
       <div className="relative z-10 py-[var(--section-padding-y)] px-6">
         
         {/* Hero Section - Light BG, Dark Text */}
-        <div className="text-center mb-24 max-w-[1200px] mx-auto relative">
+        <div className="text-center mb-12 sm:mb-24 max-w-[1200px] mx-auto relative px-2">
           
-          <div className="inline-flex items-center gap-2 mb-12 px-5 py-2.5 rounded-full bg-[#201D1D] text-white">
+          <div className="inline-flex items-center gap-2 mb-8 sm:mb-12 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#201D1D] text-white">
             <span className="w-2 h-2 rounded-full bg-[#A1FF62] animate-pulse shadow-[0_0_10px_#A1FF62]" />
-            <span className="text-[11px] font-mono tracking-[0.2em]">INTELLIGENT_PATHWAY_GENERATOR_V2</span>
+            <span className="text-[9px] sm:text-[11px] font-mono tracking-[0.15em] sm:tracking-[0.2em]">INTELLIGENT_PATHWAY_GENERATOR</span>
           </div>
           
           {/* Hero Text */}
@@ -187,14 +187,14 @@ function AiRoadmap() {
             WITH <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A1FF62] to-[#694EFF]">AI</span>
           </h1>
           
-          <p className="text-[#666666] text-xl max-w-2xl mx-auto leading-relaxed font-light mb-16">
+          <p className="text-[#666666] text-base sm:text-xl max-w-2xl mx-auto leading-relaxed font-light mb-10 sm:mb-16 px-4">
             Construct personalized, adaptive learning architectures tailored to your specific career trajectory.
           </p>
         </div>
         
         {/* Dark Command Center Pod */}
         <div 
-          className="max-w-4xl mx-auto mb-24 rounded-[var(--container-radius)] p-8 relative overflow-hidden"
+          className="max-w-4xl mx-auto mb-12 sm:mb-24 rounded-[20px] sm:rounded-[var(--container-radius)] p-4 sm:p-8 relative overflow-hidden mx-2 sm:mx-auto"
           style={{ backgroundColor: 'var(--pod-bg-dark)' }}
         >
           {/* Subtle glow */}
@@ -203,9 +203,9 @@ function AiRoadmap() {
           <div className="relative z-10">
             {/* Input Container */}
             <div className="group relative">
-              <div className={`absolute -inset-0.5 bg-gradient-to-r from-[#A1FF62] via-[#694EFF] to-[#A1FF62] rounded-[32px] opacity-20 blur transition duration-500 group-hover:opacity-40 ${isFocused ? 'opacity-75 blur-md' : ''}`} />
-              <div className="relative bg-[#0A0A0A] rounded-[30px] p-2 flex items-center border border-white/10 shadow-2xl">
-                <div className="pl-6 pr-4 text-white/30">
+              <div className={`absolute -inset-0.5 bg-gradient-to-r from-[#A1FF62] via-[#694EFF] to-[#A1FF62] rounded-[24px] sm:rounded-[32px] opacity-20 blur transition duration-500 group-hover:opacity-40 ${isFocused ? 'opacity-75 blur-md' : ''}`} />
+              <div className="relative bg-[#0A0A0A] rounded-[22px] sm:rounded-[30px] p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0 border border-white/10 shadow-2xl">
+                <div className="hidden sm:block pl-6 pr-4 text-white/30">
                   <Command size={28} />
                 </div>
                 <input
@@ -215,28 +215,27 @@ function AiRoadmap() {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   onKeyDown={handleKeyDown}
-                  placeholder="What do you want to learn? (e.g., 'Senior React Developer')"
-                  className="w-full bg-transparent text-white text-xl py-6 placeholder:text-white/20 focus:outline-none font-medium"
+                  placeholder="What do you want to learn?"
+                  className="w-full bg-transparent text-white text-base sm:text-xl py-3 sm:py-6 px-4 sm:px-0 placeholder:text-white/20 focus:outline-none font-medium"
                 />
                 <button 
                   onClick={handleSearch}
                   disabled={loading}
-                  className="px-8 py-4 bg-[#A1FF62] text-black rounded-[24px] font-bold hover:scale-105 active:scale-95 transition-all text-sm tracking-wide disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+                  className="px-6 sm:px-8 py-3 sm:py-4 bg-[#A1FF62] text-black rounded-[16px] sm:rounded-[24px] font-bold hover:scale-105 active:scale-95 transition-all text-sm tracking-wide disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shrink-0"
                 >
-                  {loading ? <Loader2 className="animate-spin" /> : "GENERATE"}
-                  {!loading && <span className="hidden md:inline">ROADMAP</span>}
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : "GENERATE"}
                 </button>
               </div>
             </div>
             
             {/* Suggestions */}
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <span className="text-[11px] font-mono text-white/30 pt-2 uppercase tracking-wider">Try:</span>
+            <div className="mt-4 sm:mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
+              <span className="text-[10px] sm:text-[11px] font-mono text-white/30 pt-2 uppercase tracking-wider">Try:</span>
               {suggestions.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => setSearchQuery(s)}
-                  className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#A1FF62]/50 text-white/60 hover:text-white text-xs transition-all hover:bg-white/10"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#A1FF62]/50 text-white/60 hover:text-white text-[10px] sm:text-xs transition-all hover:bg-white/10"
                 >
                   {s}
                 </button>
@@ -246,14 +245,14 @@ function AiRoadmap() {
         </div>
 
         {/* Content Sections - Dark Pods in Light Background */}
-        <div className="max-w-[1400px] mx-auto space-y-16">
+        <div className="max-w-[1400px] mx-auto space-y-8 sm:space-y-16 px-2 sm:px-0">
           
           {/* Career Protocols - Dark Pod Container */}
           <section 
-            className="rounded-[var(--container-radius)] p-10 relative overflow-hidden"
+            className="rounded-[20px] sm:rounded-[var(--container-radius)] p-4 sm:p-10 relative overflow-hidden"
             style={{ backgroundColor: 'var(--pod-bg-dark)' }}
           >
-            <div className="flex items-center justify-between mb-10 pb-4 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-10 pb-4 border-b border-white/10 gap-2">
               <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <Terminal size={24} className="text-[#694EFF]" />
                 Career Protocols

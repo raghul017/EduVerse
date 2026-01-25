@@ -114,14 +114,14 @@ function Paths() {
 
   return (
     <div className="space-y-8">
-      <section className="bg-white/5 border border-white/10  p-8 shadow-sm flex flex-col justify-center space-y-3 rounded-2xl">
-        <p className="text-sm uppercase tracking-wide text-slate-400">
+      <section className="bg-white/5 border border-white/10 p-4 sm:p-8 shadow-sm flex flex-col justify-center space-y-2 sm:space-y-3 rounded-2xl">
+        <p className="text-xs sm:text-sm uppercase tracking-wide text-slate-400">
           Roadmaps
         </p>
-        <h1 className="text-3xl font-semibold text-white">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-white">
           Build structured learning paths.
         </h1>
-        <p className="text-slate-400 text-base max-w-2xl">
+        <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
           Combine your videos into ordered paths and add recommended materials
           for each step.
         </p>
@@ -136,7 +136,7 @@ function Paths() {
               </h2>
             </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {paths.map((path) => (
               <PathCard key={path.id} path={path} />
             ))}
@@ -144,16 +144,16 @@ function Paths() {
         </section>
       )}
 
-      <section className="grid lg:grid-cols-[minmax(0,1.2fr),minmax(0,1.3fr)] gap-6 items-start">
+      <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr),minmax(0,1.3fr)] gap-4 sm:gap-6 items-start">
         <form
           onSubmit={handleCreatePath}
-          className="bg-white/5 border border-white/10 p-6 shadow-sm space-y-4 rounded-xl"
+          className="bg-white/5 border border-white/10 p-4 sm:p-6 shadow-sm space-y-3 sm:space-y-4 rounded-xl"
         >
           <div>
-            <p className="text-sm uppercase tracking-wide text-slate-400">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-slate-400">
               Create new path
             </p>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-400 text-xs sm:text-sm">
               Define the topic, level, and description, then pick lessons from
               your library.
             </p>
@@ -211,8 +211,8 @@ function Paths() {
           </button>
         </form>
 
-        <div className="space-y-4">
-          <div className="bg-white/5 border border-white/10 p-4 shadow-sm rounded-xl">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="bg-white/5 border border-white/10 p-3 sm:p-4 shadow-sm rounded-xl">
             <p className="text-sm font-semibold text-white mb-2">
               Available lessons
             </p>
@@ -250,7 +250,7 @@ function Paths() {
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 p-4 shadow-sm rounded-xl">
+          <div className="bg-white/5 border border-white/10 p-3 sm:p-4 shadow-sm rounded-xl">
             <p className="text-sm font-semibold text-white mb-2">
               Path outline
             </p>

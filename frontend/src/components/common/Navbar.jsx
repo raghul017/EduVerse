@@ -27,10 +27,10 @@ const Navbar = () => {
     <>
       {/* Navbar with Expansion Animation */}
       <nav className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
-        showMenu ? 'w-[98%] max-w-[1400px]' : 'w-[95%] max-w-[720px]'
+        showMenu ? 'w-[98%] max-w-[1400px]' : 'w-[92%] sm:w-[95%] max-w-[720px]'
       }`}>
-        <div className={`bg-[#1a1a1a] rounded-2xl px-6 shadow-2xl border border-white/10 transition-all duration-500 ${
-          showMenu ? 'py-8' : 'py-3.5'
+        <div className={`bg-[#1a1a1a] rounded-2xl px-3 sm:px-6 shadow-2xl border border-white/10 transition-all duration-500 ${
+          showMenu ? 'py-6 sm:py-8' : 'py-2.5 sm:py-3.5'
         }`}>
           
           {/* Top Bar - Always Visible */}
@@ -39,9 +39,11 @@ const Navbar = () => {
             {/* Left: Menu Button */}
             <button 
               onClick={() => setShowMenu(!showMenu)}
+              aria-label={showMenu ? "Close menu" : "Open menu"}
+              aria-expanded={showMenu}
               className="flex items-center gap-2 text-white hover:text-[#A1FF62] transition-colors justify-self-start"
             >
-              {showMenu ? <X size={20} /> : <Menu size={20} />}
+              {showMenu ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
               <span className="text-sm font-medium hidden sm:inline">Menu</span>
             </button>
 
@@ -68,9 +70,9 @@ const Navbar = () => {
                   <button 
                     onClick={handleLogout}
                     className="w-9 h-9 rounded-full bg-[#2a2a2a] hover:bg-[#FF6B6B] text-white flex items-center justify-center transition-all"
-                    title="Logout"
+                    aria-label="Logout from your account"
                   >
-                    <LogOut size={16} />
+                    <LogOut size={16} aria-hidden="true" />
                   </button>
                 </div>
               ) : (
@@ -102,22 +104,22 @@ const Navbar = () => {
             }}
           >
             {/* Menu Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-16">
               
               {/* Column 1: AI FEATURES */}
-              <div className="space-y-3">
-                <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] block mb-4">AI Features</span>
+              <div className="space-y-2 sm:space-y-3">
+                <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] block mb-2 sm:mb-4">AI Features</span>
                 <Link 
                   to="/ai-roadmap" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   AI Roadmaps
                 </Link>
                 <Link 
                   to="/ai-course" 
                   onClick={() => setShowMenu(false)}
-                  className="flex items-center gap-2 text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="flex items-center gap-2 text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   Smart Courses
                   <span className="px-1.5 py-0.5 bg-[#694EFF] text-white text-[8px] rounded uppercase font-bold">Hot</span>
@@ -125,40 +127,40 @@ const Navbar = () => {
                 <Link 
                   to="/ai-tutor" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   AI Tutor Chat
                 </Link>
                 <Link 
                   to="/videos" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   Video Whisper
                 </Link>
               </div>
 
               {/* Column 2: EXPLORE */}
-              <div className="space-y-3">
-                <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] block mb-4">Explore</span>
+              <div className="space-y-2 sm:space-y-3">
+                <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] block mb-2 sm:mb-4">Explore</span>
                 <Link 
                   to="/communities" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   Communities
                 </Link>
                 <Link 
                   to="/paths" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   Learning Paths
                 </Link>
                 <Link 
                   to="/dashboard" 
                   onClick={() => setShowMenu(false)}
-                  className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                  className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -166,7 +168,7 @@ const Navbar = () => {
                   <Link 
                     to={`/profile/${user.id}`}
                     onClick={() => setShowMenu(false)}
-                    className="block text-white text-lg font-bold hover:text-[#A1FF62] transition-colors"
+                    className="block text-white text-base sm:text-lg font-bold hover:text-[#A1FF62] transition-colors"
                   >
                     Profile
                   </Link>
@@ -174,12 +176,12 @@ const Navbar = () => {
               </div>
 
               {/* Column 3: FEATURED */}
-              <div>
+              <div className="hidden sm:block">
                 <span className="text-[10px] text-[#694EFF] uppercase tracking-[0.2em] block mb-4">
                   Featured • Milestone
                 </span>
-                <div className="bg-[#0f0f0f] border border-white/5 rounded-xl p-6">
-                  <h3 className="text-white text-2xl md:text-3xl font-black leading-tight mb-4">
+                <div className="bg-[#0f0f0f] border border-white/5 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-black leading-tight mb-4">
                     We hit 1700<br/>Members!
                   </h3>
                   <Link 
@@ -205,30 +207,33 @@ const Navbar = () => {
             </div>
 
             {/* Bottom: Social Icons */}
-            <div className="flex justify-center gap-3 mt-8 pt-6 border-t border-white/5">
+            <div className="flex justify-center gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/5">
               <a 
                 href="https://linkedin.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="Visit our LinkedIn page"
                 className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
               >
-                <Linkedin size={16} className="text-white/60" />
+                <Linkedin size={16} className="text-white/60" aria-hidden="true" />
               </a>
               <a 
                 href="https://github.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="Visit our GitHub page"
                 className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
               >
-                <Github size={16} className="text-white/60" />
+                <Github size={16} className="text-white/60" aria-hidden="true" />
               </a>
               <a 
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="Visit our Twitter page"
                 className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
               >
-                <Twitter size={16} className="text-white/60" />
+                <Twitter size={16} className="text-white/60" aria-hidden="true" />
               </a>
             </div>
           </div>

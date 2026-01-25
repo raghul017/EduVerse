@@ -104,34 +104,34 @@ function AiTutor() {
                     </div>
                 </div>
 
-                <h1 className="font-heading text-3xl md:text-4xl font-black mb-4 tracking-tight text-[#1a1a1a] leading-tight">
+                <h1 className="font-heading text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4 tracking-tight text-[#1a1a1a] leading-tight">
                     What do you want<br />to <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#1a1a1a] to-[#1a1a1a]/60">master</span> today?
                 </h1>
                 
-                <p className="text-black/60 text-sm md:text-base mb-8 max-w-sm font-medium leading-relaxed">
+                <p className="text-black/60 text-sm md:text-base mb-6 sm:mb-8 max-w-sm font-medium leading-relaxed px-4">
                     I'm here to help you debug code, understand complex topics, or generate personalized roadmaps.
                 </p>
 
-                <form onSubmit={(e) => { e.preventDefault(); startSession(input || "General Learning"); }} className="w-full max-w-md relative mb-8 group">
+                <form onSubmit={(e) => { e.preventDefault(); startSession(input || "General Learning"); }} className="w-full max-w-md relative mb-6 sm:mb-8 group px-4">
                     <div className="absolute inset-0 bg-black/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-2" />
                     <input 
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="e.g. Explain React Hooks..."
-                        className="relative w-full h-12 pl-6 pr-12 bg-white rounded-full border border-black/5 shadow-xl shadow-black/5 focus:outline-none focus:ring-2 focus:ring-[#A1FF62]/50 text-base placeholder:text-black/30 transition-all font-medium"
+                        className="relative w-full h-11 sm:h-12 pl-4 sm:pl-6 pr-12 bg-white rounded-full border border-black/5 shadow-xl shadow-black/5 focus:outline-none focus:ring-2 focus:ring-[#A1FF62]/50 text-sm sm:text-base placeholder:text-black/30 transition-all font-medium"
                         autoFocus
                     />
-                    <button type="submit" className="absolute right-2 top-2 bottom-2 aspect-square bg-[#1a1a1a] rounded-full text-[#A1FF62] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md">
-                        <ArrowLeft size={18} className="rotate-180" />
+                    <button type="submit" className="absolute right-5 sm:right-2 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 aspect-square bg-[#1a1a1a] rounded-full text-[#A1FF62] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md">
+                        <ArrowLeft size={16} className="rotate-180" />
                     </button>
                 </form>
 
                 <div className="flex flex-wrap gap-2 justify-center max-w-md px-4">
-                    {["Python Basics", "System Design", "Calculus I", "React Hooks", "Docker"].map(topic => (
+                    {["Python", "System Design", "Calculus", "React", "Docker"].map(topic => (
                         <button 
                             key={topic} 
                             onClick={() => startSession(topic)} 
-                            className="px-4 py-2 bg-white border border-black/5 rounded-full text-xs font-bold text-black/60 hover:text-black hover:border-black/20 hover:shadow-md transition-all transform hover:-translate-y-0.5"
+                            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-black/5 rounded-full text-[10px] sm:text-xs font-bold text-black/60 hover:text-black hover:border-black/20 hover:shadow-md transition-all transform hover:-translate-y-0.5"
                         >
                             {topic}
                         </button>
@@ -157,14 +157,14 @@ function AiTutor() {
                         </div>
 
                         {/* Content Bubble */}
-                        <div className={`max-w-[88%] md:max-w-[75%] space-y-1 group`}>
+                        <div className={`max-w-[85%] sm:max-w-[88%] md:max-w-[75%] space-y-1 group`}>
                             {m.role === 'assistant' && (
                                 <div className="flex items-center gap-2 mb-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <span className="text-[9px] font-bold text-black/40 uppercase tracking-wider">EduVerse AI</span>
                                 </div>
                             )}
                             
-                            <div className={`p-4 rounded-2xl shadow-sm text-sm md:text-[15px] leading-relaxed ${m.role === 'user' ? 'bg-[#1a1a1a] text-white rounded-tr-sm shadow-md' : 'bg-white border border-black/5 text-[#333] rounded-tl-sm shadow-sm'}`}>
+                            <div className={`p-3 sm:p-4 rounded-2xl shadow-sm text-xs sm:text-sm md:text-[15px] leading-relaxed ${m.role === 'user' ? 'bg-[#1a1a1a] text-white rounded-tr-sm shadow-md' : 'bg-white border border-black/5 text-[#333] rounded-tl-sm shadow-sm'}`}>
                                 {m.role === 'user' ? (
                                     <p className="font-medium">{m.content}</p>
                                 ) : (
@@ -217,24 +217,24 @@ function AiTutor() {
 
       {/* FLOATING FOOTER INPUT */}
       {messages.length > 0 && (
-          <footer className="fixed bottom-6 left-0 right-0 px-4 md:px-0 z-30 pointer-events-none">
+          <footer className="fixed bottom-4 sm:bottom-6 left-0 right-0 px-3 sm:px-4 md:px-0 z-30 pointer-events-none">
             <div className="max-w-3xl mx-auto w-full relative group pointer-events-auto">
                 <div className="absolute inset-0 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-lg translate-y-2" />
-                <form onSubmit={handleSend} className="relative flex items-center bg-white/90 backdrop-blur-md rounded-full border border-black/10 shadow-2xl shadow-black/10 p-2 transition-all focus-within:ring-4 focus-within:ring-[#A1FF62]/20 focus-within:border-[#A1FF62] focus-within:scale-[1.01]">
-                    <div className="pl-3 pr-2 text-xl animate-pulse">✨</div>
+                <form onSubmit={handleSend} className="relative flex items-center bg-white/90 backdrop-blur-md rounded-full border border-black/10 shadow-2xl shadow-black/10 p-1.5 sm:p-2 transition-all focus-within:ring-4 focus-within:ring-[#A1FF62]/20 focus-within:border-[#A1FF62] focus-within:scale-[1.01]">
+                    <div className="pl-2 sm:pl-3 pr-1 sm:pr-2 text-lg sm:text-xl animate-pulse">✨</div>
                     <input 
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask a follow-up question..."
-                        className="flex-1 h-10 bg-transparent border-none focus:ring-0 text-[#1a1a1a] placeholder:text-black/30 text-sm font-medium px-2"
+                        placeholder="Ask a follow-up..."
+                        className="flex-1 h-8 sm:h-10 bg-transparent border-none focus:ring-0 text-[#1a1a1a] placeholder:text-black/30 text-xs sm:text-sm font-medium px-1 sm:px-2"
                         autoFocus
                     />
                     <button 
                         type="submit" 
                         disabled={!input.trim() || loading} 
-                        className="p-2.5 bg-[#1a1a1a] text-[#A1FF62] rounded-full hover:bg-black disabled:opacity-50 disabled:hover:bg-[#1a1a1a] transition-all hover:scale-105 active:scale-95 shadow-md"
+                        className="p-2 sm:p-2.5 bg-[#1a1a1a] text-[#A1FF62] rounded-full hover:bg-black disabled:opacity-50 disabled:hover:bg-[#1a1a1a] transition-all hover:scale-105 active:scale-95 shadow-md"
                     >
-                        {loading ? <div className="w-4 h-4 border-2 border-[#A1FF62] border-t-transparent rounded-full animate-spin" /> : <Send size={16} />}
+                        {loading ? <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#A1FF62] border-t-transparent rounded-full animate-spin" /> : <Send size={14} />}
                     </button>
                 </form>
             </div>

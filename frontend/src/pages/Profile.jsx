@@ -81,21 +81,21 @@ function Profile() {
       <div className="bg-noise"></div>
 
       {/* Main Content */}
-      <div className="relative z-10 py-24 px-6">
+      <div className="relative z-10 py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-[1000px] mx-auto">
           
           {/* Header Tag */}
-          <div className="mb-10 animate-fade-in">
-            <div className="inline-flex items-center gap-3 text-xs md:text-sm text-[#A1FF62] tracking-[0.2em] font-mono border border-[#A1FF62]/20 px-4 py-1.5 rounded-full bg-[#A1FF62]/5 backdrop-blur-sm">
+          <div className="mb-6 sm:mb-10 animate-fade-in">
+            <div className="inline-flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs md:text-sm text-[#A1FF62] tracking-[0.15em] sm:tracking-[0.2em] font-mono border border-[#A1FF62]/20 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-[#A1FF62]/5 backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#A1FF62] rounded-full animate-pulse"></span>
               {isOwnProfile ? 'COMMAND CENTER' : 'USER PROFILE'}
             </div>
           </div>
 
           {/* Profile Header Component */}
-          <div className="mb-16 animate-slide-up">
-            <div className="glass-panel-deep rounded-[2rem] p-1 shadow-2xl">
-              <div className="bg-black/40 rounded-[1.8rem] p-6 md:p-10 border border-white/5 backdrop-blur-xl">
+          <div className="mb-10 sm:mb-16 animate-slide-up">
+            <div className="glass-panel-deep rounded-[1.5rem] sm:rounded-[2rem] p-1 shadow-2xl">
+              <div className="bg-black/40 rounded-[1.3rem] sm:rounded-[1.8rem] p-4 sm:p-6 md:p-10 border border-white/5 backdrop-blur-xl">
                 <ProfileHeader
                   profile={profile}
                   isOwnProfile={isOwnProfile}
@@ -107,49 +107,49 @@ function Profile() {
           
           {/* Quick Actions (Only for Owner) */}
           {isOwnProfile && (
-            <div className="mb-16 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              <div className="flex items-center gap-4 mb-6">
-                <LayoutDashboard size={18} className="text-[#A1FF62]" />
-                <h2 className="text-xl font-heading font-medium tracking-tight">Quick Actions</h2>
+            <div className="mb-10 sm:mb-16 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <LayoutDashboard size={16} className="text-[#A1FF62]" />
+                <h2 className="text-lg sm:text-xl font-heading font-medium tracking-tight">Quick Actions</h2>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <Link 
                   to="/dashboard"
-                  className="bento-card group flex flex-col justify-between p-6 h-[180px] hover:border-[#A1FF62]/50"
+                  className="bento-card group flex flex-col justify-between p-4 sm:p-6 h-[150px] sm:h-[180px] hover:border-[#A1FF62]/50"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <LayoutDashboard size={20} className="text-[#A1FF62]" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <LayoutDashboard size={18} className="text-[#A1FF62]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Dashboard</h3>
-                    <p className="text-sm text-white/40 font-medium">Manage your learning</p>
+                    <h3 className="text-base sm:text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Dashboard</h3>
+                    <p className="text-xs sm:text-sm text-white/40 font-medium">Manage your learning</p>
                   </div>
                 </Link>
 
                 <Link 
                   to="/ai-roadmap"
-                  className="bento-card group flex flex-col justify-between p-6 h-[180px] hover:border-[#A1FF62]/50"
+                  className="bento-card group flex flex-col justify-between p-4 sm:p-6 h-[150px] sm:h-[180px] hover:border-[#A1FF62]/50"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <Route size={20} className="text-[#A1FF62]" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <Route size={18} className="text-[#A1FF62]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Roadmaps</h3>
-                    <p className="text-sm text-white/40 font-medium">View your paths</p>
+                    <h3 className="text-base sm:text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Roadmaps</h3>
+                    <p className="text-xs sm:text-sm text-white/40 font-medium">View your paths</p>
                   </div>
                 </Link>
 
                 <Link 
                   to="/ai-course"
-                  className="bento-card group flex flex-col justify-between p-6 h-[180px] hover:border-[#A1FF62]/50"
+                  className="bento-card group flex flex-col justify-between p-4 sm:p-6 h-[150px] sm:h-[180px] hover:border-[#A1FF62]/50"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <BookOpen size={20} className="text-[#A1FF62]" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#A1FF62]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <BookOpen size={18} className="text-[#A1FF62]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Courses</h3>
-                    <p className="text-sm text-white/40 font-medium">Continue learning</p>
+                    <h3 className="text-base sm:text-lg font-heading font-bold mb-1 group-hover:text-[#A1FF62] transition-colors">Courses</h3>
+                    <p className="text-xs sm:text-sm text-white/40 font-medium">Continue learning</p>
                   </div>
                 </Link>
               </div>
@@ -158,12 +158,12 @@ function Profile() {
           
           {/* Edit Profile Section */}
           {isOwnProfile && (
-            <div className="mb-16 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-               <div className="flex items-center gap-4 mb-6">
+            <div className="mb-10 sm:mb-16 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+               <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <div className="w-2 h-2 rounded-full bg-[#A1FF62]"></div>
-                <h2 className="text-xl font-heading font-medium tracking-tight">Edit Profile</h2>
+                <h2 className="text-lg sm:text-xl font-heading font-medium tracking-tight">Edit Profile</h2>
               </div>
-              <div className="glass-panel-subtle rounded-3xl p-8 border border-white/5">
+              <div className="glass-panel-subtle rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/5">
                 <EditProfile
                   profile={profile}
                   onUpdated={(nextProfile) => setProfile(nextProfile)}
@@ -174,14 +174,14 @@ function Profile() {
           
           {/* Posts Section */}
           <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
-             <div className="flex items-center gap-4 mb-6">
+             <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="w-2 h-2 rounded-full bg-white/50"></div>
-              <h2 className="text-xl font-heading font-medium tracking-tight">Recent Activity</h2>
+              <h2 className="text-lg sm:text-xl font-heading font-medium tracking-tight">Recent Activity</h2>
             </div>
             
-            <div className="glass-panel-subtle rounded-3xl p-1 min-h-[200px]">
+            <div className="glass-panel-subtle rounded-2xl sm:rounded-3xl p-1 min-h-[200px]">
                {/* Pass transparent bg to posts component if possible, otherwise it might have its own bg */}
-              <div className="bg-black/20 rounded-[1.3rem] p-6">
+              <div className="bg-black/20 rounded-[1.1rem] sm:rounded-[1.3rem] p-4 sm:p-6">
                 <ProfilePosts posts={profile?.posts} />
               </div>
             </div>
