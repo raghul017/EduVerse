@@ -246,9 +246,9 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">POWERED BY</span>
+                  <span className="text-[10px] text-white/60 uppercase tracking-[0.2em] font-bold">POWERED BY</span>
                   <p className="text-white font-heading font-bold text-xl leading-none">Llama 3.3 70B</p>
-                  <p className="text-white/50 text-xs mt-2">AI Roadmaps in seconds</p>
+                  <p className="text-white/70 text-xs mt-2">AI Roadmaps in seconds</p>
                 </div>
               </div>
             </div>
@@ -271,7 +271,7 @@ const Home = () => {
                   <BookOpen size={80} className="text-[#A1FF62] relative z-10 drop-shadow-[0_0_20px_rgba(161,255,98,0.5)] group-hover:scale-110 transition-transform duration-300" />
                   <div className="text-center">
                     <span className="text-white text-3xl md:text-4xl font-heading font-bold block">AI Courses</span>
-                    <span className="text-white/40 text-sm font-medium">Auto-generated learning paths</span>
+                    <span className="text-white/60 text-sm font-medium">Auto-generated learning paths</span>
                   </div>
                 </div>
 
@@ -314,7 +314,7 @@ const Home = () => {
                 </div>
                 <div className="flex-1">
                   <span className="text-xs text-white uppercase font-bold tracking-widest">AI Tutor</span>
-                  <p className="text-white/50 text-sm mt-1">24/7 Learning Assistant</p>
+                  <p className="text-white/70 text-sm mt-1">24/7 Learning Assistant</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#A1FF62] animate-pulse"></div>
@@ -407,14 +407,14 @@ const Home = () => {
           {/* Center Dark Card - The Vault */}
           <div className="z-20 hover:scale-105 transition-all duration-500">
             <div className="w-[280px] md:w-[340px] h-[400px] md:h-[480px] bg-[#0a0a0a] rounded-3xl p-6 flex flex-col shadow-2xl border border-white/5">
-              <span className="text-[9px] font-mono uppercase tracking-widest text-white/40">Part of the membership</span>
+              <span className="text-[9px] font-mono uppercase tracking-widest text-white/60">Part of the membership</span>
               
               <div className="flex items-center justify-center my-5">
                 <Asterisk size={40} className="text-white" />
               </div>
               
               <h3 className="text-4xl md:text-5xl font-black text-white text-center">Dashboard</h3>
-              <p className="text-xs text-white/50 text-center mt-3 leading-relaxed">
+              <p className="text-xs text-white/70 text-center mt-3 leading-relaxed">
                 Track your learning journey with progress stats, streaks, and AI usage analytics.
               </p>
               

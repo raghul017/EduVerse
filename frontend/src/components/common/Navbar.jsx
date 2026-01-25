@@ -61,9 +61,10 @@ const Navbar = () => {
                   {/* User Profile Picture */}
                   <Link 
                     to={`/profile/${user.id}`}
+                    aria-label="Go to your profile"
                     className="w-9 h-9 rounded-full bg-gradient-to-br from-[#694EFF] to-[#A1FF62] flex items-center justify-center text-white font-bold text-sm hover:scale-105 transition-transform"
                   >
-                    {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                    <span aria-hidden="true">{user.username ? user.username.charAt(0).toUpperCase() : 'U'}</span>
                   </Link>
                   
                   {/* Logout Icon Button */}
