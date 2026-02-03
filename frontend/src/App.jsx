@@ -25,10 +25,12 @@ const Videos = lazy(() => import("./pages/Videos.jsx"));
 const Paths = lazy(() => import("./pages/Paths.jsx"));
 
 import { ThemeProvider } from "./context/ThemeContext";
+import ColdStartBanner from "./components/common/ColdStartBanner.jsx";
 
 function App() {
   return (
     <ThemeProvider>
+      <ColdStartBanner />
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route
