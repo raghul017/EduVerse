@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../utils/api.js";
 import { useAuthStore } from "../store/authStore.js";
-import { BookOpen, Bookmark, Flame, TrendingUp, Loader2, Clock, Target, Zap, Activity, MoreHorizontal, ArrowUpRight, Layers } from "lucide-react";
+import { BookOpen, Bookmark, Flame, TrendingUp, Loader2, Clock, Target, Zap, Activity, MoreHorizontal, ArrowUpRight, Layers, Map, Cpu } from "lucide-react";
 import SpotlightCard from "../components/ui/SpotlightCard";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import Magnetic from "../components/ui/Magnetic";
@@ -52,10 +52,9 @@ function Dashboard() {
     );
   }
 
-  const subjectsCount = stats?.subjects_explored_count || stats?.subjects_count || 0;
-  const averageMastery = stats?.subjects_progress 
-      ? (stats.subjects_progress.reduce((acc, curr) => acc + (curr.progress || 0), 0) / stats.subjects_progress.length) | 0
-      : 0;
+  const roadmapsCount = stats?.roadmaps_count || 0;
+  const completedNodes = stats?.completed_nodes || 0;
+  const aiUsagePercent = stats?.ai_usage_percent || 0;
 
   return (
     <div className="min-h-screen text-textPrimary font-sans pb-24 overflow-x-hidden" style={{ backgroundColor: 'var(--page-bg-light)' }}>
@@ -83,9 +82,9 @@ function Dashboard() {
             </div>
             
             <div className="flex flex-col items-start lg:items-end gap-4 sm:gap-6">
-               <p className="text-textSecondary text-base sm:text-xl max-w-md lg:text-right text-balance">
+              <p className="text-textSecondary text-base sm:text-xl max-w-md lg:text-right text-balance">
                 Ready for deployment, <span className="text-white font-semibold">{user?.name?.split(" ")[0] || "Commander"}</span>. 
-                Neural efficiency is at <span className="text-accent animate-pulse">{averageMastery}%</span>.
+                You have <span className="text-accent animate-pulse">{roadmapsCount}</span> active roadmaps.
               </p>
               <div className="flex flex-wrap gap-2 sm:gap-4">
                  <Magnetic>
@@ -132,19 +131,19 @@ function Dashboard() {
                 </div>
              </SpotlightCard>
   
-             {/* Quick Stat - Progress Ring */}
+             {/* Quick Stat - Roadmaps Created */}
              <SpotlightCard className="p-4 sm:p-8 relative flex flex-col items-center justify-center overflow-hidden min-h-[200px] sm:min-h-[300px]" spotlightColor="rgba(59, 130, 246, 0.15)">
                 <div className="absolute inset-0 flex items-center justify-center opacity-10 scale-150 pointer-events-none">
                    <div className="w-64 h-64 border-[30px] border-blue-500 rounded-full"></div>
                 </div>
                 <div className="text-center z-10">
                    <div className="text-4xl sm:text-6xl font-bold text-white mb-2 tracking-tighter">
-                      {subjectsCount}
+                      {roadmapsCount}
                    </div>
-                   <div className="text-xs font-mono uppercase tracking-widest text-textMuted border-t border-border pt-4 mt-2">Topics Explored</div>
+                   <div className="text-xs font-mono uppercase tracking-widest text-textMuted border-t border-border pt-4 mt-2">Roadmaps Created</div>
                 </div>
                 <div className="absolute top-6 right-6 p-2 bg-blue-500/10 rounded-full">
-                   <Target size={20} className="text-blue-500" />
+                   <Map size={20} className="text-blue-500" />
                 </div>
              </SpotlightCard>
   
@@ -152,17 +151,17 @@ function Dashboard() {
              <SpotlightCard className="p-4 sm:p-8 flex flex-col justify-between hover:bg-surface-hover transition-colors min-h-[180px] sm:min-h-[220px]" spotlightColor="rgba(255, 255, 255, 0.08)">
                 <div className="flex justify-between items-start mb-4">
                    <div className="w-12 h-12 rounded-[16px] bg-surface flex items-center justify-center text-textSecondary border border-border">
-                      <BookOpen size={24} />
+                      <Target size={24} />
                    </div>
-                   {stats.posts_watched > 0 && 
+                   {completedNodes > 0 && 
                       <span className="flex items-center text-[10px] text-accent-action bg-accent-action/10 border border-accent-action/20 px-2 py-1 rounded-full font-mono">
-                         <ArrowUpRight size={10} className="mr-1" /> +12%
+                         <ArrowUpRight size={10} className="mr-1" /> Active
                       </span>
                    }
                 </div>
                 <div>
-                   <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{stats.posts_watched || 0}</div>
-                   <div className="text-xs sm:text-sm text-textMuted mt-1">Lessons Completed</div>
+                   <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{completedNodes}</div>
+                   <div className="text-xs sm:text-sm text-textMuted mt-1">Nodes Completed</div>
                 </div>
              </SpotlightCard>
   
@@ -178,15 +177,18 @@ function Dashboard() {
                 </div>
              </SpotlightCard>
   
-             <SpotlightCard className="p-4 sm:p-8 flex flex-col justify-between hover:bg-surface-hover transition-colors min-h-[180px] sm:min-h-[220px]" spotlightColor="rgba(255, 255, 255, 0.08)">
+             <SpotlightCard className="p-4 sm:p-8 flex flex-col justify-between hover:bg-surface-hover transition-colors min-h-[180px] sm:min-h-[220px]" spotlightColor="rgba(161, 255, 98, 0.08)">
                 <div className="flex justify-between items-start mb-4">
                    <div className="w-12 h-12 rounded-[16px] bg-surface flex items-center justify-center text-textSecondary border border-border">
-                      <Clock size={24} />
+                      <Cpu size={24} />
                    </div>
+                   <span className={`flex items-center text-[10px] ${aiUsagePercent > 80 ? 'text-red-400 bg-red-500/10 border-red-500/20' : 'text-accent bg-accent/10 border-accent/20'} border px-2 py-1 rounded-full font-mono`}>
+                      {aiUsagePercent}% used
+                   </span>
                 </div>
                 <div>
-                   <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{stats.total_time || 0}<span className="text-base sm:text-lg text-textDisabled ml-1 font-normal">h</span></div>
-                   <div className="text-xs sm:text-sm text-textMuted mt-1">Focus Time</div>
+                   <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{stats.ai_requests_today || 0}</div>
+                   <div className="text-xs sm:text-sm text-textMuted mt-1">AI Requests Today</div>
                 </div>
              </SpotlightCard>
   
