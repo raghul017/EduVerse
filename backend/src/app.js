@@ -31,8 +31,9 @@ const getAllowedOrigins = () => {
     origins.push(env.frontendUrl);
   }
   
-  // Explicitly add Vercel production URL
+  // Explicitly add Vercel production URLs
   origins.push('https://edu-verse-ebon.vercel.app');
+  origins.push('https://eduverse0.vercel.app');
   
   // Allow additional origins from env if specified
   if (process.env.CORS_ALLOWED_ORIGINS) {
