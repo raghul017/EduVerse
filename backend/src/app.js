@@ -14,65 +14,74 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 ensureEnv();
 
+// Cold start tracking — server.js sets these after boot + DB warm-up
+export const serverReadyState = {
+    ready: false,
+    dbReady: false,
+    bootTime: null,
+};
+
 const app = express();
 const logger = pino({ level: env.node === "development" ? "debug" : "info" });
 
 const getAllowedOrigins = () => {
-  const origins = [];
-  
-  // Development: allow all localhost ports
-  if (env.node === 'development') {
-    return [/^http:\/\/localhost:\d+$/];
-  }
-  
-  // Production: explicit URLs
-  // Add exact frontend URL from env
-  if (env.frontendUrl) {
-    origins.push(env.frontendUrl);
-  }
-  
-  // Explicitly add Vercel production URLs
-  origins.push('https://edu-verse-ebon.vercel.app');
-  origins.push('https://eduverse0.vercel.app');
-  
-  // Allow additional origins from env if specified
-  if (process.env.CORS_ALLOWED_ORIGINS) {
-    const additional = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
-    origins.push(...additional);
-  }
-  
-  // Allow Vercel preview deployments (with regex)
-  origins.push(/^https:\/\/edu-verse-[a-z0-9-]+\.vercel\.app$/);
-  
-  console.log('[CORS] Allowed origins:', origins);
-  return origins;
+    const origins = [];
+
+    // Development: allow all localhost ports
+    if (env.node === "development") {
+        return [/^http:\/\/localhost:\d+$/];
+    }
+
+    // Production: explicit URLs
+    // Add exact frontend URL from env
+    if (env.frontendUrl) {
+        origins.push(env.frontendUrl);
+    }
+
+    // Explicitly add Vercel production URLs
+    origins.push("https://edu-verse-ebon.vercel.app");
+    origins.push("https://eduverse0.vercel.app");
+
+    // Allow additional origins from env if specified
+    if (process.env.CORS_ALLOWED_ORIGINS) {
+        const additional = process.env.CORS_ALLOWED_ORIGINS.split(",").map(
+            (o) => o.trim(),
+        );
+        origins.push(...additional);
+    }
+
+    // Allow Vercel preview deployments (with regex)
+    origins.push(/^https:\/\/edu-verse-[a-z0-9-]+\.vercel\.app$/);
+
+    console.log("[CORS] Allowed origins:", origins);
+    return origins;
 };
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = getAllowedOrigins();
-      
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
-      
-      // Check if origin matches any allowed origin
-      const isAllowed = allowedOrigins.some(allowed => {
-        if (allowed instanceof RegExp) return allowed.test(origin);
-        return allowed === origin;
-      });
-      
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        console.warn(`[CORS] Blocked request from origin: ${origin}`);
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  })
+    cors({
+        origin: (origin, callback) => {
+            const allowedOrigins = getAllowedOrigins();
+
+            // Allow requests with no origin (like mobile apps or curl)
+            if (!origin) return callback(null, true);
+
+            // Check if origin matches any allowed origin
+            const isAllowed = allowedOrigins.some((allowed) => {
+                if (allowed instanceof RegExp) return allowed.test(origin);
+                return allowed === origin;
+            });
+
+            if (isAllowed) {
+                callback(null, true);
+            } else {
+                console.warn(`[CORS] Blocked request from origin: ${origin}`);
+                callback(new Error(`Origin ${origin} not allowed by CORS`));
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    }),
 );
 app.use(express.json({ limit: "100mb" })); // Increased for video uploads
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
@@ -80,46 +89,59 @@ app.use(pinoHttp({ logger }));
 app.use(apiLimiter);
 
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: Date.now() });
+    res.json({ status: "ok", timestamp: Date.now() });
 });
 
 import { query, getDebugInfo } from "./config/database.js";
 app.get("/health/db", async (req, res) => {
-  try {
-    const result = await query("SELECT NOW()");
-    res.json({ 
-      status: "ok", 
-      time: result.rows[0].now,
-      debug: getDebugInfo()
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      status: "error", 
-      message: error.message,
-      code: error.code,
-      debug: getDebugInfo()
-    });
-  }
+    try {
+        const result = await query("SELECT NOW()");
+        res.json({
+            status: "ok",
+            time: result.rows[0].now,
+            debug: getDebugInfo(),
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message,
+            code: error.code,
+            debug: getDebugInfo(),
+        });
+    }
 });
 
 // API health endpoint for cron ping (prevents Render cold starts)
 app.get("/api/health", async (req, res) => {
-  try {
-    const start = Date.now();
-    await query("SELECT 1");
-    const dbLatency = Date.now() - start;
-    res.json({ 
-      status: "ok", 
-      timestamp: new Date().toISOString(),
-      dbLatency: `${dbLatency}ms`,
-      uptime: process.uptime()
+    try {
+        const start = Date.now();
+        await query("SELECT 1");
+        const dbLatency = Date.now() - start;
+        res.json({
+            status: "ok",
+            timestamp: new Date().toISOString(),
+            dbLatency: `${dbLatency}ms`,
+            uptime: process.uptime(),
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message,
+        });
+    }
+});
+
+// Cold start status — frontend checks this to show/hide warning banner
+const COLD_START_WINDOW_MS = 60000; // 60 seconds
+app.get("/api/health/status", (req, res) => {
+    const uptime = process.uptime();
+    const isColdStart = uptime < COLD_START_WINDOW_MS / 1000;
+    res.json({
+        ready: serverReadyState.ready,
+        dbReady: serverReadyState.dbReady,
+        coldStart: isColdStart,
+        uptime: Math.round(uptime),
     });
-  } catch (error) {
-    res.status(500).json({ 
-      status: "error", 
-      message: error.message 
-    });
-  }
 });
 
 app.use("/api/auth", authRoutes);
