@@ -62,24 +62,13 @@ export default function ProductProof() {
         }
       );
 
-      // Media parallax, allowed on media only. The panel drifts slightly
-      // slower than the page, which makes the dark rectangle feel seated
-      // rather than pasted. Disabled entirely under reduced motion.
-      if (reduced) return;
-      gsap.fromTo(
-        panelRef.current,
-        { yPercent: 3 },
-        {
-          yPercent: -3,
-          ease: "none",
-          scrollTrigger: {
-            trigger: scope.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        }
-      );
+      // NOTE: the panel previously carried a yPercent parallax. It has been
+      // removed because the panel now overlaps the hero with a negative
+      // margin, and a yPercent transform fights that offset: the peeking slice
+      // would grow and shrink on scroll and the hero's bottom edge would move.
+      // The overlap itself is what creates depth now, so the parallax was
+      // doing the same job twice and losing.
+      void reduced;
     },
     { scope }
   );
@@ -88,9 +77,17 @@ export default function ProductProof() {
     <section
       ref={scope}
       aria-labelledby="lp-proof-heading"
-      className="bg-canvas pb-section"
+      className="relative z-10 bg-canvas pb-section"
     >
-      <div className="mx-auto max-w-lp px-gutter">
+      {/* THE PEEK. The panel is pulled up so a slice of it breaks into the
+          bottom of the hero viewport. This is the fix for a type-only hero
+          reading flat: the cream field gains an edge, the overlap creates real
+          depth, and the eye is pulled toward the product, which is the job this
+          section already had. It is composition, not decoration, so it works
+          just as well while the slot is still an empty labelled state.
+          The negative margin is a clamp so the slice stays proportional: about
+          72px at 360px and 132px at desktop. */}
+      <div className="mx-auto -mt-[clamp(72px,11vw,132px)] max-w-lp px-gutter">
         {/* Deliberately NOT a SectionIntro: this section leads with the
             artifact, not with a headline. The caption sits under the panel so
             the product is the first thing the eye lands on after the hero. */}

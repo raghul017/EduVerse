@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -33,7 +34,7 @@ import { useGSAP } from "@gsap/react";
  * No parallax here now that there is no media. The brief allows parallax on
  * media only, never on text, so a type-only hero simply has none.
  */
-export default function Hero() {
+export default function Hero({ variant = "short" }) {
   const scope = useRef(null);
 
   useGSAP(
@@ -59,13 +60,33 @@ export default function Hero() {
     { scope }
   );
 
+  // VARIANT SWITCH, temporary. Set by pages/Home.jsx so both options can be
+  // compared at the real route. Collapses to the chosen one once decided.
+  //   "tall"  full height, headline scaled up to fill the space
+  //   "short" ~74vh, so section 4 arrives sooner
+  const tall = variant === "tall";
+
   return (
     <section
       ref={scope}
-      className="relative flex min-h-[92dvh] flex-col justify-center bg-canvas"
+      className={`relative flex flex-col justify-center bg-canvas ${
+        tall
+          ? // Full height. The headline has to genuinely fill it, otherwise
+            // the emptiness is visible. lp-display--fill lifts the ceiling
+            // from 140px to 200px and drops the max-width so the type spans
+            // the column rather than sitting in the middle of it.
+            "min-h-[100dvh] pb-[clamp(96px,14vw,180px)] pt-lp8"
+          : // Shorter. No media to justify full-bleed, so the hero is sized to
+            // its content and section 4 arrives sooner.
+            "min-h-[74dvh] pb-[clamp(84px,12vw,150px)] pt-lp7"
+      }`}
     >
-      <div className="mx-auto w-full max-w-lp px-gutter py-lp9">
-        <h1 className="lp-hero-enter lp-display max-w-[15ch] text-primaryText">
+      <div className="mx-auto w-full max-w-lp px-gutter">
+        <h1
+          className={`lp-hero-enter lp-display text-primaryText ${
+            tall ? "lp-display--fill max-w-[13ch]" : "max-w-[15ch]"
+          }`}
+        >
           Stop collecting courses. Start finishing one.
         </h1>
 
@@ -93,3 +114,10 @@ export default function Hero() {
     </section>
   );
 }
+
+Hero.propTypes = {
+  /** TEMPORARY. "tall" = full height with the headline scaled to fill it.
+   *  "short" = ~74vh so section 4 arrives sooner. Collapses to one once
+   *  the variant is chosen. */
+  variant: PropTypes.oneOf(["tall", "short"]),
+};

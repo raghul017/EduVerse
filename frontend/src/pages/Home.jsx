@@ -69,7 +69,16 @@ export default function Home() {
       <AnnouncementBar />
       <LandingNav />
       <main>
-        <Hero />
+        {/* TEMPORARY variant switch so both hero options can be compared at the
+            real route: append ?hero=tall to the URL. Defaults to "short".
+            Remove this and hard-code the winner once decided. */}
+        <Hero
+          variant={
+            new URLSearchParams(window.location.search).get("hero") === "tall"
+              ? "tall"
+              : "short"
+          }
+        />
         <ProductProof />
         <Mission />
         <OfferingsRail />
