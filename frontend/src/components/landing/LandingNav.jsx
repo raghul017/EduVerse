@@ -53,19 +53,36 @@ export default function LandingNav() {
     <>
       <div id="lp-nav-sentinel" aria-hidden="true" className="h-px w-full" />
 
+      {/* CONTRAST OVER VIDEO. Before scroll the bar is transparent and sits on
+          the hero video, whose luminance is not knowable in advance, so
+          text-primaryText (#34342E) could land on a dark frame at well under
+          4.5:1. Two changes fix it without giving up the transparent look:
+          the unscrolled state uses on-dark text, and a short scrim sits behind
+          the bar so that text has a guaranteed ground.
+          After scroll the bar is opaque cream and reverts to dark text. */}
       <header
         className={`sticky top-0 z-30 transition-colors duration-300 ease-lpOut ${
-          scrolled ? "bg-canvas border-b border-subtle" : "bg-transparent"
+          scrolled
+            ? "border-b border-subtle bg-canvas"
+            : "bg-transparent"
         }`}
       >
+        {!scrolled && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[140%] bg-gradient-to-b from-dark/70 to-transparent"
+          />
+        )}
         <nav
           aria-label="Main"
-          className="mx-auto flex h-16 max-w-lp items-center justify-between gap-lp5 px-gutter"
+          className="relative mx-auto flex h-16 max-w-lp items-center justify-between gap-lp5 px-gutter"
         >
           {/* Wordmark. Inter, not Anton: below the 40px display floor. */}
           <Link
             to="/"
-            className="font-body text-lpH3 font-semibold tracking-tight text-primaryText"
+            className={`font-body text-lpH3 font-semibold tracking-tight transition-colors duration-300 ease-lpOut ${
+              scrolled ? "text-primaryText" : "text-onDark"
+            }`}
           >
             EduVerse
           </Link>
@@ -76,13 +93,21 @@ export default function LandingNav() {
               <li key={l.to}>
                 <NavLink
                   to={l.to}
-                  className={({ isActive }) =>
-                    `font-body text-lpSm transition-colors duration-200 ease-lpOut ${
-                      isActive
-                        ? "text-primaryText"
-                        : "text-secondaryText hover:text-primaryText"
-                    }`
-                  }
+                  className={({ isActive }) => {
+                    const base =
+                      "font-body text-lpSm transition-colors duration-200 ease-lpOut";
+                    if (scrolled) {
+                      return `${base} ${
+                        isActive
+                          ? "text-primaryText"
+                          : "text-secondaryText hover:text-primaryText"
+                      }`;
+                    }
+                    // Over the video: on-dark tokens, both AA against the scrim.
+                    return `${base} ${
+                      isActive ? "text-onDark" : "text-onDark2 hover:text-onDark"
+                    }`;
+                  }}
                 >
                   {l.label}
                 </NavLink>
@@ -106,18 +131,26 @@ export default function LandingNav() {
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               aria-controls="lp-mobile-menu"
-              className="flex h-11 w-11 items-center justify-center text-primaryText lg:hidden"
+              className={`flex h-11 w-11 items-center justify-center transition-colors duration-300 ease-lpOut lg:hidden ${
+                scrolled || menuOpen ? "text-primaryText" : "text-onDark"
+              }`}
             >
-              {menuOpen ? <Menu size={20} aria-hidden="true" className="hidden" /> : null}
-              {menuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+              {menuOpen ? (
+                <X size={20} aria-hidden="true" />
+              ) : (
+                <Menu size={20} aria-hidden="true" />
+              )}
             </button>
           </div>
         </nav>
 
+        {/* Opaque regardless of scroll state: the panel can open while the bar
+            is still transparent over the video, and cream-on-video would be
+            unreadable. */}
         {menuOpen && (
           <div
             id="lp-mobile-menu"
-            className="border-t border-subtle bg-canvas lg:hidden"
+            className="relative border-t border-subtle bg-canvas lg:hidden"
           >
             <ul className="mx-auto flex max-w-lp flex-col px-gutter py-lp3">
               {LINKS.map((l) => (

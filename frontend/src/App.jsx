@@ -24,10 +24,6 @@ const RoadmapGenerator = lazy(() => import("./pages/RoadmapGenerator.jsx"));
 const Videos = lazy(() => import("./pages/Videos.jsx"));
 const Paths = lazy(() => import("./pages/Paths.jsx"));
 
-// TEMPORARY review harness for the landing redesign. Remove once approved.
-const SectionIntroPreview = lazy(() => import("./pages/SectionIntroPreview.jsx"));
-// Landing redesign. Carries its own nav and footer, so it sits outside MainLayout.
-const Landing = lazy(() => import("./pages/Landing.jsx"));
 
 import { ThemeProvider } from "./context/ThemeContext";
 import ColdStartBanner from "./components/common/ColdStartBanner.jsx";
@@ -65,15 +61,13 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* TEMPORARY review harness for the landing redesign.
-              Full screen, no navbar, unauthenticated. Remove once approved. */}
-          <Route path="/_preview/section-intro" element={<SectionIntroPreview />} />
-          {/* Landing redesign, previewed alongside the live Home until it
-              replaces it. Full screen, own nav, unauthenticated. */}
-          <Route path="/_preview/landing" element={<Landing />} />
+          {/* Landing page. OUTSIDE MainLayout: it carries its own nav (and,
+              from batch C, its own footer). Inside MainLayout the app Navbar
+              would stack above LandingNav and the container padding would
+              break the full-bleed hero. */}
+          <Route path="/" element={<Home />} />
 
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/login" element={<Login />} />
@@ -127,7 +121,6 @@ function App() {
               }
             />
             <Route path="/posts/:id" element={<PostDetail />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
             <Route
               path="/communities"
               element={
@@ -145,6 +138,13 @@ function App() {
               }
             />
           </Route>
+
+          {/* Catch-all, declared LAST. React Router v6 ranks by specificity
+              rather than source order, so this worked mid-list by luck, but
+              declaring it last is what the ordering actually communicates.
+              Outside MainLayout so an unmatched URL redirects to the landing
+              page without briefly mounting the app chrome. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </ThemeProvider>

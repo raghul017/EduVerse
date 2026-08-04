@@ -431,6 +431,39 @@
 }
 
 /* =============================================================================
+   STICKY NAV FIX (landing only)
+
+   styles/design-system.css sets `overflow-x: hidden` on html AND body to stop
+   pre-redesign pages from scrolling sideways. That turns both elements into
+   scroll containers, and `position: sticky` resolves against its nearest
+   scrolling ancestor, so the landing nav was sticking to the body rather than
+   the viewport and scrolled away with the page. Measured: header top went to
+   -270px at scrollY 315.
+
+   `overflow: clip` gives the same horizontal containment WITHOUT creating a
+   scroll container, so sticky resolves against the viewport again.
+
+   Scoped with :has() so the other 15 pages keep the original behaviour. They
+   rely on overflow-x: hidden and several have genuine horizontal overflow.
+
+   Do NOT also set overflow-y here. Setting overflow-y: visible alongside a
+   clipped x axis makes the browser compute it back to auto and reintroduces
+   the scroll container, and it detaches the body from the viewport scroll,
+   which renders as a black band above the pinned bar. Only the x axis is
+   touched.
+   ============================================================================= */
+html:has(.lp-root),
+body:has(.lp-root) {
+  overflow-x: clip;
+  /* The app's base body background is the dark-theme #000 from
+     styles/design-system.css. Once the nav pins correctly it stops covering
+     the top of the page, and that black shows through above the bar and in
+     any overscroll gutter. The landing ground is cream, so the body must be
+     cream too. Also removes the black flash on iOS rubber-band scroll. */
+  background-color: var(--lp-canvas);
+}
+
+/* =============================================================================
    COLD-START TOAST REPOSITION (landing only)
 
    components/common/ColdStartBanner.jsx is mounted globally in App.jsx and
