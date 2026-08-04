@@ -12,6 +12,11 @@ import Mission from "../components/landing/Mission.jsx";
 import OfferingsRail from "../components/landing/OfferingsRail.jsx";
 import ForCompanies from "../components/landing/ForCompanies.jsx";
 import MarqueeBand from "../components/landing/MarqueeBand.jsx";
+import OriginStory from "../components/landing/OriginStory.jsx";
+import Testimonials from "../components/landing/Testimonials.jsx";
+import CommunityGrid from "../components/landing/CommunityGrid.jsx";
+import Newsletter from "../components/landing/Newsletter.jsx";
+import SiteFooter from "../components/landing/SiteFooter.jsx";
 
 /**
  * EduVerse landing page. This is the "/" route.
@@ -30,11 +35,11 @@ import MarqueeBand from "../components/landing/MarqueeBand.jsx";
  *   6  offerings rail        OfferingsRail
  *   7  for companies         ForCompanies
  *   8  marquee band          MarqueeBand
- *   9  origin story          [batch C]
- *  10  dark testimonials     [batch C]
- *  11  community grid        [batch C]
- *  12  newsletter            [batch C]
- *  13  footer                [batch C]
+ *   9  origin story          OriginStory
+ *  10  dark testimonials     Testimonials    EB Garamond lives here only
+ *  11  community grid        CommunityGrid
+ *  12  newsletter            Newsletter
+ *  13  footer                SiteFooter      two-line EDU / VERSE wordmark
  *
  * The placeholder logo strip that previously sat at 4 is DELETED, not
  * deferred. Six invented monograms were doing no work, and the slot is better
@@ -69,22 +74,18 @@ export default function Home() {
       <AnnouncementBar />
       <LandingNav />
       <main>
-        {/* TEMPORARY variant switch so both hero options can be compared at the
-            real route: append ?hero=tall to the URL. Defaults to "short".
-            Remove this and hard-code the winner once decided. */}
-        <Hero
-          variant={
-            new URLSearchParams(window.location.search).get("hero") === "tall"
-              ? "tall"
-              : "short"
-          }
-        />
+        <Hero />
         <ProductProof />
         <Mission />
         <OfferingsRail />
         <ForCompanies />
         <MarqueeBand />
+        <OriginStory />
+        <Testimonials />
+        <CommunityGrid />
+        <Newsletter />
       </main>
+      <SiteFooter />
     </div>
   );
 }

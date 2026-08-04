@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -33,8 +32,24 @@ import { useGSAP } from "@gsap/react";
  *
  * No parallax here now that there is no media. The brief allows parallax on
  * media only, never on text, so a type-only hero simply has none.
+ *
+ * WHY THIS HERO IS ~74vh AND NOT FULL HEIGHT.
+ * A type-only hero reads flat, and there were two candidate fixes: scale the
+ * headline up to genuinely fill a full-height viewport, or shorten the hero so
+ * the ProductProof panel breaks into its bottom edge. They turned out to be
+ * MUTUALLY EXCLUSIVE, not additive. At 100vh the panel is pushed entirely
+ * below the fold, so a full-height hero structurally cannot have a peek.
+ * Measured, panel visible in viewport:
+ *     tall  903px (1.00vh), h1 164px  ->  peek NOT visible, both viewports
+ *     short 735px (0.82vh), h1 121px  ->  peek visible, 132px desktop
+ * Short keeps the headline oversized at 121px and buys the cream field an edge
+ * plus the product on the first screen.
+ * Mobile decided it: at 360px tall gives 4 headline lines with an empty band
+ * above them and no peek; short gives 3 lines and a visible panel.
+ * If anyone reaches for min-h-[100dvh] here again, the peek in ProductProof
+ * silently stops working. The two are coupled.
  */
-export default function Hero({ variant = "short" }) {
+export default function Hero() {
   const scope = useRef(null);
 
   useGSAP(
@@ -60,33 +75,15 @@ export default function Hero({ variant = "short" }) {
     { scope }
   );
 
-  // VARIANT SWITCH, temporary. Set by pages/Home.jsx so both options can be
-  // compared at the real route. Collapses to the chosen one once decided.
-  //   "tall"  full height, headline scaled up to fill the space
-  //   "short" ~74vh, so section 4 arrives sooner
-  const tall = variant === "tall";
-
   return (
     <section
       ref={scope}
-      className={`relative flex flex-col justify-center bg-canvas ${
-        tall
-          ? // Full height. The headline has to genuinely fill it, otherwise
-            // the emptiness is visible. lp-display--fill lifts the ceiling
-            // from 140px to 200px and drops the max-width so the type spans
-            // the column rather than sitting in the middle of it.
-            "min-h-[100dvh] pb-[clamp(96px,14vw,180px)] pt-lp8"
-          : // Shorter. No media to justify full-bleed, so the hero is sized to
-            // its content and section 4 arrives sooner.
-            "min-h-[74dvh] pb-[clamp(84px,12vw,150px)] pt-lp7"
-      }`}
+      // The bottom padding leaves room for ProductProof's negative margin to
+      // pull into. Reducing it closes the peek.
+      className="relative flex min-h-[74dvh] flex-col justify-center bg-canvas pb-[clamp(84px,12vw,150px)] pt-lp7"
     >
       <div className="mx-auto w-full max-w-lp px-gutter">
-        <h1
-          className={`lp-hero-enter lp-display text-primaryText ${
-            tall ? "lp-display--fill max-w-[13ch]" : "max-w-[15ch]"
-          }`}
-        >
+        <h1 className="lp-hero-enter lp-display max-w-[15ch] text-primaryText">
           Stop collecting courses. Start finishing one.
         </h1>
 
@@ -114,10 +111,3 @@ export default function Hero({ variant = "short" }) {
     </section>
   );
 }
-
-Hero.propTypes = {
-  /** TEMPORARY. "tall" = full height with the headline scaled to fill it.
-   *  "short" = ~74vh so section 4 arrives sooner. Collapses to one once
-   *  the variant is chosen. */
-  variant: PropTypes.oneOf(["tall", "short"]),
-};

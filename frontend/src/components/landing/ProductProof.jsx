@@ -62,12 +62,12 @@ export default function ProductProof() {
         }
       );
 
-      // NOTE: the panel previously carried a yPercent parallax. It has been
-      // removed because the panel now overlaps the hero with a negative
-      // margin, and a yPercent transform fights that offset: the peeking slice
-      // would grow and shrink on scroll and the hero's bottom edge would move.
-      // The overlap itself is what creates depth now, so the parallax was
-      // doing the same job twice and losing.
+      // DO NOT REINTRODUCE PARALLAX HERE while the negative margin is doing
+      // the work. The panel used to carry a yPercent scrub. It fights the
+      // overlap: a transform on the same axis as the offset makes the peeking
+      // slice grow and shrink on scroll, so the hero's bottom edge visibly
+      // moves. The overlap already provides the depth the parallax was there
+      // to provide, so it was doing the job twice and losing.
       void reduced;
     },
     { scope }

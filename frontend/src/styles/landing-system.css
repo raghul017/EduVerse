@@ -396,17 +396,6 @@
    case, it only moves the comma sideways into the neighbouring gap. The fix
    is the copy rule, applied when the headline is written. */
 
-/* Hero fill modifier, for the full-height hero variant ONLY.
-   A type-only hero at full height fails if the headline does not genuinely
-   fill the space: 120px of Anton sitting mid-viewport in 900px of cream just
-   makes the emptiness visible. This lifts the ceiling from 140px to 200px and
-   raises the fluid rate so the type spans the column rather than floating in
-   it. The 40px floor is unchanged, so HARD RULE 2 still holds at every width.
-   Not for use on section headings: those stay on the standard display token,
-   or the hero stops being the largest thing on the page. */
-.lp-display--fill {
-  font-size: clamp(40px, 11.4vw, 200px);
-}
 
 /* Serif display, dark section only. */
 .lp-serif {
@@ -497,12 +486,15 @@ body:has(.lp-root) {
    If ColdStartBanner is ever refactored, replace this selector with a stable
    data attribute on the banner itself.
 
-   REVISED for the shorter hero. Pinning the toast to the TOP was correct when
-   the hero was full-height with the CTAs near the bottom. With the shorter
-   hero the headline now occupies that upper band, and at 360px the toast
-   covered it. Bottom is the right home again: on desktop the hero CTAs sit
-   bottom-LEFT and the toast is bottom-RIGHT, and on mobile it sits below the
-   CTA stack rather than over the headline.
+   DO NOT "CORRECT" THIS BACK TO top. It was pinned to the top for one commit,
+   which was right for the full-height hero: the CTAs sat near the bottom of a
+   100vh viewport, so the top was the only clear band. The hero is now ~74vh
+   and the headline occupies that upper band, so a top-pinned toast covers the
+   headline at 360px. This is a positioning fix that only holds for one hero
+   height; if the hero height changes again, re-check it rather than assuming.
+   Bottom works for the current layout: on desktop the hero CTAs are bottom-
+   LEFT and the toast is bottom-RIGHT; on mobile the toast is full-width and
+   sits below the CTA stack rather than over the headline.
    ============================================================================= */
 body:has(.lp-root) div.fixed.bottom-4 {
   bottom: var(--lp-space-5) !important;
