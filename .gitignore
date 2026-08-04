@@ -76,3 +76,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+# Local-only Claude Code skills (not shared / not committed)
+.claude/
+
+# Local design probes (never shipped, never committed)
+frontend/design-probe/

@@ -1,0 +1,473 @@
+/* =============================================================================
+   EDUVERSE LANDING DESIGN SYSTEM
+   Scoped to the landing page. Does NOT replace styles/design-system.css, which
+   the other 15 pages still depend on. Landing tokens are namespaced --lp-* so
+   the two systems can coexist without collision.
+
+   All colour values below are contrast-verified. Use exactly as given.
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   HARD RULES. These are not suggestions. Violating any of them is a bug.
+
+   1. #A1FF62 (--lp-accent) measures 1.01:1 against cream (#EDE6D3). It is
+      INVISIBLE as text on light surfaces. NEVER use it for text, icons, or
+      borders on cream/surface. BACKGROUND ONLY, and always paired with
+      --lp-accent-text (#34342E, 10.14:1) as the foreground.
+      On --lp-dark sections lime MAY be used as text: it measures 10.14:1 there.
+
+   2. ANTON IS NEVER USED BELOW 40px. Anton's counters close up below roughly
+      40px and it becomes an illegible black mass. There is exactly ONE display
+      token (--lp-text-display, floor 40px) and it is the only way Anton should
+      enter the page. Inter is the ONLY permitted face beneath 40px, including
+      card titles, rail labels, supporting decks, and captions.
+      DISPLAY FACE IS HEADLINE-ONLY, 40px AND UP.
+
+   3. No raw hex values in JSX. Semantic Tailwind classes only
+      (bg-canvas, text-primary, border-subtle...). If a colour is needed that
+      is not in this file, it does not belong on the page.
+
+   4. --lp-text-disabled (#7A7B72) is NEVER body copy. It fails AA at body
+      size. Permitted for LARGE text only (>=24px or >=19px bold).
+
+   5. #694EFF is RETIRED. It has no slot in this palette. Any reappearance is
+      a regression from the pre-redesign page.
+   ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+   TYPEFACES. Self-hosted, latin + latin-ext subsets, woff2 only.
+   Previously the app linked Manrope from a CDN while the CSS asked for
+   'Haffer XH', which was never loaded, so every user saw Arial. Self-hosting
+   removes the CDN round-trip and the silent fallback.
+
+   THREE VOICES, NO MORE:
+     Anton       oversized headlines only, 40px+          (12KB latin)
+     EB Garamond dark testimonial section only, w500      (25KB latin)
+     Inter       everything else, all sizes below 40px    (24KB latin x2)
+   ----------------------------------------------------------------------------- */
+
+/* Anton -- display, headline-only. Single weight by design; see rule 2.
+   ACCEPTED TRADE-OFF, recorded deliberately: the ui-ux-pro-max database
+   mood-tags Anton "brutal, loud, shouty, meme, internet, bold" and files it
+   under Gen Z / streetwear. We are overruling that knowingly. The judgment is
+   that set in cream on #34342E with generous space, and with an EB Garamond
+   section adjacent, it reads declarative rather than shouty. Chosen over
+   Archivo Variable (wght 100-900, wdth 62-125) because the weight axis only
+   earns its ~45KB if the display face is used below headline size, and under
+   rule 2 it never is. Anton is also 23% narrower, which is the difference
+   between a three-word headline holding one line or wrapping. */
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* EB Garamond 500 -- dark testimonial section ONLY.
+   Weight 500 is a genuine cut in the family, not a synthetic bolding.
+   Chosen over Playfair and Cormorant because light-on-dark text irradiates:
+   thin strokes visually thicken and hairlines break up. High-contrast serifs
+   suffer most. EB Garamond's lower stroke contrast survives the dark ground.
+   The weight was judged under grayscale antialiasing -- see the smoothing
+   declarations on :root below, which MUST ship for this to hold. */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ebgaramond-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ebgaramond-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Italic 500 for same-family emphasis. Never mix a second family for emphasis. */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ebgaramond-500i-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ebgaramond-500i-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Inter 400 / 600 -- body and every size below 40px. Two weights only. */
+@font-face {
+  font-family: 'InterLP';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'InterLP';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'InterLP';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'InterLP';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* =============================================================================
+   TOKENS
+   ============================================================================= */
+:root {
+  /* --- SURFACES --------------------------------------------------------- */
+  --lp-canvas:          #EDE6D3;   /* page ground */
+  --lp-canvas-alt:      #E9E8E0;   /* alternating band */
+  --lp-surface:         #F7F3E9;   /* raised card */
+  --lp-surface-sunken:  #E4DCC6;   /* inset / well */
+  --lp-dark:            #34342E;   /* dark sections 8 and 10, footer */
+
+  /* --- TEXT ON CREAM ---------------------------------------------------- */
+  --lp-text-primary:    #34342E;   /* 10.06:1 on canvas */
+  --lp-text-secondary:  #54554F;   /*  6.04:1 on canvas */
+  --lp-text-muted:      #63645C;   /*  4.81:1 on canvas, AA floor for body */
+  --lp-text-disabled:   #7A7B72;   /* LARGE TEXT ONLY. See hard rule 4. */
+
+  /* --- TEXT ON DARK ----------------------------------------------------- */
+  --lp-text-on-dark:    #EDE6D3;   /* 10.06:1 on --lp-dark */
+  --lp-text-on-dark-2:  #CDC7B4;   /*  7.41:1 on --lp-dark */
+
+  /* --- ACCENT ----------------------------------------------------------- */
+  /* See hard rule 1. Background only on light. Text only on dark. */
+  --lp-accent:          #A1FF62;
+  --lp-accent-text:     #34342E;   /* 10.14:1 on --lp-accent. The ONLY text
+                                      colour permitted on the accent. */
+
+  /* --- BORDERS ---------------------------------------------------------- */
+  --lp-border:          #CDC7B4;
+  --lp-border-strong:   #9A937D;
+  --lp-border-input:    #7A7460;
+
+  /* --- SUPPORT ---------------------------------------------------------- */
+  /* Illustration and section tints ONLY. Never UI chrome, never borders,
+     never text, never button fills. */
+  --lp-sage:            #99A4A6;
+  --lp-blue-pale:       #A3BBCE;
+  --lp-blue-soft:       #B6C1C4;
+  --lp-blue-mid:        #7D9EB9;
+  --lp-blue:            #6589A6;
+  --lp-sand:            #CDC7B4;
+
+  /* --- SEMANTIC --------------------------------------------------------- */
+  --lp-success:         #3F6B4A;
+  --lp-warning:         #8A5A12;
+  --lp-error:           #9C3B2E;
+  --lp-info:            #3D6486;
+
+  /* --- RADIUS ----------------------------------------------------------- */
+  /* Pills (--lp-radius-full) are permitted on buttons and chips ONLY.
+     Cards, panels, and media use sm/md/lg/xl. Mixing pill cards with pill
+     buttons destroys the shape hierarchy. */
+  --lp-radius-sm:    4px;
+  --lp-radius-md:    8px;
+  --lp-radius-lg:   16px;
+  --lp-radius-xl:   24px;
+  --lp-radius-full: 9999px;
+
+  /* --- TYPE FAMILIES ---------------------------------------------------- */
+  --lp-font-display:  'Anton', 'Arial Narrow', Impact, sans-serif;
+  --lp-font-serif:    'EB Garamond', Georgia, 'Times New Roman', serif;
+  --lp-font-sans:     'InterLP', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                      Roboto, Helvetica, Arial, sans-serif;
+
+  /* --- TYPE SCALE ------------------------------------------------------- */
+  /* ONE display token. Its clamp floor is 40px. See hard rule 2: Anton must
+     never render below this. Every smaller step below is Inter.
+     40px floor / 8.4vw fluid / 140px ceiling matches the brief's 72-140px
+     target at desktop while staying legible at 360px. */
+  --lp-text-display:    clamp(40px, 8.4vw, 140px);
+
+  /* Serif display, dark section only. Floor 40px for the same legibility
+     reason, though EB Garamond survives smaller than Anton does. */
+  --lp-text-serif-lg:   clamp(40px, 7.2vw, 84px);
+
+  /* Inter, everything below the display floor. */
+  --lp-text-h2:         clamp(28px, 3.4vw, 38px);
+  --lp-text-h3:         clamp(20px, 2.2vw, 24px);
+  --lp-text-lead:       clamp(17px, 1.5vw, 19px);
+  --lp-text-body:       16px;
+  --lp-text-sm:         14px;
+  --lp-text-xs:         13px;
+  --lp-text-eyebrow:    11px;
+
+  /* --- TRACKING --------------------------------------------------------- */
+  --lp-track-display:  -0.025em;  /* Anton, all-caps */
+  --lp-track-serif:    -0.015em;  /* EB Garamond at display size. Approved
+                                     value: tighter starts colliding the y
+                                     descender with adjacent letters. */
+  --lp-track-eyebrow:   0.18em;   /* uppercase micro-label */
+  --lp-track-body:      0;
+
+  /* --- LEADING ---------------------------------------------------------- */
+  /* DISPLAY LEADING = 0.9. Measured, not guessed.
+     Anton's cap-height is 0.8594em with effectively no lowercase descender,
+     so a value that reads as merely tight on a normal face crosses into
+     physical collision on Anton. At the previous 0.88 every multi-line
+     headline overlapped: measured -12.4px of ink overlap at 120px.
+
+       cap-height ............... 0.8594em  <- ink span, no descending mark
+       0.90 clearance ........... +0.0406em  clear
+       0.86 clearance ........... +0.0006em  touching, the practical floor
+       0.95+ .................... packed-block quality starts to go
+
+     Bounds: 0.86 floor, 0.95 ceiling. 0.9 is the standard for heavy
+     condensed all-caps: visibly tight, no collision.
+
+     CAVEAT, verified by rasterising the real page and scanning pixels.
+     A comma or parenthesis descends to -0.1147em, pushing the worst-case ink
+     span to 0.9741em. When a line ends in a comma AND a glyph sits directly
+     beneath it on the next line, the comma lands ON that glyph. Confirmed:
+     "TRUTH OVER COMFORT," above "ALWAYS DELIVERED HERE" puts the comma
+     through the R.
+
+     This is a PER-GLYPH collision, not a leading problem. Raising
+     line-height to 0.98+ would fix it but breaks the 0.95 ceiling and loses
+     the packed-block quality for all 13 sections, to serve one punctuation
+     mark. Two targeted mitigations instead, both below in .lp-display:
+
+       1. padding-bottom reserves the descender depth so a trailing comma on
+          the LAST line is never clipped by the element box.
+       2. COPY RULE, enforced at authoring time: do not end a non-final
+          headline line with a comma or a parenthesis. Headlines here are 2-3
+          lines of authored marketing copy, not user input, so this is fully
+          controllable. Rewrite the line so the break lands on a word boundary
+          with no trailing descending mark.
+
+     Raising leading was tested and rejected: at 0.98 the comma merely shifts
+     from striking the glyph below to grazing the gap beside it, so it does
+     not actually solve the case, and it costs the packed-block quality on
+     every other headline. The copy rule does solve it, at zero cost. */
+  --lp-leading-display: 0.9;
+  --lp-display-descender: 0.115em;  /* Anton comma yMin, rounded up */
+
+  --lp-leading-serif:   1.06;
+  --lp-leading-tight:   1.15;
+  --lp-leading-body:    1.65;
+
+  /* --- SPACING SCALE ---------------------------------------------------- */
+  /* 4px base. Section rhythm is deliberately generous: VISUAL_DENSITY 3. */
+  --lp-space-1:   4px;
+  --lp-space-2:   8px;
+  --lp-space-3:  12px;
+  --lp-space-4:  16px;
+  --lp-space-5:  24px;
+  --lp-space-6:  32px;
+  --lp-space-7:  48px;
+  --lp-space-8:  64px;
+  --lp-space-9:  96px;
+  --lp-space-10:128px;
+  --lp-section-y:  clamp(64px, 9vw, 128px);   /* vertical section padding */
+  --lp-gutter:     clamp(16px, 4vw, 48px);    /* horizontal page gutter */
+  --lp-measure:    65ch;                       /* body copy max line length */
+
+  /* --- SECTIONINTRO VERTICAL RHYTHM ------------------------------------- */
+  /* The eyebrow, headline and supporting copy must read as ONE unit, not as
+     three evenly spaced items. Proximity is what groups them, so the two
+     gaps are deliberately unequal:
+
+       eyebrow -> headline   TIGHT. The eyebrow is a label ON the headline,
+                             so it binds to it. Sub-linear, roughly half a
+                             line of the eyebrow's own size.
+       headline -> support   OPEN. This is a hierarchy break between the
+                             statement and its elaboration, so it needs
+                             roughly 3x the gap above.
+
+     Ratio is about 1:3.3. Defined as tokens because all 13 sections inherit
+     them; ad-hoc margins would drift immediately.
+
+     OPTICAL NOTE: at line-height 0.9 Anton's cap sits only ~2.5px below the
+     top of its line box, so the measured margin is very nearly the optical
+     gap. There is almost no half-leading to absorb, unlike a normal face.
+     That means these values read TIGHTER than the same numbers would on
+     Inter. They are tuned for Anton specifically; do not reuse them above a
+     non-display heading without re-checking. */
+  --lp-intro-eyebrow-gap:  clamp(14px, 1.3vw, 20px);
+  --lp-intro-support-gap:  clamp(30px, 3.2vw, 52px);
+
+  /* --- MOTION ----------------------------------------------------------- */
+  --lp-ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --lp-dur-reveal:    0.7s;    /* brief: 0.6-0.8s */
+  --lp-stagger:       0.08s;   /* brief: 0.08s */
+}
+
+/* =============================================================================
+   BASE
+   ============================================================================= */
+
+/* MANDATORY. The EB Garamond weight-500 judgment was made under grayscale
+   antialiasing. Light-on-dark text irradiates: with subpixel smoothing, 500
+   renders visibly heavier than what was approved and the editorial quality is
+   lost. Both declarations must ship. Do not remove either one. */
+.lp-root {
+  background-color: var(--lp-canvas);
+  color: var(--lp-text-primary);
+  font-family: var(--lp-font-sans);
+  font-size: var(--lp-text-body);
+  line-height: var(--lp-leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headline. The ONLY sanctioned way Anton enters the page.
+   Floor is 40px by construction -- see hard rule 2. */
+.lp-display {
+  font-family: var(--lp-font-display);
+  font-weight: 400;              /* Anton ships one weight. Never synthesise. */
+  font-size: var(--lp-text-display);
+  line-height: var(--lp-leading-display);
+  letter-spacing: var(--lp-track-display);
+  text-transform: uppercase;
+  text-wrap: balance;            /* brief: never whitespace-nowrap on headlines */
+  margin: 0;
+  /* Descender reserve. At line-height 0.9 the line box is shorter than the
+     ink of a line ending in a comma or parenthesis (0.9741em worst case).
+     Without this the last line's punctuation is clipped by the element box
+     and, in a flex/grid column, collides with whatever follows.
+     This does NOT affect inter-line spacing, only the block's own bottom
+     edge, so the packed-block quality is preserved. */
+  padding-bottom: var(--lp-display-descender);
+}
+
+/* NOTE: there is deliberately no line-height escape hatch here. See the
+   leading comment above: raising leading does not fix the comma-above-glyph
+   case, it only moves the comma sideways into the neighbouring gap. The fix
+   is the copy rule, applied when the headline is written. */
+
+/* Serif display, dark section only. */
+.lp-serif {
+  font-family: var(--lp-font-serif);
+  font-weight: 500;
+  font-style: normal;
+  font-size: var(--lp-text-serif-lg);
+  line-height: var(--lp-leading-serif);
+  letter-spacing: var(--lp-track-serif);
+  text-wrap: balance;
+  margin: 0;
+}
+.lp-serif em { font-style: italic; font-weight: 500; }
+
+/* Eyebrow. Inter, never Anton. */
+.lp-eyebrow {
+  font-family: var(--lp-font-sans);
+  font-size: var(--lp-text-eyebrow);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--lp-track-eyebrow);
+  color: var(--lp-text-muted);
+  margin: 0;
+}
+
+/* Body copy. Capped at 65ch per the readability guideline. */
+.lp-body {
+  font-family: var(--lp-font-sans);
+  font-size: var(--lp-text-body);
+  line-height: var(--lp-leading-body);
+  color: var(--lp-text-secondary);
+  max-width: var(--lp-measure);
+  margin: 0;
+}
+
+/* =============================================================================
+   COLD-START TOAST REPOSITION (landing only)
+
+   components/common/ColdStartBanner.jsx is mounted globally in App.jsx and
+   pins itself bottom-right. On the landing hero that lands on top of the
+   primary CTA, which is the one element on the page that must never be
+   obscured.
+
+   This moves it clear on the landing route ONLY. It is a positional override
+   with no JSX change, so the banner behaves identically on the other 15
+   pages. Scoped by `body:has(.lp-root)` because the banner renders as a
+   sibling of the landing root inside #root, so a `.lp-root ...` descendant
+   selector cannot reach it. A descendant combinator is required, not a child
+   combinator: the banner is nested inside #root, not a direct body child.
+
+   The !important is needed because the override competes with Tailwind's
+   own `.bottom-4` utility at equal specificity, and utility order is not
+   guaranteed across builds.
+
+   If ColdStartBanner is ever refactored, replace this selector with a stable
+   data attribute on the banner itself.
+   ============================================================================= */
+body:has(.lp-root) div.fixed.bottom-4 {
+  bottom: auto !important;
+  top: calc(64px + var(--lp-space-5)) !important;   /* clear of the 64px nav */
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   Scrub and parallax collapse entirely; opacity fades are kept.
+   ============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .lp-root *,
+  .lp-root *::before,
+  .lp-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -24,6 +24,11 @@ const RoadmapGenerator = lazy(() => import("./pages/RoadmapGenerator.jsx"));
 const Videos = lazy(() => import("./pages/Videos.jsx"));
 const Paths = lazy(() => import("./pages/Paths.jsx"));
 
+// TEMPORARY review harness for the landing redesign. Remove once approved.
+const SectionIntroPreview = lazy(() => import("./pages/SectionIntroPreview.jsx"));
+// Landing redesign. Carries its own nav and footer, so it sits outside MainLayout.
+const Landing = lazy(() => import("./pages/Landing.jsx"));
+
 import { ThemeProvider } from "./context/ThemeContext";
 import ColdStartBanner from "./components/common/ColdStartBanner.jsx";
 
@@ -60,6 +65,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* TEMPORARY review harness for the landing redesign.
+              Full screen, no navbar, unauthenticated. Remove once approved. */}
+          <Route path="/_preview/section-intro" element={<SectionIntroPreview />} />
+          {/* Landing redesign, previewed alongside the live Home until it
+              replaces it. Full screen, own nav, unauthenticated. */}
+          <Route path="/_preview/landing" element={<Landing />} />
+
           <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/feed" element={<Feed />} />
