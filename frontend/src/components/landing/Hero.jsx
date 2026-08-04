@@ -4,24 +4,37 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 /**
- * SECTION 3 -- hero.
- * Full-bleed looping muted video, oversized caps headline, one line of
- * sub-copy, two CTAs side by side.
+ * SECTION 3 -- hero. Typographic, no media.
+ *
+ * DELIBERATE DIVERGENCE FROM THE REFERENCE, recorded so it is not
+ * "corrected" later by someone assuming it was an oversight:
+ * get-ripe.com opens on a full-bleed video. This does not. The reason is that
+ * we have no real footage and no photography of anyone actually learning, and
+ * a typographic hero propped up by a stock image is that design's silhouette
+ * with nothing in it. Honest divergence beats imitation on borrowed material.
+ * Headline-then-product is also the stronger pattern for software: the
+ * product proof in section 4 is now one scroll from the headline instead of
+ * three screens down.
+ * If real footage is ever shot, revisit this: the media version is the
+ * reference's composition and it is better WHEN the asset is real.
+ *
+ * The dead <video> wiring that pointed at /video/hero.webm and .mp4 is gone.
+ * Those files never existed, so every visitor was seeing a poster frame around
+ * an empty element.
  *
  * HERO STACK DISCIPLINE (skill 4.7): exactly 3 text elements, under the cap
  * of 4. Headline, sub-copy, CTAs. No eyebrow, no trust micro-strip, no
- * tagline below the buttons, no version label. The old hero had 6 including
+ * tagline below the buttons, no version label. The old hero had 6, including
  * a warning banner, five vendor-name pills and a "Groq Ultra-Fast" strip.
  *
- * The headline is NOT a SectionIntro: it is the page h1 and the only place
- * where the display type sits over media, so it needs its own scrim handling.
- * Every OTHER section uses SectionIntro.
+ * The headline is NOT a SectionIntro: it is the page h1 and carries its own
+ * scale. Every OTHER section uses SectionIntro.
  *
- * PARALLAX is on the video only, never on the text (brief).
+ * No parallax here now that there is no media. The brief allows parallax on
+ * media only, never on text, so a type-only hero simply has none.
  */
 export default function Hero() {
   const scope = useRef(null);
-  const mediaRef = useRef(null);
 
   useGSAP(
     () => {
@@ -29,7 +42,7 @@ export default function Hero() {
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      // Entrance. Opacity + y, matching the page-wide Reveal timing.
+      // Entrance only. Opacity + y, matching the page-wide Reveal timing.
       gsap.fromTo(
         ".lp-hero-enter",
         { autoAlpha: 0, y: reduced ? 0 : 28 },
@@ -42,20 +55,6 @@ export default function Hero() {
           delay: 0.1,
         }
       );
-
-      // Media parallax. Disabled entirely under reduced motion, per the brief:
-      // scrub and parallax go, opacity fades stay.
-      if (reduced) return;
-      gsap.to(mediaRef.current, {
-        yPercent: 12,
-        ease: "none",
-        scrollTrigger: {
-          trigger: scope.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
     },
     { scope }
   );
@@ -63,50 +62,15 @@ export default function Hero() {
   return (
     <section
       ref={scope}
-      className="relative isolate flex min-h-[100dvh] flex-col justify-end overflow-hidden bg-dark"
+      className="relative flex min-h-[92dvh] flex-col justify-center bg-canvas"
     >
-      {/* MEDIA. 110% tall so the parallax has somewhere to travel without
-          exposing an edge. */}
-      <div ref={mediaRef} className="absolute inset-0 -z-10 h-[112%]">
-        {/* TODO: replace with real EduVerse footage. Muted, looping, no audio
-            track. Poster comes from the same grayscale seed so the first
-            paint matches the video's tone rather than flashing a colour. */}
-        <video
-          className="h-full w-full object-cover opacity-[0.55]"
-          poster="https://picsum.photos/seed/eduverse-hero-study/1920/1080?grayscale"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          tabIndex={-1}
-        >
-          {/* TODO: supply /video/hero.webm and /video/hero.mp4.
-              Until then the poster frame is what renders, which is why the
-              poster is a real image and not a placeholder colour. */}
-          <source src="/video/hero.webm" type="video/webm" />
-          <source src="/video/hero.mp4" type="video/mp4" />
-        </video>
-
-        {/* Scrim. Without it the headline sits on unpredictable video luminance
-            and the contrast guarantee is lost. Weighted to the bottom where
-            the copy sits. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-dark via-dark/75 to-dark/35"
-        />
-      </div>
-
-      <div className="mx-auto w-full max-w-lp px-gutter pb-lp9 pt-lp10">
-        {/* h1. Not SectionIntro, see the note above. Uses the same .lp-display
-            token so the 40px floor and 0.9 leading are identical. */}
-        <h1 className="lp-hero-enter lp-display max-w-[16ch] text-onDark">
+      <div className="mx-auto w-full max-w-lp px-gutter py-lp9">
+        <h1 className="lp-hero-enter lp-display max-w-[15ch] text-primaryText">
           Stop collecting courses. Start finishing one.
         </h1>
 
         {/* Sub-copy: 18 words, inside the 20-word hero cap. */}
-        <p className="lp-hero-enter mt-introSupport max-w-measure font-body text-lpLead text-onDark2">
+        <p className="lp-hero-enter mt-introSupport max-w-measure font-body text-lpLead text-secondaryText">
           Tell us what you want to learn. You get a roadmap with real
           resources at every step, and a tutor that has read them.
         </p>
@@ -120,7 +84,7 @@ export default function Hero() {
           </Link>
           <Link
             to="/videos"
-            className="inline-flex items-center justify-center rounded-lpFull border border-onDark2/40 px-lp6 py-lp4 font-body text-lpSm font-semibold text-onDark transition-colors duration-200 ease-lpOut hover:border-onDark hover:bg-onDark/10 active:scale-[0.98]"
+            className="inline-flex items-center justify-center rounded-lpFull border border-strong px-lp6 py-lp4 font-body text-lpSm font-semibold text-primaryText transition-colors duration-200 ease-lpOut hover:bg-surfaceSunken active:scale-[0.98]"
           >
             See how it works
           </Link>

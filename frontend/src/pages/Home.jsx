@@ -7,7 +7,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnnouncementBar from "../components/landing/AnnouncementBar.jsx";
 import LandingNav from "../components/landing/LandingNav.jsx";
 import Hero from "../components/landing/Hero.jsx";
-import LogoStrip from "../components/landing/LogoStrip.jsx";
+import ProductProof from "../components/landing/ProductProof.jsx";
+import Mission from "../components/landing/Mission.jsx";
+import OfferingsRail from "../components/landing/OfferingsRail.jsx";
+import ForCompanies from "../components/landing/ForCompanies.jsx";
+import MarqueeBand from "../components/landing/MarqueeBand.jsx";
 
 /**
  * EduVerse landing page. This is the "/" route.
@@ -20,17 +24,22 @@ import LogoStrip from "../components/landing/LogoStrip.jsx";
  * Sections, in order:
  *   1  announcement bar      AnnouncementBar
  *   2  nav                   LandingNav
- *   3  hero                  Hero
- *   4  logo strip            LogoStrip
- *   5  mission               [batch B]
- *   6  offerings rail        [batch B]
- *   7  for companies         [batch B]
- *   8  marquee band          [batch B]
+ *   3  hero                  Hero            typographic, no media
+ *   4  product proof         ProductProof    real generator screenshot
+ *   5  mission               Mission
+ *   6  offerings rail        OfferingsRail
+ *   7  for companies         ForCompanies
+ *   8  marquee band          MarqueeBand
  *   9  origin story          [batch C]
  *  10  dark testimonials     [batch C]
  *  11  community grid        [batch C]
  *  12  newsletter            [batch C]
  *  13  footer                [batch C]
+ *
+ * The placeholder logo strip that previously sat at 4 is DELETED, not
+ * deferred. Six invented monograms were doing no work, and the slot is better
+ * spent putting real product on screen one scroll from the headline. Revisit
+ * only if real partner logos exist and there is a real relationship to claim.
  *
  * .lp-root scopes the landing design system so its tokens cannot leak into
  * the other 15 pages, which still use styles/design-system.css.
@@ -61,7 +70,11 @@ export default function Home() {
       <LandingNav />
       <main>
         <Hero />
-        <LogoStrip />
+        <ProductProof />
+        <Mission />
+        <OfferingsRail />
+        <ForCompanies />
+        <MarqueeBand />
       </main>
     </div>
   );
