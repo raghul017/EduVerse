@@ -40,7 +40,7 @@ export default function Mission() {
             >
               <Link
                 to="/ai-roadmap"
-                className="inline-flex items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText transition-transform duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.98]"
+                className="inline-flex items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText [transition-property:transform,filter] duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.96]"
               >
                 Build my roadmap
               </Link>

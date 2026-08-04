@@ -29,13 +29,15 @@ export default function AnnouncementBar() {
 
   return (
     <div className="relative bg-dark text-onDark">
+      {/* pr-lp8 reserves the close button's 44px hit area so the two targets
+          never overlap (polish principle 16). */}
       <div className="mx-auto flex max-w-lp items-center justify-center px-gutter py-lp3 pr-lp8">
         {/* ONE LINE at every width (brief). The message is truncated rather
             than wrapped: a two-line announcement bar pushes the hero down and
             stops reading as a bar. On dark, lime IS legal as text: 10.14:1. */}
         <Link
           to="/ai-roadmap"
-          className="group flex min-w-0 items-center gap-lp2 font-body text-lpXs text-onDark transition-colors duration-200 ease-lpOut hover:text-lime"
+          className="group flex min-w-0 items-center gap-lp2 font-body text-lpXs text-onDark [transition-property:color] duration-200 ease-lpOut hover:text-lime"
         >
           <span className="shrink-0 font-semibold uppercase tracking-lpEyebrow text-lime">
             New

@@ -89,7 +89,7 @@ export default function ForCompanies() {
 
             <Link
               to="/communities"
-              className="mt-lp6 inline-flex items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText transition-transform duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.98]"
+              className="mt-lp6 inline-flex items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText [transition-property:transform,filter] duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.96]"
             >
               Talk to us
             </Link>

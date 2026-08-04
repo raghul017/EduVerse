@@ -429,6 +429,56 @@
   color: var(--lp-text-secondary);
   max-width: var(--lp-measure);
   margin: 0;
+  text-wrap: pretty;   /* avoids single-word orphans on the last line */
+}
+
+/* Body copy inside the landing page gets `pretty` by default. Headings get
+   `balance` from .lp-display / .lp-serif. Set here rather than as a utility on
+   ~20 individual paragraphs, so a new section inherits it automatically. */
+.lp-root p,
+.lp-root li,
+.lp-root blockquote {
+  text-wrap: pretty;
+}
+
+/* HIT AREAS (polish principle 16). Nav and footer links are 17px tall as
+   drawn, which is the correct visual size for a text link but well under the
+   40px minimum for a target. Rather than pad the links, which would break the
+   layout rhythm, each gets an invisible ::after that extends the target
+   vertically. The links are in vertical stacks with gap-lp3 (12px), so a 40px
+   target on a 17px link leaves ~1px of clearance and the hit areas never
+   overlap. Horizontal nav links have gap-lp6 (32px) between them, so widening
+   is safe there too.
+   Applied to nav and footer link lists only, NOT to every anchor: the
+   announcement bar link and in-body links are inside running text where an
+   expanded target would overlap the surrounding lines. */
+.lp-root header nav a,
+.lp-root footer nav a,
+.lp-root footer ul a {
+  position: relative;
+}
+.lp-root header nav a::after,
+.lp-root footer nav a::after,
+.lp-root footer ul a::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  transform: translateY(-50%);
+  height: 40px;
+  /* Height only. A min-width here widens narrow links symmetrically past
+     their own column and creates cross-column target overlap; the links are
+     already 33px+ wide and sit in separate columns, so the vertical axis is
+     the only one that needed extending. */
+}
+
+/* IMAGE OUTLINE (polish principle 11). A 1px low-opacity outline gives every
+   image a consistent edge against whatever sits behind it. Pure white at 10%,
+   never a tinted neutral: a tinted outline picks up the surface colour under
+   it and reads as dirt on the image edge. White because every image on this
+   page sits on the --lp-dark panel ground. */
+.lp-root img {
+  outline: 1px solid rgb(255 255 255 / 0.1);
+  outline-offset: -1px;
 }
 
 /* =============================================================================

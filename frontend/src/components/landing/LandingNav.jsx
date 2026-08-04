@@ -102,7 +102,7 @@ export default function LandingNav() {
                 pairing on a light surface. HARD RULE 1. */}
             <Link
               to={user ? "/ai-roadmap" : "/signup"}
-              className="rounded-lpFull bg-lime px-lp5 py-lp2 font-body text-lpSm font-semibold text-accentText transition-transform duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.98]"
+              className="rounded-lpFull bg-lime px-lp5 py-lp2 font-body text-lpSm font-semibold text-accentText [transition-property:transform,filter] duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.96]"
             >
               {user ? "Dashboard" : "Get started"}
             </Link>

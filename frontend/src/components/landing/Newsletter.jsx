@@ -82,7 +82,7 @@ export default function Newsletter() {
             />
             <button
               type="submit"
-              className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-lp2 rounded-lpFull bg-lime px-lp6 font-body text-lpSm font-semibold text-accentText transition-transform duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.98]"
+              className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-lp2 rounded-lpFull bg-lime px-lp6 font-body text-lpSm font-semibold text-accentText [transition-property:transform,filter] duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.96]"
             >
               Subscribe
               <ArrowRight size={16} aria-hidden="true" />

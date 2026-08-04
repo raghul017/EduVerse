@@ -95,7 +95,7 @@ export default function SiteFooter() {
               <h2 className="font-body text-eyebrow font-semibold uppercase tracking-lpEyebrow text-onDark2">
                 {group.title}
               </h2>
-              <ul className="mt-lp4 flex flex-col gap-lp3">
+              <ul className="mt-lp4 flex flex-col gap-lp5">
                 {group.links.map((l) => (
                   <li key={l.to}>
                     <Link

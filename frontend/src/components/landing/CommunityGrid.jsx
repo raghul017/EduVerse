@@ -75,7 +75,7 @@ export default function CommunityGrid() {
 
           <Link
             to="/communities"
-            className="inline-flex w-fit shrink-0 items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText transition-transform duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.98]"
+            className="inline-flex w-fit shrink-0 items-center justify-center rounded-lpFull bg-lime px-lp6 py-lp4 font-body text-lpSm font-semibold text-accentText [transition-property:transform,filter] duration-200 ease-lpOut hover:brightness-[0.97] active:scale-[0.96]"
           >
             Join a community
           </Link>
@@ -96,6 +96,9 @@ export default function CommunityGrid() {
                 c.wide ? "sm:col-span-2" : ""
               }`}
             >
+              {/* Flush to the card edge, so the image's own corners are square
+                  and the card's overflow-hidden clips them to its lpXl radius.
+                  Adding a radius here would double-round and read as a seam. */}
               <MediaSlot
                 src={c.src}
                 alt={c.alt}

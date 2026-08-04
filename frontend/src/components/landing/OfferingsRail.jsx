@@ -83,9 +83,14 @@ const CARDS = [
   },
 ];
 
+// CONCENTRIC RADII (polish principle 1): outer = inner + padding.
+// Card is lpXl (24px) with p-lp4 (16px) padding, so the inner media must be
+// lpMd (8px): 8 + 16 = 24. It was lpLg (16px) inside p-lp5 (24px), which needs
+// a 40px outer to be concentric; equal-ish nested radii make the inner surface
+// look pinched.
 function Card({ card }) {
   return (
-    <article className="flex h-full w-[78vw] shrink-0 flex-col justify-between rounded-lpXl border border-subtle bg-surfaceRaised p-lp5 sm:w-[420px]">
+    <article className="flex h-full w-[78vw] shrink-0 flex-col justify-between rounded-lpXl border border-subtle bg-surfaceRaised p-lp4 sm:w-[420px]">
       <div>
         {card.kind === "media" ? (
           <MediaSlot
@@ -93,13 +98,13 @@ function Card({ card }) {
             slotPath={card.slot}
             alt={`${card.title} in EduVerse`}
             aspect="aspect-[4/5]"
-            className="rounded-lpLg"
+            className="rounded-lpMd"
           />
         ) : (
           // Type-only card. Bento background diversity (skill 4.7): these two
           // use a sunken tint and a large numeral rather than an image, so the
           // rail is not five identical media cards.
-          <div className="flex aspect-[4/5] items-end rounded-lpLg bg-surfaceSunken p-lp5">
+          <div className="flex aspect-[4/5] items-end rounded-lpMd bg-surfaceSunken p-lp4">
             <p className="font-body text-lpH2 font-semibold leading-tight text-primaryText">
               {card.stat}
             </p>
@@ -116,7 +121,7 @@ function Card({ card }) {
 
       <Link
         to={card.to}
-        className="mt-lp5 inline-flex w-fit items-center justify-center rounded-lpFull border border-strong px-lp5 py-lp3 font-body text-lpSm font-semibold text-primaryText transition-colors duration-200 ease-lpOut hover:bg-surfaceSunken active:scale-[0.98]"
+        className="mt-lp5 inline-flex w-fit items-center justify-center rounded-lpFull border border-strong px-lp5 py-lp3 font-body text-lpSm font-semibold text-primaryText [transition-property:transform,background-color,border-color] duration-200 ease-lpOut hover:bg-surfaceSunken active:scale-[0.96]"
       >
         {card.cta}
       </Link>

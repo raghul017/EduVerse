@@ -82,7 +82,7 @@ export default function OriginStory() {
 
             <a
               href="/ai-roadmap"
-              className="mt-lp2 inline-flex w-fit items-center justify-center rounded-lpFull border border-strong px-lp6 py-lp4 font-body text-lpSm font-semibold text-primaryText transition-colors duration-200 ease-lpOut hover:bg-surfaceSunken active:scale-[0.98]"
+              className="mt-lp2 inline-flex w-fit items-center justify-center rounded-lpFull border border-strong px-lp6 py-lp4 font-body text-lpSm font-semibold text-primaryText [transition-property:transform,background-color,border-color] duration-200 ease-lpOut hover:bg-surfaceSunken active:scale-[0.96]"
             >
               Try the sequencer
             </a>
