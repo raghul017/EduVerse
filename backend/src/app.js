@@ -24,6 +24,10 @@ export const serverReadyState = {
 const app = express();
 const logger = pino({ level: env.node === "development" ? "debug" : "info" });
 
+// Render/Cloudflare terminate TLS upstream and forward client IPs via proxy headers.
+// Express needs to trust the first proxy so rate limiting and request metadata work correctly.
+app.set("trust proxy", 1);
+
 const getAllowedOrigins = () => {
     const origins = [];
 

@@ -20,8 +20,22 @@ const server = app.listen(env.port, async () => {
         serverReadyState.dbReady = true;
     } catch (error) {
         console.error("[Warm-up] Database connection failed:", error.message);
+        console.error("[Warm-up] Database error code:", error.code);
+        if (error.code === "XX000") {
+            console.error(
+                "[Warm-up] Check Render DATABASE_URL. Supabase returned 'Tenant or user not found', which usually means the host, username, or pooler connection string is wrong.",
+            );
+        }
         console.error("[Warm-up] First requests may be slow while DB wakes up");
         serverReadyState.dbReady = false;
+
+        if (env.node === "production") {
+            console.error(
+                "[Warm-up] Exiting because the production database connection is not usable.",
+            );
+            server.close(() => process.exit(1));
+            return;
+        }
     }
 
     serverReadyState.bootTime = Date.now();

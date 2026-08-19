@@ -91,6 +91,15 @@ export default defineConfig(({ mode }) => {
             //                    renders outside of
             // That still keeps ~38 kB gzip of motion off the landing route,
             // which was the win worth having.
+            //
+            // TRAP FOR WHOEVER REVISITS THIS. The failure was an INTERACTION
+            // BETWEEN CHUNKS, not a property of any single chunk.
+            // Reintroducing `react-vendor` alone and rebuilding PASSED the
+            // smoke test. Only react-vendor AND markdown-vendor together
+            // reproduced the blank page. So testing one carve-out at a time
+            // would have cleared a config that breaks in combination.
+            // If you add a chunk here, re-run `npm run verify` with the FULL
+            // set you intend to ship, never one variable at a time.
             if (id.includes('gsap') || id.includes('lenis')) return 'gsap-vendor';
             if (id.includes('framer-motion') || id.includes('motion-dom') ||
                 id.includes('motion-utils')) {

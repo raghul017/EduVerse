@@ -20,6 +20,15 @@ const sslConfig = needsSSL ? {
 
 console.log('[Database] Connecting with SSL:', needsSSL ? 'enabled (self-signed allowed)' : 'disabled');
 
+const getDatabaseHost = () => {
+  if (!connectionString) return null;
+  try {
+    return new URL(connectionString).host;
+  } catch {
+    return null;
+  }
+};
+
 export const pool = new Pool({
   connectionString,
   ssl: sslConfig,
@@ -55,7 +64,7 @@ export const query = async (text, params) => {
 
 export const getDebugInfo = () => ({
   ssl: needsSSL ? 'enabled (rejectUnauthorized: false)' : 'disabled',
-  poolSize: 5,
+  poolSize: 10,
+  host: getDatabaseHost(),
   message: "Using SSL with self-signed cert support for Supabase"
 });
-

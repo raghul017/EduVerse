@@ -3,9 +3,13 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# package-lock.json IS committed. It was ignored, which meant CI could not run
+# `npm ci` and would have resolved different dependency versions than local
+# builds -- so a green CI run would not have proven the thing you actually
+# ship. A lockfile is the record of what was verified.
 
 # Environment variables
 .env

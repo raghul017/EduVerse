@@ -1,0 +1,76 @@
+name: Verify build
+
+# WHY THIS EXISTS
+# Two bugs shipped in one session that every local check passed: a
+# manualChunks split that produced a blank page on every route, and an
+# image pipeline that only ran on macOS. Both had the same shape -- the
+# artifact was verified, the running page was not.
+#
+# `npm run verify` builds and then LOADS the built output in headless
+# Chrome, asserting each route mounts. This workflow makes that a merge
+# gate rather than a command someone has to remember.
+#
+# WHY NOT THE OTHER TWO OPTIONS:
+#   - Vercel build command: ruled out by checking, not assuming. The build
+#     image is Amazon Linux 2023 with no Chrome or Chromium; Puppeteer on
+#     Vercel requires shipping your own binary (@sparticuz/chromium, ~50MB).
+#     Adding that to gate a test that runs after merge anyway is the wrong
+#     trade.
+#   - Pre-push hook: bypassable with --no-verify, and a guard that depends
+#     on discipline is not a guard.
+#
+# ubuntu-latest ships Chrome pre-installed, which is what smoke.mjs needs.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/verify.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Confirm Chrome is present
+        # smoke.mjs exits 1 with a clear message if it finds no browser, but
+        # failing here names the cause directly instead of inside the test.
+        run: |
+          which google-chrome || which chromium || which chromium-browser
+          google-chrome --version || chromium --version
+
+      - name: Build and smoke test
+        # `verify` = build + load every route in headless Chrome.
+        # The image step inside `build` also self-checks here: on Linux it
+        # has no encoder, so it verifies the committed AVIF/WebP derivatives
+        # exist and exits 1 if any are missing. That is the guard against
+        # the macOS-only pipeline silently shipping no derivatives.
+        run: npm run verify
+
+      - name: Upload build output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-on-failure
+          path: frontend/dist
+          retention-days: 5
