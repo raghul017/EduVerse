@@ -1,62 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Every package in the react-markdown dependency tree. See the note in
-// manualChunks below for why this is an explicit list and not a regex.
-const MARKDOWN_PKGS = [
-              'bail',
-              'character-entities',
-              'comma-separated-tokens',
-              'decode-named-character-reference',
-              'devlop',
-              'estree-util-is-identifier-name',
-              'extend',
-              'hast-util-to-jsx-runtime',
-              'hast-util-whitespace',
-              'html-url-attributes',
-              'inline-style-parser',
-              'is-plain-obj',
-              'mdast-util-from-markdown',
-              'mdast-util-to-hast',
-              'mdast-util-to-string',
-              'micromark',
-              'micromark-core-commonmark',
-              'micromark-factory-destination',
-              'micromark-factory-label',
-              'micromark-factory-space',
-              'micromark-factory-title',
-              'micromark-factory-whitespace',
-              'micromark-util-character',
-              'micromark-util-chunked',
-              'micromark-util-classify-character',
-              'micromark-util-combine-extensions',
-              'micromark-util-decode-numeric-character-reference',
-              'micromark-util-decode-string',
-              'micromark-util-encode',
-              'micromark-util-html-tag-name',
-              'micromark-util-normalize-identifier',
-              'micromark-util-resolve-all',
-              'micromark-util-sanitize-uri',
-              'micromark-util-subtokenize',
-              'property-information',
-              'react-markdown',
-              'remark-parse',
-              'remark-rehype',
-              'space-separated-tokens',
-              'style-to-js',
-              'style-to-object',
-              'trim-lines',
-              'trough',
-              'unified',
-              'unist-util-is',
-              'unist-util-position',
-              'unist-util-stringify-position',
-              'unist-util-visit',
-              'unist-util-visit-parents',
-              'vfile',
-              'vfile-message',
-];
-
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
@@ -128,31 +72,29 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (!id.includes('node_modules')) return;
 
-            // React runtime. Every route needs it.
-            if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) {
-              return 'react-vendor';
-            }
-            // GSAP + Lenis: the landing page's animation stack.
+            // ONLY split what is genuinely leaf-like and route-specific.
+            //
+            // An earlier version also carved out a `react-vendor` chunk. That
+            // broke production: react-router-dom and zustand consume React at
+            // module-init time, and separating them produced a circular chunk
+            // init order that threw
+            //   TypeError: Cannot read properties of undefined
+            //              (reading 'createContext')
+            // before the app could mount. The build succeeded and every local
+            // check passed; only loading the built output caught it.
+            //
+            // React therefore stays in the default vendor chunk with the
+            // things that depend on it. The two carve-outs below are safe
+            // because nothing in the default chunk imports them at init:
+            //   gsap/lenis  -> landing animation stack
+            //   framer-motion -> MainLayout only, which the landing route
+            //                    renders outside of
+            // That still keeps ~38 kB gzip of motion off the landing route,
+            // which was the win worth having.
             if (id.includes('gsap') || id.includes('lenis')) return 'gsap-vendor';
-            // framer-motion: MainLayout transitions and a few app components.
-            // The landing route is outside MainLayout, so it skips this.
             if (id.includes('framer-motion') || id.includes('motion-dom') ||
                 id.includes('motion-utils')) {
               return 'motion-vendor';
-            }
-            // Markdown: AI tutor, AI chat and the roadmap generator only.
-            // The markdown stack. Enumerated by package name rather than
-            // matched by pattern: this list came from inspecting which
-            // packages Rollup actually placed in `vendor`, and a pattern
-            // guess left 4 of them behind (unified, trim-lines,
-            // decode-named-character-reference, inline-style-parser). Any one
-            // left out creates a static vendor -> markdown edge, and since
-            // the entry HTML preloads `vendor`, that single edge drags all
-            // 31 kB onto every route including "/".
-            // Verified after every change: vendor.js must have NO static
-            // import of markdown-vendor.
-            if (MARKDOWN_PKGS.some((n) => id.includes(`node_modules/${n}/`))) {
-              return 'markdown-vendor';
             }
             return 'vendor';
           }

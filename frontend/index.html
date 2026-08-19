@@ -33,10 +33,46 @@
     <meta name="apple-mobile-web-app-title" content="EduVerse" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     
-    <!-- Fonts with display swap -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FONTS.
+         The Manrope stylesheet and its two preconnects were removed: nothing
+         referenced Manrope. The CSS asked for 'Haffer XH', which has no
+         @font-face and no link anywhere, so every non-landing page fell
+         through to Arial while still paying for three render-blocking
+         requests to Google Fonts. Removing it is a pure win and it also stops
+         the dead requests from distorting LCP measurement.
+
+         Landing fonts are self-hosted and declared in
+         src/styles/landing-system.css. They are NOT preloaded here yet, on
+         purpose: preloading the wrong resource delays the real LCP element.
+         See the note below. -->
+
+    <!-- LCP DECISION, PENDING MEASUREMENT IN A REAL BROWSER.
+         Headless Chrome in this environment emits no LCP entries at all
+         (verified with a 120px <h1> control page), so this has to be measured
+         by hand: DevTools > Performance > record a reload, read the LCP marker.
+
+         Then exactly one of these:
+
+         a) The section 4 product panel wins
+            -> preload the image and set fetchpriority="high" on it.
+               <link rel="preload" as="image" fetchpriority="high"
+                     imagesrcset="/media/gen/roadmap-generator-720.avif 720w,
+                                  /media/gen/roadmap-generator-1080.avif 1080w,
+                                  /media/gen/roadmap-generator-1440.avif 1440w,
+                                  /media/gen/roadmap-generator-2160.avif 2160w"
+                     imagesizes="(min-width: 1440px) 1352px, (min-width: 768px) calc(100vw - 96px), calc(100vw - 32px)"
+                     type="image/avif">
+               Also pass priority to <ResponsiveImage> in ProductProof.jsx.
+
+         b) The Anton headline wins
+            -> the font is on the LCP critical path, so preload ANTON, not the
+               image. Latin subset only; latin-ext is unicode-range gated and
+               a typical visitor never fetches it.
+               <link rel="preload" href="/fonts/anton-latin.woff2" as="font"
+                     type="font/woff2" crossorigin>
+               Leave the image without preload.
+
+         Do not do both. -->
   </head>
   <body>
     <div id="root"></div>
