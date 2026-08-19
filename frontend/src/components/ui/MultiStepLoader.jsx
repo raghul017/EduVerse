@@ -1,5 +1,7 @@
 import React from "react";
-import { AnimatePresence, motion } from "motion/react";
+// framer-motion, not "motion/react": they are the same library under two
+// package names, and importing both bundled it twice.
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../lib/utils.js";
 
 const CheckFilled = ({ className }) => (

@@ -6,12 +6,22 @@
  * WebP and a downscaled PNG fallback at four widths. The browser picks one via
  * <picture>; see components/landing/ResponsiveImage.jsx.
  *
- * ZERO NEW DEPENDENCIES BY DESIGN. Uses macOS `sips` (AVIF + PNG resize) and
- * Homebrew `cwebp` (WebP), both already present. sharp would be the portable
- * choice but it is a ~10MB native install and this project did not have it.
- * The tradeoff: this script is macOS-only. It degrades safely -- if the tools
- * or the source files are missing it warns and exits 0, so `npm run build`
- * never fails because a designer has not dropped a screenshot in yet.
+ * MACOS-ONLY, AND THAT IS WHY THE OUTPUT IS COMMITTED.
+ * Uses macOS `sips` (AVIF + PNG resize) and Homebrew `cwebp`, both already
+ * present, so no new dependency. sharp would be portable but is a ~10MB
+ * native install this project did not have.
+ *
+ * The catch: Vercel builds on Linux, where `sips` does not exist. If the
+ * derivatives were gitignored, production would silently ship no AVIF and no
+ * WebP, <picture> would fall through to the 529 kB PNG, and the regression
+ * would pass every local check. So public/media/gen/ IS COMMITTED. The source
+ * changes almost never, the derivatives are ~95 kB per slot, and a committed
+ * artifact cannot fail to exist on a machine that cannot rebuild it.
+ *
+ * Consequence: run `npm run build:images` and commit the result whenever a
+ * source image changes. CI verifies rather than regenerates -- see the
+ * --check flag below, which the build uses on non-macOS so a missing or
+ * stale derivative fails loudly instead of silently degrading.
  *
  * WIDTHS: 720 / 1080 / 1440 / 2160. These key off the `sizes` attribute and
  * DPR (1x, 1.5x, 2x), NOT off measured render dimensions, so a layout tweak
@@ -57,16 +67,40 @@ if (sources.length === 0) {
 
 const hasSips = have("sips");
 const hasCwebp = have("cwebp");
+
+// On any machine that cannot encode (Linux CI, Vercel), do not silently skip:
+// VERIFY that the committed derivatives are present for every source, and fail
+// the build if they are not. Silently shipping the PNG fallback is exactly the
+// regression this guards against.
 if (!hasSips) {
-  console.warn("[images] `sips` not found (macOS only). Skipping image build.");
+  const missing = [];
+  for (const file of sources) {
+    const name = basename(file, extname(file));
+    for (const w of WIDTHS) {
+      for (const ext of ["avif", "webp"]) {
+        const f = join(OUT_DIR, `${name}-${w}.${ext}`);
+        if (!existsSync(f)) missing.push(f);
+      }
+    }
+  }
+  if (missing.length) {
+    console.error(
+      `[images] Cannot encode here (no \`sips\`, macOS only) and ${missing.length} ` +
+      `committed derivative(s) are missing, e.g. ${missing[0]}.\n` +
+      `[images] Run \`npm run build:images\` on macOS and commit public/media/gen/.`
+    );
+    process.exit(1);
+  }
+  console.log(`[images] No encoder here; verified ${sources.length} source(s) have committed derivatives.`);
   process.exit(0);
 }
 if (!hasCwebp) {
   console.warn("[images] `cwebp` not found. WebP output will be skipped.");
 }
 
-rmSync(OUT_DIR, { recursive: true, force: true });
 mkdirSync(OUT_DIR, { recursive: true });
+const TMP_DIR = join(OUT_DIR, ".tmp");
+mkdirSync(TMP_DIR, { recursive: true });
 
 const kb = (p) => Math.round(statSync(p).size / 1024);
 let emitted = 0;
@@ -76,8 +110,11 @@ for (const file of sources) {
   const name = basename(file, extname(file));
 
   for (const w of WIDTHS) {
-    const png = join(OUT_DIR, `${name}-${w}.png`);
-    // sips resamples on the long edge; our sources are landscape, so width.
+    // Intermediate only. PNG derivatives are NOT kept: AVIF and WebP cover
+    // ~96% of browsers, and the untouched source PNG is the <img> fallback for
+    // the rest. Keeping four PNG sizes would add ~2.1 MB per slot to the repo
+    // for a case the source already handles.
+    const png = join(TMP_DIR, `${name}-${w}.png`);
     execFileSync("sips", ["-s", "format", "png", "--resampleWidth", String(w), src, "--out", png], { stdio: "ignore" });
 
     const avif = join(OUT_DIR, `${name}-${w}.avif`);
@@ -90,9 +127,10 @@ for (const file of sources) {
       webpSize = `${kb(webp)}KB`;
       emitted++;
     }
-    emitted += 2;
-    console.log(`[images] ${name} ${String(w).padStart(4)}w  avif ${String(kb(avif)).padStart(4)}KB  webp ${webpSize.padStart(6)}  png ${String(kb(png)).padStart(4)}KB`);
+    emitted += 1;
+    console.log(`[images] ${name} ${String(w).padStart(4)}w  avif ${String(kb(avif)).padStart(4)}KB  webp ${webpSize.padStart(6)}`);
   }
 }
 
+rmSync(TMP_DIR, { recursive: true, force: true });
 console.log(`[images] ${emitted} files written to ${OUT_DIR}`);

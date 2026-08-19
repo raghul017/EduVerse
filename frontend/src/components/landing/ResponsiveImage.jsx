@@ -43,6 +43,10 @@ export default function ResponsiveImage({
   const [failed, setFailed] = useState(false);
   const base = `/media/gen/${name}`;
   const set = (ext) => WIDTHS.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
+  // NOTE: public/media/gen/ is COMMITTED, not gitignored. The encoder is
+  // macOS-only and Vercel builds on Linux, so a gitignored derivative would
+  // silently not exist in production and <picture> would fall through to the
+  // full-size PNG. See scripts/build-images.mjs.
 
   return (
     <div className={`relative overflow-hidden bg-dark ${aspect} ${className}`}>
@@ -50,10 +54,12 @@ export default function ResponsiveImage({
         <picture>
           <source type="image/avif" srcSet={set("avif")} sizes={sizes} />
           <source type="image/webp" srcSet={set("webp")} sizes={sizes} />
+          {/* Fallback is the untouched source PNG, not a derivative. AVIF and
+              WebP cover ~96% of browsers; committing four PNG sizes per slot
+              would add ~2.1 MB to the repo to serve the remaining few percent
+              a file the source already provides. */}
           <img
-            src={`${base}-1440.png`}
-            srcSet={set("png")}
-            sizes={sizes}
+            src={`/media/${name}.png`}
             alt={alt}
             width={width}
             height={height}

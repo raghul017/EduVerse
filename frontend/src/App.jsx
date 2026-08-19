@@ -1,10 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import MainLayout from "./layout/MainLayout.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import Loader from "./components/common/Loader.jsx";
 
 // Lazy load pages
+// MainLayout is lazy, not static. It imports framer-motion for its page
+// transitions, and a static import pulled that ~39 kB gzip into every route
+// including "/" -- which renders outside MainLayout and never uses it.
+const MainLayout = lazy(() => import("./layout/MainLayout.jsx"));
+
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Feed = lazy(() => import("./pages/Feed.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
