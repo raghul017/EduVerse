@@ -46,7 +46,14 @@
          purpose: preloading the wrong resource delays the real LCP element.
          See the note below. -->
 
-    <!-- LCP DECISION, PENDING MEASUREMENT IN A REAL BROWSER.
+    <!-- TODO(lcp): DELETE THE LOSING BRANCH BELOW ONCE MEASURED.
+         Decided by: DevTools > Performance > record a reload on "/", read
+         which element the LCP marker names. Exactly one branch is applied and
+         the other is deleted from this file. These must not sit here commented
+         out indefinitely; a commented block that nobody deletes reads as an
+         unfinished decision to the next person.
+
+         LCP DECISION, PENDING MEASUREMENT IN A REAL BROWSER.
          Headless Chrome in this environment emits no LCP entries at all
          (verified with a 120px <h1> control page), so this has to be measured
          by hand: DevTools > Performance > record a reload, read the LCP marker.
