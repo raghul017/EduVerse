@@ -8,7 +8,9 @@
     "build": "node scripts/build-images.mjs && vite build",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.{js,jsx}\" --max-warnings=0",
-    "build:images": "node scripts/build-images.mjs"
+    "build:images": "node scripts/build-images.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "verify": "npm run build && node scripts/smoke.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
