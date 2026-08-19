@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-images.mjs && vite build",
     "preview": "vite preview",
-    "lint": "eslint \"src/**/*.{js,jsx}\" --max-warnings=0"
+    "lint": "eslint \"src/**/*.{js,jsx}\" --max-warnings=0",
+    "build:images": "node scripts/build-images.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

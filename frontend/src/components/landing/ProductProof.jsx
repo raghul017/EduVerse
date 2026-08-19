@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import MediaSlot from "./MediaSlot.jsx";
+import ResponsiveImage from "./ResponsiveImage.jsx";
 
 /**
  * SECTION 4 -- product proof.
@@ -33,11 +33,17 @@ import MediaSlot from "./MediaSlot.jsx";
  * approximated product interface. See skill 4.8 and 9.E.
  */
 
-// TODO: replace with the real capture once frontend/public/media/roadmap-generator.png
-// exists. Spec: 1440x900 logical at DPR 2 (2880x1800), Frontend Developer
-// roadmap, complete, 2-3 nodes marked done, resource sidebar open, scrolled
-// past the header chrome. PNG, max 1.2MB.
-const SHOT = "/media/roadmap-generator.png";
+// TODO: drop the real capture at frontend/public/media/roadmap-generator.png.
+// Spec: 1440x900 logical at DPR 2 (2880x1800), Frontend Developer roadmap,
+// complete, 2-3 nodes marked done, resource sidebar open, scrolled past the
+// header chrome. PNG, max 1.2MB. `npm run build` derives AVIF/WebP/PNG at
+// 720/1080/1440/2160 from it; nothing else needs to change.
+const SHOT = "roadmap-generator";
+
+// The panel is inset from the page gutter, so it is never full viewport width.
+// Keyed off viewport breakpoints and the gutter, not measured dimensions.
+const SIZES =
+  "(min-width: 1440px) 1352px, (min-width: 768px) calc(100vw - 96px), calc(100vw - 32px)";
 
 export default function ProductProof() {
   const scope = useRef(null);
@@ -97,8 +103,9 @@ export default function ProductProof() {
         >
           {/* 16:10, matching the 1440x900 capture, so the slot and the asset
               agree and nothing is cropped by surprise. */}
-          <MediaSlot
-            src={SHOT}
+          <ResponsiveImage
+            name={SHOT}
+            sizes={SIZES}
             alt="The EduVerse roadmap generator showing a Frontend Developer path, with completed steps marked and curated resources open for one step."
             slotPath="public/media/roadmap-generator.png"
             note="Real screenshot of the roadmap generator goes here. No mock UI is rendered in its place."

@@ -15,14 +15,13 @@ import MarqueeBand from "../components/landing/MarqueeBand.jsx";
 import OriginStory from "../components/landing/OriginStory.jsx";
 import Testimonials from "../components/landing/Testimonials.jsx";
 import CommunityGrid from "../components/landing/CommunityGrid.jsx";
-import Newsletter from "../components/landing/Newsletter.jsx";
 import SiteFooter from "../components/landing/SiteFooter.jsx";
 
 /**
  * EduVerse landing page. This is the "/" route.
  *
  * It renders OUTSIDE MainLayout (see App.jsx) because it carries its own
- * navigation and, once section 13 lands, its own footer. Rendering it inside
+ * navigation and its own footer. Rendering it inside
  * MainLayout would stack the app Navbar above LandingNav, and MainLayout's
  * container padding would break the full-bleed sections.
  *
@@ -38,8 +37,13 @@ import SiteFooter from "../components/landing/SiteFooter.jsx";
  *   9  origin story          OriginStory
  *  10  dark testimonials     Testimonials    EB Garamond lives here only
  *  11  community grid        CommunityGrid
- *  12  newsletter            Newsletter
- *  13  footer                SiteFooter      two-line EDU / VERSE wordmark
+ *  12  footer                SiteFooter      two-line EDU / VERSE wordmark
+ *
+ * The newsletter that previously sat at 12 is REMOVED, not disabled. It posted
+ * nowhere, and a form on a live page that silently does nothing is worse than
+ * no form. Whether EduVerse sends email is a product decision, not a landing
+ * page one. Section 11's "Join a community" and the footer already carry the
+ * follow-up action. Twelve sections, renumbered.
  *
  * The placeholder logo strip that previously sat at 4 is DELETED, not
  * deferred. Six invented monograms were doing no work, and the slot is better
@@ -83,7 +87,6 @@ export default function Home() {
         <OriginStory />
         <Testimonials />
         <CommunityGrid />
-        <Newsletter />
       </main>
       <SiteFooter />
     </div>
