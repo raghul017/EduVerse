@@ -108,6 +108,22 @@ export default defineConfig(({ mode }) => {
            * NOT use react-markdown (AI chat/tutor only), axios (API layer),
            * date-fns (post timestamps) or framer-motion (MainLayout page
            * transitions, which the landing route sits outside of).
+           *
+           * KNOWN, TRIAGED, DO NOT RE-INVESTIGATE WITHOUT NEW INFORMATION:
+           * markdown-vendor (~35 kB gzip) still loads on "/". Ruled out:
+           *   - not an import-surface problem. There are ZERO barrel files in
+           *     src/, and tracing the full landing graph from Home.jsx gives
+           *     20 local modules with no markdown import anywhere in it.
+           *   - not a manualChunks matcher gap. Enumerating all 51 packages in
+           *     the react-markdown tree by name did not break the edge.
+           *   - not a modulePreload issue. Filtering it out of the entry
+           *     preload did not stop it loading.
+           * The remaining edge is react/jsx-runtime, which
+           * hast-util-to-jsx-runtime shares with React itself, so the chunk
+           * stays reachable from a preloaded chunk no matter how it is split.
+           * Fixing it means either a custom Rollup plugin or dropping
+           * react-markdown from the three routes that use it. Neither is worth
+           * 35 kB. Left deliberately.
            */
           manualChunks(id) {
             if (!id.includes('node_modules')) return;
