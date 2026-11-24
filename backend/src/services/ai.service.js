@@ -233,45 +233,33 @@ class AIService {
   async callGemini(prompt) {
     if (!this.genAI) throw new Error("Gemini API key not configured");
 
-    try {
-      // Note: Google AI SDK currently uses v1beta endpoint which has limited model availability
-      // If this fails, Groq will be used as the primary provider
-      // You can get Gemini working by using the REST API directly or waiting for SDK updates
+    // The old list (gemini-1.5-pro, gemini-1.5-flash, gemini-pro) names models
+    // Google has retired, so the fallback failed every time. Model names
+    // churn, so they come from env: GEMINI_MODEL takes a comma-separated list
+    // tried in order. Check https://ai.google.dev/gemini-api/docs/models when
+    // this starts failing again.
+    const models = (process.env.GEMINI_MODEL || "gemini-2.5-flash,gemini-2.0-flash")
+      .split(",")
+      .map((m) => m.trim())
+      .filter(Boolean);
 
-      const models = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro"];
-
-      let lastError = null;
-      for (const modelName of models) {
-        try {
-          const model = this.genAI.getGenerativeModel({ model: modelName });
-          const result = await model.generateContent(prompt);
-          const response = await result.response;
-          const text = response.text();
-          if (text && text.trim().length > 0) {
-            console.log(`[AI Service] Gemini success with model: ${modelName}`);
-            return text;
-          }
-        } catch (err) {
-          lastError = err;
-          // Only log error for the last model to reduce noise
-          if (modelName === models[models.length - 1]) {
-            console.warn(
-              `[AI Service] All Gemini models failed. This is expected - Groq will be used instead.`
-            );
-          }
-          continue;
+    let lastError = null;
+    for (const modelName of models) {
+      try {
+        const model = this.genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        if (text && text.trim().length > 0) {
+          console.log(`[AI Service] Gemini success with model: ${modelName}`);
+          return text;
         }
+      } catch (err) {
+        lastError = err;
+        console.warn(`[AI Service] Gemini model ${modelName} failed: ${err.message}`);
       }
-      throw (
-        lastError ||
-        new Error(
-          "Gemini models not available on v1beta endpoint. Using Groq as primary provider."
-        )
-      );
-    } catch (error) {
-      // Don't log as error since Groq is working fine
-      throw new Error(`Gemini unavailable (v1beta API limitation)`);
     }
+    // Surface the real reason instead of a generic "unavailable".
+    throw new Error(`Gemini failed: ${lastError?.message || "empty response"}`);
   }
 
   async callAI(prompt, priority = "fast") {
@@ -717,12 +705,12 @@ Return ONLY valid JSON (no markdown) with this structure:
           "id": "lesson-id",
           "title": "Lesson Title",
           "duration": "20 min",
-          "theory": "## Introduction\\n[Engaging introduction to the topic]\\n\\n## Key Concepts\\n### [Concept 1]\\n[Detailed explanation]\\n\\n### [Concept 2]\\n[Detailed explanation]\\n\\n## Real-world Example\\n[Practical application or code snippet]\\n\\n## Summary\\n[Key takeaways]\\n\\n(Total approx 400 words)",
+          "theory": "## Key Concepts\\n[Concise explanation]\\n\\n## Example\\n[Short practical example]\\n\\n## Takeaways\\n- [Point]\\n- [Point]",
           "articles": [
-            { "title": "Deep Dive Article", "url": "https://example.com/article", "type": "article" }
+            { "title": "Article title", "url": "https://real-site.com/path", "type": "article" }
           ],
           "links": [
-            { "title": "Reference Doc", "url": "https://example.com/resource" }
+            { "title": "Reference doc title", "url": "https://real-site.com/docs" }
           ]
         }
       ]
@@ -731,10 +719,15 @@ Return ONLY valid JSON (no markdown) with this structure:
 }
 
 Requirements:
-1. Create 3 modules, each with 3 lessons (Total ~9 lessons).
-2. 'theory' MUST be a high-quality, structured markdown article (approx 400 words).
-3. Use headers (##, ###), bullet points, and code blocks where relevant.
-4. Ensure 'articles' and 'links' are relevant and realistic.`;
+1. Create 3 modules, each with 3 lessons (9 lessons total).
+2. 'theory' is a structured markdown mini-article of 120-160 words. Use ## headings, bullet points, and a short code block only if the topic is technical.
+3. At most 1 article and 1 link per lesson, from real, well-known sites.
+4. Output ONLY the JSON object. The whole response must stay well under 3000 tokens.`;
+    // WHY 120-160 WORDS: the previous prompt asked for 9 x 400 words in one
+    // response with max_tokens 4096. That is ~5000 tokens of prose before any
+    // JSON, so the reply was cut off mid-string, JSON.parse failed, and the
+    // user got the offline fallback almost every time. 9 x ~150 words plus
+    // structure lands near 2500-3000 tokens, inside the cap.
 
     try {
       const aiResponse = await this.callAIWithRetry(prompt, "balanced");

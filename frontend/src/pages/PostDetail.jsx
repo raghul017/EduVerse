@@ -7,8 +7,8 @@ import {
 import VideoPlayer from "../components/feed/VideoPlayer.jsx";
 import AISummary from "../components/ai/AISummary.jsx";
 import AIChat from "../components/ai/AIChat.jsx";
+import AIFlashcards from "../components/ai/AIFlashcards.jsx";
 import api from "../utils/api.js";
-import { usePostStore } from "../store/postStore.js";
 import { useAuthStore } from "../store/authStore.js";
 
 function PostDetail() {
@@ -17,7 +17,6 @@ function PostDetail() {
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { toggleLike, toggleBookmark } = usePostStore();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -35,24 +34,42 @@ function PostDetail() {
     loadPost();
   }, [id]);
 
-  const handleLike = async () => {
+  // Like/bookmark act on THIS page's post, not the feed store. The store
+  // version looked the post up in the feed list; when the video was opened
+  // directly (shared link, refresh) it wasn't there, so every click sent
+  // "like" and unliking was impossible.
+  const toggleReaction = async (field, countField, endpoint) => {
+    const wasOn = Boolean(post[field]);
+    const previous = post;
+    setPost((p) => ({
+      ...p,
+      [field]: !wasOn,
+      ...(countField && {
+        [countField]: Math.max(0, Number(p[countField] || 0) + (wasOn ? -1 : 1)),
+      }),
+    }));
+    try {
+      if (wasOn) await api.delete(`/posts/${post.id}/${endpoint}`);
+      else await api.post(`/posts/${post.id}/${endpoint}`);
+    } catch {
+      setPost(previous);
+    }
+  };
+
+  const handleLike = () => {
     if (!user) {
       alert('Please login to like videos');
       return;
     }
-    await toggleLike(post.id);
-    const { data } = await api.get(`/posts/${id}`);
-    setPost(data.data);
+    toggleReaction('liked', 'likes_count', 'like');
   };
 
-  const handleBookmark = async () => {
+  const handleBookmark = () => {
     if (!user) {
       alert('Please login to bookmark videos');
       return;
     }
-    await toggleBookmark(post.id);
-    const { data } = await api.get(`/posts/${id}`);
-    setPost(data.data);
+    toggleReaction('bookmarked', 'bookmarks_count', 'bookmark');
   };
 
   const handleShare = async () => {

@@ -28,14 +28,22 @@ function AiTutor() {
     setLoading(true);
 
     try {
-        const history = messages.slice(-6).map(m => `${m.role}: ${m.content}`).join('\n');
+        // The API caps context at 4000 chars. Keep the most recent end of
+        // the conversation, which is the part the follow-up refers to.
+        const history = messages
+            .slice(-6)
+            .map(m => `${m.role}: ${m.content}`)
+            .join('\n')
+            .slice(-3800);
         const { data } = await api.post("/paths/ai-chat", {
             message: userMsg,
             context: history
         });
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
     } catch (err) {
-        setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now." }]);
+        // Show the server's reason when it gave one (too long, rate limited).
+        const reason = err.response?.data?.message;
+        setMessages(prev => [...prev, { role: 'assistant', content: reason || "Sorry, I'm having trouble connecting right now." }]);
     } finally {
         setLoading(false);
     }

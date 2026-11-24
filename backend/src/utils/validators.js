@@ -1,4 +1,15 @@
-import { body, param } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
+
+// Runs after a validator chain and rejects the request with the first error.
+// Without this, a validator chain only records errors and lets the request
+// through, which is how the AI validators below sat unused.
+export const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ message: errors.array()[0].msg });
+  }
+  next();
+};
 
 export const signupValidator = [
   body('name').isLength({ min: 2 }).withMessage('Name is required'),
@@ -38,30 +49,57 @@ export const aiExplainValidator = [
     .escape()
 ];
 
+// trim() runs BEFORE the length check, so "  a  " is rejected as too short.
 export const aiRoadmapValidator = [
   body('role')
-    .isLength({ min: 2, max: 100 })
-    .withMessage('Role must be between 2 and 100 characters')
+    .isString()
+    .withMessage('Role is required')
     .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Role must be between 2 and 100 characters'),
+  body('detailLevel')
+    .optional()
+    .isIn(['quick', 'standard', 'comprehensive'])
+    .withMessage('detailLevel must be quick, standard or comprehensive')
 ];
 
 export const aiCourseValidator = [
   body('topic')
+    .isString()
+    .withMessage('Topic is required')
+    .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('Topic must be between 2 and 100 characters')
-    .trim()
 ];
 
+// context carries recent chat history from the AI Tutor, so it needs more
+// room than a single message. The client trims it to fit.
 export const aiChatValidator = [
   body('message')
-    .isLength({ min: 1, max: 1000 })
-    .withMessage('Message must be between 1 and 1000 characters')
-    .trim(),
-  body('context')
-    .optional()
-    .isLength({ max: 500 })
-    .withMessage('Context must be less than 500 characters')
+    .isString()
+    .withMessage('Message is required')
     .trim()
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Message must be between 1 and 1000 characters'),
+  body('context')
+    .optional({ nullable: true })
+    .isString()
+    .isLength({ max: 4000 })
+    .withMessage('Context must be less than 4000 characters')
+];
+
+export const aiResourcesValidator = [
+  body('topic')
+    .isString()
+    .withMessage('Topic is required')
+    .trim()
+    .isLength({ min: 2, max: 200 })
+    .withMessage('Topic must be between 2 and 200 characters'),
+  body('context')
+    .optional({ nullable: true })
+    .isString()
+    .isLength({ max: 1000 })
+    .withMessage('Context must be less than 1000 characters')
 ];
 
 // Sanitization helper for AI prompts - removes potentially harmful patterns

@@ -9,11 +9,14 @@ export const UserModel = {
        VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, bio, interests, role`,
       [name, email, passwordHash, bio, interests]
     ).then((res) => res.rows[0]),
+  // Never SELECT users.* here: this feeds the public profile endpoint, and
+  // users.* includes password_hash.
   findById: (id) =>
     query(
-      `SELECT users.*, 
-        (SELECT COUNT(*) FROM follows WHERE following_id = users.id) as followers_count,
-        (SELECT COUNT(*) FROM follows WHERE follower_id = users.id) as following_count
+      `SELECT users.id, users.name, users.email, users.bio, users.interests,
+        users.role, users.created_at,
+        (SELECT COUNT(*)::int FROM follows WHERE following_id = users.id) as followers_count,
+        (SELECT COUNT(*)::int FROM follows WHERE follower_id = users.id) as following_count
        FROM users WHERE id = $1`,
       [id]
     ).then((res) => res.rows[0]),
@@ -45,10 +48,10 @@ export const PostModel = {
   list: ({ limit = 10, offset = 0, userId = null }) => {
     if (userId) {
       return query(
-        `SELECT posts.*, 
+        `SELECT posts.*,
          users.name as creator_name,
-         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
-         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         (SELECT COUNT(*)::int FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*)::int FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
          (SELECT COUNT(*) FROM likes WHERE post_id = posts.id AND user_id = $3) > 0 as liked,
          (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id AND user_id = $3) > 0 as bookmarked
          FROM posts
@@ -59,10 +62,10 @@ export const PostModel = {
       ).then((res) => res.rows);
     }
     return query(
-      `SELECT posts.*, 
+      `SELECT posts.*,
        users.name as creator_name,
-       (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
-       (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+       (SELECT COUNT(*)::int FROM likes WHERE post_id = posts.id) as likes_count,
+       (SELECT COUNT(*)::int FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
        false as liked,
        false as bookmarked
        FROM posts

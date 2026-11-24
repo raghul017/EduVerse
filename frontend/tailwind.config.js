@@ -1,3 +1,5 @@
+import typography from "@tailwindcss/typography";
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -49,5 +51,8 @@ export default {
       },
     }
   },
-  plugins: [],
+  // typography provides the `prose` classes that AI Tutor, AI Course and the
+  // roadmap chat use to render markdown. Without it those classes did nothing
+  // and AI answers showed as flat text: no heading sizes, no list bullets.
+  plugins: [typography],
 };
