@@ -41,7 +41,7 @@ function Profile() {
       setProfile((prev) => ({
         ...prev,
         following: !prev.following,
-        followers_count: prev.followers_count + (prev.following ? -1 : 1)
+        followers_count: Math.max(0, Number(prev.followers_count || 0) + (prev.following ? -1 : 1))
       }));
     } catch {
       // NOOP
@@ -166,7 +166,9 @@ function Profile() {
               <div className="glass-panel-subtle rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/5">
                 <EditProfile
                   profile={profile}
-                  onUpdated={(nextProfile) => setProfile(nextProfile)}
+                  // Merge: the update endpoint returns only the edited fields,
+                  // so replacing wiped posts and follower counts from the page.
+                  onUpdated={(nextProfile) => setProfile((prev) => ({ ...prev, ...nextProfile }))}
                 />
               </div>
             </div>

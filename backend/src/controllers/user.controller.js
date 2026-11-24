@@ -26,9 +26,14 @@ export const getProfile = async (req, res, next) => {
       following = follow.rowCount > 0;
     }
 
+    // Email is private: only the profile's owner gets it back.
+    const isOwner = req.user?.id === user.id;
+    const { email, ...publicFields } = user;
+
     res.json({
       data: {
-        ...user,
+        ...publicFields,
+        ...(isOwner && { email }),
         posts,
         following
       }

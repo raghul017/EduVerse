@@ -38,8 +38,8 @@ export const getPost = async (req, res, next) => {
       post = await query(
         `SELECT posts.*,
          users.name as creator_name,
-         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
-         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         (SELECT COUNT(*)::int FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*)::int FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
          (SELECT COUNT(*) FROM likes WHERE post_id = posts.id AND user_id = $2) > 0 as liked,
          (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id AND user_id = $2) > 0 as bookmarked
          FROM posts
@@ -51,8 +51,8 @@ export const getPost = async (req, res, next) => {
       post = await query(
         `SELECT posts.*,
          users.name as creator_name,
-         (SELECT COUNT(*) FROM likes WHERE post_id = posts.id) as likes_count,
-         (SELECT COUNT(*) FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
+         (SELECT COUNT(*)::int FROM likes WHERE post_id = posts.id) as likes_count,
+         (SELECT COUNT(*)::int FROM bookmarks WHERE post_id = posts.id) as bookmarks_count,
          false as liked,
          false as bookmarked
          FROM posts

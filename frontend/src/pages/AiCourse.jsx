@@ -273,7 +273,7 @@ function AiCourse() {
              <div className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#0a0a0a]/50 backdrop-blur-md z-10">
                 <div className="flex items-center gap-4">
                   <span className="text-gray-500 font-mono text-sm uppercase tracking-wide">
-                     MODULE {modules.findIndex(m => m.lessons.includes(activeLesson)) + 1} / LESSON
+                     MODULE {modules.findIndex(m => m.lessons?.includes(activeLesson)) + 1} / LESSON
                   </span>
                   <div className="h-4 w-px bg-white/10" />
                   <h2 className="text-white font-bold text-sm truncate max-w-md">
@@ -306,8 +306,9 @@ function AiCourse() {
                               <ReactMarkdown>{activeLesson.theory}</ReactMarkdown>
                             ) : (
                                <div className="text-gray-500 italic">
-                                 <p className="mb-4">Content is generating...</p>
-                                 <p>{activeLesson.description || "Select a lesson to view its content."}</p>
+                                 {/* Nothing is generating at this point: the course arrives whole.
+                                     Saying so used to leave people waiting on a spinner that never ends. */}
+                                 <p>{activeLesson.description || "The AI didn't return content for this lesson. Try regenerating the course."}</p>
                                </div>
                             )}
                          </article>

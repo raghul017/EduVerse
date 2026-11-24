@@ -173,7 +173,12 @@ function RoadmapGenerator() {
   // Auto-generate roadmap when role query parameter is present
   useEffect(() => {
     const roleParam = searchParams.get("role");
-    const detailParam = searchParams.get("detail") || "standard";
+    // Saved roadmaps used to link with detail=undefined. The API now rejects
+    // unknown levels, so anything outside the allowed set falls back.
+    const rawDetail = searchParams.get("detail");
+    const detailParam = ["quick", "standard", "comprehensive"].includes(rawDetail)
+      ? rawDetail
+      : "standard";
     if (roleParam && !hasGeneratedRef.current) {
       setTopic(roleParam);
       hasGeneratedRef.current = true;
@@ -280,7 +285,13 @@ function RoadmapGenerator() {
       }
     } catch (error) {
       console.error("Error generating roadmap:", error);
-      setError(error.message || "Failed to generate roadmap. Please try again.");
+      // Prefer the API's message ("Too many AI requests...") over axios's
+      // generic "Request failed with status code 429".
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to generate roadmap. Please try again."
+      );
     } finally {
       setLoading(false);
     }

@@ -18,8 +18,10 @@ export const usePostStore = create((set, get) => ({
         transcript_ready: Boolean(post.transcript && post.transcript.length > 20),
         liked: post.liked || false,
         bookmarked: post.bookmarked || false,
-        likes_count: post.likes_count || 0,
-        bookmarks_count: post.bookmarks_count || 0
+        // Postgres COUNT() arrives as a string unless cast; coerce so the
+        // optimistic +1 below adds instead of concatenating ("3" + 1 = "31").
+        likes_count: Number(post.likes_count) || 0,
+        bookmarks_count: Number(post.bookmarks_count) || 0
       }));
       const nextPosts = reset ? normalized : [...get().posts, ...normalized];
       set({
@@ -45,7 +47,7 @@ export const usePostStore = create((set, get) => ({
         ? {
             ...post,
             liked: !post.liked,
-            likes_count: Math.max(0, post.likes_count + (post.liked ? -1 : 1))
+            likes_count: Math.max(0, Number(post.likes_count || 0) + (post.liked ? -1 : 1))
           }
         : post
     );

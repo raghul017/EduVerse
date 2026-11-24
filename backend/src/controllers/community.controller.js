@@ -39,19 +39,21 @@ export const listCommunities = async (req, res, next) => {
 
 export const getCommunityPosts = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    // userId is a bound parameter, never interpolated into the SQL string.
+    // When it is null the user_vote subquery simply matches nothing.
+    const userId = req.user?.id || null;
     const posts = await query(
-      `SELECT cp.*, 
+      `SELECT cp.*,
               u.name as user_name,
-              (SELECT COUNT(*) FROM community_post_likes WHERE post_id = cp.id AND is_like = true) as upvotes,
-              (SELECT COUNT(*) FROM community_post_likes WHERE post_id = cp.id AND is_like = false) as downvotes,
-              (SELECT COUNT(*) FROM community_post_comments WHERE post_id = cp.id) as comments_count,
-              ${userId ? `(SELECT is_like FROM community_post_likes WHERE post_id = cp.id AND user_id = '${userId}') as user_vote` : 'NULL as user_vote'}
-       FROM community_posts cp 
-       JOIN users u ON u.id = cp.user_id 
-       WHERE cp.community_id = $1 
+              (SELECT COUNT(*)::int FROM community_post_likes WHERE post_id = cp.id AND is_like = true) as upvotes,
+              (SELECT COUNT(*)::int FROM community_post_likes WHERE post_id = cp.id AND is_like = false) as downvotes,
+              (SELECT COUNT(*)::int FROM community_post_comments WHERE post_id = cp.id) as comments_count,
+              (SELECT is_like FROM community_post_likes WHERE post_id = cp.id AND user_id = $2::uuid) as user_vote
+       FROM community_posts cp
+       JOIN users u ON u.id = cp.user_id
+       WHERE cp.community_id = $1
        ORDER BY cp.created_at DESC`,
-      [req.params.id]
+      [req.params.id, userId]
     ).then((result) => result.rows);
     res.json({ data: posts });
   } catch (error) {

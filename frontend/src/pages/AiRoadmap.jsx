@@ -96,9 +96,11 @@ function AiRoadmap() {
     }
   };
 
-  const handleRoadmapClick = (roadmap, level = detailLevel) => {
+  const handleRoadmapClick = (roadmap, level) => {
     const encodedRole = encodeURIComponent(roadmap);
-    navigate(`/roadmap?role=${encodedRole}&detail=${level}`);
+    // Saved roadmaps have no detail_level column, so `level` is often
+    // undefined; never put "undefined" in the URL.
+    navigate(`/roadmap?role=${encodedRole}&detail=${level || detailLevel}`);
   };
 
   const handleVanishSubmit = (e, value) => {

@@ -17,10 +17,11 @@ export const uploadVideoBuffer = async (buffer, filename, mimetype) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
+        // No public_id: Cloudinary generates a unique one. Deriving it from
+        // the filename let two users' "lecture.mp4" overwrite each other.
         resource_type: 'video',
         folder: 'eduverse',
-        public_id: filename.replace(/\.[^.]+$/, ''), // Remove extension
-        overwrite: true
+        overwrite: false
       },
       (error, result) => {
         if (error) return reject(error);
@@ -46,11 +47,11 @@ export const uploadVideoFile = async (filePath, originalName) => {
   }
   
   try {
+    // No public_id: see uploadVideoBuffer. Unique IDs prevent overwrites.
     const result = await cloudinary.uploader.upload(filePath, {
       resource_type: 'video',
       folder: 'eduverse',
-      public_id: originalName.replace(/\.[^.]+$/, ''), // Remove extension
-      overwrite: true
+      overwrite: false
     });
     
     return {
